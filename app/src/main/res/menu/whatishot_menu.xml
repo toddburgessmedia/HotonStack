@@ -1,0 +1,43 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_searchalltime"
+        android:title="@string/show_all_time"
+        android:orderInCategory="100"
+        />
+    <item
+        android:id="@+id/menu_searchtoday"
+        android:title="@string/show_today"
+        android:orderInCategory="500"
+        />
+    <item
+        android:id="@+id/menu_searchyesterday"
+        android:orderInCategory="400"
+        android:title="@string/show_since_yesterday"
+        />
+    <item
+        android:id="@+id/menu_searchthismonth"
+        android:orderInCategory="300"
+        android:title="@string/show_this_month"
+        />
+    <item
+        android:id="@+id/menu_searchthisyear"
+        android:orderInCategory="200"
+        android:title="@string/show_this_year"
+    />
+
+    <item
+        android:orderInCategory="0"
+        android:id="@+id/whats_hot_refresh"
+        android:title="@string/refresh"
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_gogithub"
+        android:orderInCategory="1"
+        android:title="GitHub PRojects"
+        android:icon="@drawable/ic_github"
+        app:showAsAction="always" />
+</menu>

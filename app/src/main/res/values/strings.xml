@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Hot on Stack</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- FAQ Question List Dialog -->
+    <string name="nothing_dialog_title">Nothing Found</string>
+    <string name="nothing_dialog_body">Your search term found nothing</string>
+    <string name="show_all_time">Show All Time</string>
+    <string name="show_today">Show Today</string>
+    <string name="show_this_month">Show This Month</string>
+    <string name="show_since_yesterday">Show Since Yesterday</string>
+    <string name="show_this_year">Show This Year</string>
+    <string name="refresh">Refresh</string>
+    <string name="nothing_ok_button">OK</string>
+    <string name="no_github_desc">No description available</string>
+
+</resources>
