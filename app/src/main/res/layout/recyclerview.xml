@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="4dp"
     >
 
     <GridLayout
@@ -35,9 +38,8 @@
         android:id="@+id/tag_rank"
         android:gravity="right"
         android:layout_centerHorizontal="true"
-        android:layout_marginRight="16sp"
         android:textSize="18sp"
 
         />
 
-</RelativeLayout>
+</android.support.v7.widget.CardView>

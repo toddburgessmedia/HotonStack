@@ -4,7 +4,9 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,14 +30,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity implements
-//        GestureDetector.OnGestureListener,
         SearchDialog.SearchDialogListener {
 
     public final static String TAG = "StackOverFlow";
 
     RecyclerView rv;
     RecyclerView.Adapter adapter;
+    StackOverFlowTags tags;
 
+    String tagcount;
     ProgressDialog progress;
 
     @Override
@@ -48,14 +51,34 @@ public class MainActivity extends AppCompatActivity implements
             rv.setHasFixedSize(true);
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.addItemDecoration(new SimpleDividerItemDecoration(this));
+        //rv.addItemDecoration(new SimpleDividerItemDecoration(this));
+
+        if (savedInstanceState != null) {
+            tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
+            if (tags != null) {
+                adapter = new StackTagsRecyclerView(tags.tags, getBaseContext());
+                rv.setAdapter(adapter);
+                return;
+            }
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        tagcount = prefs.getString("tagcount","100");
 
         progress = new ProgressDialog(this);
         progress.setMessage("Loading Tags");
         progress.show();
 
-        getTags();
+        getTags(tagcount);
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putSerializable("taglist",tags);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -73,7 +96,11 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
             case R.id.menu_refresh:
-                getTags();
+                getTags(tagcount);
+                break;
+            case R.id.menu_preferences:
+                Intent i = new Intent(this,PreferencesActivity.class);
+                startActivity(i);
                 break;
         }
         return true;
@@ -89,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void getTags() {
+    private void getTags(String tagcount) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.stackexchange.com")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -97,13 +124,13 @@ public class MainActivity extends AppCompatActivity implements
 
         StackOverFlowAPI stackOverFlowAPI = retrofit.create(StackOverFlowAPI.class);
 
-        Call<StackOverFlowTags> call = stackOverFlowAPI.loadquestions();
+        Call<StackOverFlowTags> call = stackOverFlowAPI.loadquestions(tagcount);
 
         call.enqueue(new Callback<StackOverFlowTags>() {
             @Override
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
-                StackOverFlowTags tags = response.body();
+                tags = response.body();
 
                 adapter = new StackTagsRecyclerView(tags.tags,getBaseContext());
                 rv.setAdapter(adapter);

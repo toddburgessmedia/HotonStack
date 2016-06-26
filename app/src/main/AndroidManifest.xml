@@ -26,7 +26,8 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".ListQuestionsActivity" />
-        <activity android:name=".GitHubActivity"></activity>
+        <activity android:name=".GitHubActivity" />
+        <activity android:name=".PreferencesActivity"></activity>
     </application>
 
 </manifest>

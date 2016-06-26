@@ -2,12 +2,13 @@ package com.toddburgessmedia.stackoverflowretrofit.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 24/06/16.
  */
-public class GitHubProjectCollection {
+public class GitHubProjectCollection implements Serializable {
 
     @SerializedName("items")
     private List<GitHubProject> projects;

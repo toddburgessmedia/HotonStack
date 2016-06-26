@@ -16,6 +16,7 @@
         android:orientation="horizontal"
         android:background="#000000"
         android:minWidth="16sp"
+        android:elevation="10dp"
         >
 
         <TextView

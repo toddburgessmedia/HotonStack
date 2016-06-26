@@ -40,6 +40,8 @@ public class ListQuestionsActivity extends AppCompatActivity {
     RecyclerView rv;
     RecycleViewFAQ adapter;
 
+    StackOverFlowFAQ faq;
+
     ProgressDialog progress;
 
     @Override
@@ -61,7 +63,6 @@ public class ListQuestionsActivity extends AppCompatActivity {
             startActivity(i);
             return true;
         }
-
 
         progress.show();
         switch (item.getItemId()) {
@@ -93,7 +94,6 @@ public class ListQuestionsActivity extends AppCompatActivity {
         return true;
     }
 
-    StackOverFlowFAQ faq;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,11 +114,28 @@ public class ListQuestionsActivity extends AppCompatActivity {
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
 
+        if (savedInstanceState != null) {
+            faq = (StackOverFlowFAQ) savedInstanceState.getSerializable("faqlist");
+            if (faq != null) {
+                adapter = new RecycleViewFAQ(faq.faq, getBaseContext());
+                rv.setAdapter(adapter);
+                return;
+            }
+        }
+
         progress = new ProgressDialog(this);
         progress.setMessage("Loading questions");
         progress.show();
 
         getQuestions(searchTag);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putSerializable("faqlist",faq);
+
+        super.onSaveInstanceState(outState);
     }
 
     private void getQuestions(String tag) {

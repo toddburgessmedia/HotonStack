@@ -4,13 +4,14 @@ import com.google.gson.annotations.SerializedName;
 
 import org.jsoup.Jsoup;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by tburgess on 07/06/16.
  */
-public class StackOverFlowFAQ {
+public class StackOverFlowFAQ implements Serializable {
 
     @SerializedName("items")
     public List<FAQTag> faq;
@@ -34,10 +35,6 @@ public class StackOverFlowFAQ {
 
         String[] q = new String[questions.size()];
         questions.toArray(q);
-//        for (int i = 0; i < questions.size(); i++) {
-//            q[i] = questions.get(i);
-//        }
-
         return q;
     }
 

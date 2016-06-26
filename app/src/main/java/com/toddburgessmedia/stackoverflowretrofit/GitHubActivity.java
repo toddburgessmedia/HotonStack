@@ -1,10 +1,7 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,7 +18,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class GitHubActivity extends AppCompatActivity {
+public class GitHubActivity extends AppCompatActivity implements NoLanguageFoundDialog.NothingFoundListener {
 
     String TAG = MainActivity.TAG;
     String searchTag;
@@ -42,17 +39,30 @@ public class GitHubActivity extends AppCompatActivity {
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
 
-        searchTag = getIntent().getStringExtra("title");
+        if (savedInstanceState != null) {
+            projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
+            if (projects != null) {
+                adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
+                rv.setAdapter(adapter);
+                return;
+            }
+        }
 
+        searchTag = getIntent().getStringExtra("title");
         progress = new ProgressDialog(this);
         progress.setMessage("Loading GitHub Projects");
         progress.show();
-        getProjects(searchTag);
-
+        getProjects(searchTag,true);
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
 
-    private void getProjects(String language) {
+        outState.putSerializable("savedprojects",projects);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void getProjects(String language,boolean langugesearch) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
@@ -61,24 +71,26 @@ public class GitHubActivity extends AppCompatActivity {
 
         GitHubProjectAPI projectAPI = retrofit.create(GitHubProjectAPI.class);
 
-        String qlanguage = "language:" + language;
+        String qlanguage;
+        if (langugesearch) {
+            qlanguage = "language:" + language;
+        } else {
+            qlanguage = language;
+        }
+
         Call<GitHubProjectCollection> call = projectAPI.getProjects(qlanguage);
 
         call.enqueue(new Callback<GitHubProjectCollection>() {
             @Override
             public void onResponse(Call<GitHubProjectCollection> call, Response<GitHubProjectCollection> response) {
                 projects = response.body();
-                Log.d(TAG, "onResponse: code" + response.headers());
-
-                Log.d(TAG, "onResponse: it worked");
 
                 progress.dismiss();
-                if  (response.code() != 200) {
-                    NothingFoundDialog nothing = new NothingFoundDialog();
+                if  ((response.code() != 200) || (projects==null)) {
+                    NoLanguageFoundDialog nothing = new NoLanguageFoundDialog();
                     nothing.show(getFragmentManager(),"nothing");
                     return;
                 }
-
 
                 adapter = new RecyclerViewGitHub(projects.getProjects(),getBaseContext());
                 rv.setAdapter(adapter);
@@ -91,25 +103,19 @@ public class GitHubActivity extends AppCompatActivity {
                 Log.d(TAG, "onFailure: it failed horribly. how embarassing");
             }
         });
-
     }
 
-    public static class NothingFoundDialog extends DialogFragment {
+    @Override
+    public void positiveClick(DialogFragment dialog) {
+        Log.d(TAG, "positiveClick: yo yo yo ");
 
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.nothing_dialog_title);
-            builder.setMessage(R.string.nothing_dialog_body);
-            builder.setNeutralButton(R.string.nothing_ok_button, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    getActivity().finish();
-                }
-            });
-
-            return builder.create();
-        }
+        progress.show();
+        getProjects(searchTag,false);
     }
+
+    @Override
+    public void negativeClick(DialogFragment dialog) {
+        finish();
+    }
+
 }

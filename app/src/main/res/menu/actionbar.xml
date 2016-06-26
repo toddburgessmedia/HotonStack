@@ -12,6 +12,11 @@
         android:icon="@drawable/ic_refresh"
         android:title="Refresh"
         android:orderInCategory="100"
-
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_preferences"
+        android:title="Preferences"
+        android:orderInCategory="300" />
+
 </menu>

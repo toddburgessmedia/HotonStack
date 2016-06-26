@@ -2,10 +2,12 @@ package com.toddburgessmedia.stackoverflowretrofit.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by tburgess on 07/06/16.
  */
-public class FAQTag {
+public class FAQTag implements Serializable {
 
     @SerializedName("title")
     public String title;
