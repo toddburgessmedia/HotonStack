@@ -65,19 +65,25 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         tagcount = prefs.getString("tagcount","100");
 
-        progress = new ProgressDialog(this);
-        progress.setMessage("Loading Tags");
-        progress.show();
+        startProgressDialog();
 
         getTags(tagcount);
 
+    }
+
+    private void startProgressDialog() {
+
+        if (progress == null) {
+            progress = new ProgressDialog(this);
+            progress.setMessage("Loading Tags");
+        }
+        progress.show();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
         outState.putSerializable("taglist",tags);
-
         super.onSaveInstanceState(outState);
     }
 
@@ -96,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 break;
             case R.id.menu_refresh:
+                startProgressDialog();
                 getTags(tagcount);
                 break;
             case R.id.menu_preferences:

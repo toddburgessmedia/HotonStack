@@ -89,6 +89,11 @@ public class ListQuestionsActivity extends AppCompatActivity {
             case R.id.whats_hot_refresh:
                 getQuestions(searchTag);
                 break;
+            case R.id.menu_meetup:
+                Intent i = new Intent(this,MeetupActivity.class);
+                i.putExtra("searchtag",searchTag);
+                startActivity(i);
+                break;
         }
 
         return true;

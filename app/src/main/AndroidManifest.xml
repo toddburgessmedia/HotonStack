@@ -3,6 +3,8 @@
     package="com.toddburgessmedia.stackoverflowretrofit">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -27,7 +29,16 @@
 
         <activity android:name=".ListQuestionsActivity" />
         <activity android:name=".GitHubActivity" />
-        <activity android:name=".PreferencesActivity"></activity>
+        <activity android:name=".PreferencesActivity" />
+        <activity android:name=".MeetupActivity" />
+        <activity android:name=".MeetupAuthActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="whatshotonstack" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
