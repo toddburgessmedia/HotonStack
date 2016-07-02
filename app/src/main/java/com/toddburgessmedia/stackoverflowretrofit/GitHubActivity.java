@@ -48,7 +48,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             }
         }
 
-        searchTag = getIntent().getStringExtra("title");
+        searchTag = getIntent().getStringExtra("name");
         progress = new ProgressDialog(this);
         progress.setMessage("Loading GitHub Projects");
         progress.show();

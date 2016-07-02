@@ -6,8 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
@@ -48,7 +46,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
                 }
 
                 Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
-                i.putExtra("title",tag);
+                i.putExtra("name",tag);
                 v.getContext().startActivity(i);
             }
         };
@@ -83,10 +81,10 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
 
         String r = Integer.valueOf(position+1).toString();
 
-        Animation animation = AnimationUtils.loadAnimation(context,
-                (position > lastPosition) ? R.anim.up_from_bottom
-                        : R.anim.down_from_top);
-        holder.itemView.startAnimation(animation);
+//        Animation animation = AnimationUtils.loadAnimation(context,
+//                (position > lastPosition) ? R.anim.up_from_bottom
+//                        : R.anim.down_from_top);
+//        holder.itemView.startAnimation(animation);
         lastPosition = position;
 
         switch (viewType) {

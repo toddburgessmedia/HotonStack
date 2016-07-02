@@ -15,4 +15,14 @@
     <string name="nothing_ok_button">OK</string>
     <string name="no_github_desc">No description available</string>
 
+    <string name="time_dialog_title">Select Time Period</string>
+    <string-array name="time_dialog">
+        <item>All Time</item>
+        <item>This Year</item>
+        <item>This Month</item>
+        <item>Since Yesterday</item>
+        <item>Today</item>
+    </string-array>
+
+
 </resources>

@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.Transition;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,7 +27,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ListQuestionsActivity extends AppCompatActivity {
+public class ListQuestionsActivity extends AppCompatActivity implements TimeFrameDialog.TimeFrameDialogListener {
 
     public static final int ALLTIME = 0;
     public static final int TODAY = 1;
@@ -59,41 +61,46 @@ public class ListQuestionsActivity extends AppCompatActivity {
 
         if (item.getItemId() == R.id.menu_gogithub) {
             Intent i = new Intent(this,GitHubActivity.class);
-            i.putExtra("title",searchTag);
+            i.putExtra("name",searchTag);
+            startActivity(i);
+            return true;
+        } else if (item.getItemId() == R.id.menu_meetup) {
+            Intent i = new Intent(this, MeetupActivity.class);
+            i.putExtra("searchtag", searchTag);
             startActivity(i);
             return true;
         }
 
         progress.show();
         switch (item.getItemId()) {
-            case (R.id.menu_searchalltime):
-                searchtime = ALLTIME;
-                getQuestions(searchTag);
-                break;
-            case (R.id.menu_searchtoday):
-                searchtime = TODAY;
-                getQuestions(searchTag);
-                break;
-            case (R.id.menu_searchyesterday):
-                searchtime = YESTERDAY;
-                getQuestions(searchTag);
-                break;
-            case (R.id.menu_searchthismonth):
-                searchtime = THISMONTH;
-                getQuestions(searchTag);
-                break;
-            case (R.id.menu_searchthisyear):
-                searchtime = THISYEAR;
-                getQuestions(searchTag);
-                break;
+            case (R.id.whatshot_timeframe):
+                TimeFrameDialog timeFrameDialog = new TimeFrameDialog();
+                timeFrameDialog.show(getFragmentManager(),"timeframe");
+                return true;
+//            case (R.id.menu_searchalltime):
+//                searchtime = ALLTIME;
+//                getQuestions(searchTag);
+//                break;
+//            case (R.id.menu_searchtoday):
+//                searchtime = TODAY;
+//                getQuestions(searchTag);
+//                break;
+//            case (R.id.menu_searchyesterday):
+//                searchtime = YESTERDAY;
+//                getQuestions(searchTag);
+//                break;
+//            case (R.id.menu_searchthismonth):
+//                searchtime = THISMONTH;
+//                getQuestions(searchTag);
+//                break;
+//            case (R.id.menu_searchthisyear):
+//                searchtime = THISYEAR;
+//                getQuestions(searchTag);
+//                break;
             case R.id.whats_hot_refresh:
                 getQuestions(searchTag);
                 break;
-            case R.id.menu_meetup:
-                Intent i = new Intent(this,MeetupActivity.class);
-                i.putExtra("searchtag",searchTag);
-                startActivity(i);
-                break;
+
         }
 
         return true;
@@ -104,11 +111,18 @@ public class ListQuestionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
+        Transition enter = new Slide();
+        getWindow().setEnterTransition(enter);
+        Transition reEnter = new Slide();
+        //getWindow().setReenterTransition(reEnter);
+
         setContentView(R.layout.activity_list_questions);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Intent i = getIntent();
-        searchTag = i.getStringExtra("title");
+        searchTag = i.getStringExtra("name");
         String title = getString(R.string.app_name) + " - " + searchTag;
         setTitle(title);
 
@@ -149,6 +163,7 @@ public class ListQuestionsActivity extends AppCompatActivity {
                 .baseUrl("https://api.stackexchange.com")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
 
         final StackOverFlowFaqAPI faqAPI = retrofit.create(StackOverFlowFaqAPI.class);
 
@@ -214,6 +229,40 @@ public class ListQuestionsActivity extends AppCompatActivity {
                 break;
         }
         return call;
+    }
+
+    @Override
+    public void positiveClick(DialogFragment fragment, int which) {
+
+        String[] what = getResources().getStringArray(R.array.time_dialog);
+
+        switch (what[which]) {
+            case "All Time":
+                searchtime = ALLTIME;
+                getQuestions(searchTag);
+                break;
+            case "Today":
+                searchtime = TODAY;
+                getQuestions(searchTag);
+                break;
+            case "Since Yesterday":
+                searchtime = YESTERDAY;
+                getQuestions(searchTag);
+                break;
+            case "This Month":
+                searchtime = THISMONTH;
+                getQuestions(searchTag);
+                break;
+            case "This Year":
+                searchtime = THISYEAR;
+                getQuestions(searchTag);
+                break;
+        }
+    }
+
+    @Override
+    public void negativeClick(DialogFragment fragment, int which) {
+
     }
 
     public static class NothingFoundDialog extends DialogFragment {

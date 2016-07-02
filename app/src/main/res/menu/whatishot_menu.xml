@@ -2,30 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/menu_searchalltime"
-        android:title="@string/show_all_time"
-        android:orderInCategory="100"
-        />
-    <item
-        android:id="@+id/menu_searchtoday"
-        android:title="@string/show_today"
-        android:orderInCategory="500"
-        />
-    <item
-        android:id="@+id/menu_searchyesterday"
-        android:orderInCategory="400"
-        android:title="@string/show_since_yesterday"
-        />
-    <item
-        android:id="@+id/menu_searchthismonth"
-        android:orderInCategory="300"
-        android:title="@string/show_this_month"
-        />
-    <item
-        android:id="@+id/menu_searchthisyear"
+        android:title="Select Time Frame"
         android:orderInCategory="200"
-        android:title="@string/show_this_year"
-    />
+        android:id="@+id/whatshot_timeframe" />
 
     <item
         android:orderInCategory="0"

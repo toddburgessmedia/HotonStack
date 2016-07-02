@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         rv = (RecyclerView) findViewById(R.id.recycleview);
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements
             rv.setHasFixedSize(true);
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
+
         //rv.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         if (savedInstanceState != null) {
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements
         startProgressDialog();
 
         getTags(tagcount);
+
+
 
     }
 
@@ -138,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
                 tags = response.body();
-
                 adapter = new StackTagsRecyclerView(tags.tags,getBaseContext());
                 rv.setAdapter(adapter);
                 progress.dismiss();
@@ -160,10 +163,11 @@ public class MainActivity extends AppCompatActivity implements
 
         EditText text = (EditText) search.view.findViewById(R.id.search_tag);
         tag = text.getText().toString();
+
         tag = tag.replace(' ','-');
 
         Intent i = new Intent(this,ListQuestionsActivity.class);
-        i.putExtra("title",tag);
+        i.putExtra("name",tag);
         startActivity(i);
     }
 
