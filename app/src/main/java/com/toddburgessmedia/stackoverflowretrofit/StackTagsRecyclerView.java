@@ -3,6 +3,7 @@ package com.toddburgessmedia.stackoverflowretrofit;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
     int lastPosition = -1;
     Context context;
 
+    String sitename;
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
 
@@ -47,21 +50,33 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
 
                 Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
                 i.putExtra("name",tag);
+                i.putExtra("sitename",sitename);
                 v.getContext().startActivity(i);
+            }
+        };
+
+        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d(MainActivity.TAG, "onLongClick: long click!");
+                return false;
             }
         };
 
         switch (viewType) {
             case VIEWTYPE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
                 v.setOnClickListener(click);
+                v.setOnLongClickListener(longClickListener);
                 return new ViewHolder(v);
             case VIEWTYPE_EVEN:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_even,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_even,parent,false);
                 v.setOnClickListener(click);
+                v.setOnLongClickListener(longClickListener);
                 return new ViewHolderEven(v);
             default:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
                 break;
         }
         return new ViewHolder(v);
@@ -76,29 +91,20 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         } else {
             viewType = position % 2;
         }
-//                Log.d(MainActivity.TAG, "onBindViewHolder: " + position);
+
         Tag t = tagList.get(position);
 
         String r = Integer.valueOf(position+1).toString();
 
-//        Animation animation = AnimationUtils.loadAnimation(context,
-//                (position > lastPosition) ? R.anim.up_from_bottom
-//                        : R.anim.down_from_top);
-//        holder.itemView.startAnimation(animation);
-        lastPosition = position;
-
         switch (viewType) {
             case VIEWTYPE:
-                //Log.d(MainActivity.TAG, "onBindViewHolder: in VIEWTYPE " + viewType);
                 ViewHolder v = (ViewHolder) holder;
-
                 v.tagname.setText(Jsoup.parse(t.getName()).text());
                 v.tagcount.setText("Tag count: " + t.getCount());
                 v.tagrank.setText(r);
                 break;
             case VIEWTYPE_EVEN:
                 ViewHolderEven ve = (ViewHolderEven) holder;
-
                 ve.tagname.setText(Jsoup.parse(t.getName()).text());
                 ve.tagcount.setText("Tag count: " + t.getCount());
                 ve.tagrank.setText(r);
@@ -128,10 +134,11 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         }
     }
 
-    public StackTagsRecyclerView (List<Tag> tags, Context con) {
+    public StackTagsRecyclerView (List<Tag> tags, Context con, String site) {
 
         this.tagList = tags;
         this.context = con;
+        this.sitename = site;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

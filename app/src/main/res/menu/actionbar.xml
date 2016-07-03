@@ -15,6 +15,11 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/menu_siteselect"
+        android:orderInCategory="500"
+        android:title="Select Site" />
+
+    <item
         android:id="@+id/menu_preferences"
         android:title="Preferences"
         android:orderInCategory="300" />

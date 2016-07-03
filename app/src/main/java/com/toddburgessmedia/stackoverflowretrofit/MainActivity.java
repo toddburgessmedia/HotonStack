@@ -30,7 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity implements
-        SearchDialog.SearchDialogListener {
+        SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener {
 
     public final static String TAG = "StackOverFlow";
 
@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements
 
     String tagcount;
     ProgressDialog progress;
+
+    String searchsite = "stackoverflow";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +59,9 @@ public class MainActivity extends AppCompatActivity implements
 
         if (savedInstanceState != null) {
             tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
+            searchsite = savedInstanceState.getString("searchsite");
             if (tags != null) {
-                adapter = new StackTagsRecyclerView(tags.tags, getBaseContext());
+                adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(),searchsite);
                 rv.setAdapter(adapter);
                 return;
             }
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onSaveInstanceState(Bundle outState) {
 
         outState.putSerializable("taglist",tags);
+        outState.putString("searchsite",searchsite);
         super.onSaveInstanceState(outState);
     }
 
@@ -113,6 +117,10 @@ public class MainActivity extends AppCompatActivity implements
                 Intent i = new Intent(this,PreferencesActivity.class);
                 startActivity(i);
                 break;
+            case R.id.menu_siteselect:
+                SiteSelectDialog siteSelectDialog = new SiteSelectDialog();
+                siteSelectDialog.show(getFragmentManager(),"sitesearch");
+                break;
         }
         return true;
     }
@@ -135,14 +143,14 @@ public class MainActivity extends AppCompatActivity implements
 
         StackOverFlowAPI stackOverFlowAPI = retrofit.create(StackOverFlowAPI.class);
 
-        Call<StackOverFlowTags> call = stackOverFlowAPI.loadquestions(tagcount);
+        Call<StackOverFlowTags> call = stackOverFlowAPI.loadquestions(tagcount,searchsite);
 
         call.enqueue(new Callback<StackOverFlowTags>() {
             @Override
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
                 tags = response.body();
-                adapter = new StackTagsRecyclerView(tags.tags,getBaseContext());
+                adapter = new StackTagsRecyclerView(tags.tags,getBaseContext(),searchsite);
                 rv.setAdapter(adapter);
                 progress.dismiss();
             }
@@ -168,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Intent i = new Intent(this,ListQuestionsActivity.class);
         i.putExtra("name",tag);
+        i.putExtra("sitename",searchsite);
         startActivity(i);
     }
 
@@ -178,4 +187,20 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG, "negativeClick: ");
     }
 
+    @Override
+    public void siteSelectpositiveClick(DialogFragment fragment, int which) {
+
+        String[] sites = getResources().getStringArray(R.array.site_select_array);
+        searchsite = sites[which];
+
+        startProgressDialog();
+        getTags(tagcount);
+
+
+    }
+
+    @Override
+    public void siteSelectnegativeClick(DialogFragment fragment, int which) {
+
+    }
 }

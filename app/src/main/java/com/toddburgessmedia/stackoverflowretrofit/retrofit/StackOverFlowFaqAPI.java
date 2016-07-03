@@ -10,16 +10,18 @@ import retrofit2.http.Query;
  */
 public interface StackOverFlowFaqAPI {
 
-        @GET("/2.2/tags/{tag}/faq?site=stackoverflow&pagesize=100")
-        Call<StackOverFlowFAQ> loadQuestions (@Path("tag") String tag);
+        @GET("/2.2/tags/{tag}/faq?pagesize=100")
+        Call<StackOverFlowFAQ> loadQuestions (@Path("tag") String tag, @Query("site") String site);
 
-        @GET("/2.2/questions?order=desc&sort=activity&site=stackoverflow")
+        @GET("/2.2/questions?order=desc&sort=activity")
         Call<StackOverFlowFAQ> loadQuestionsToday (@Query("fromdate") long fromdate,
-                                                   @Query("tagged") String tagged);
+                                                   @Query("tagged") String tagged,
+                                                   @Query("site") String site);
 
-        @GET("/2.2/questions?order=desc&sort=activity&site=stackoverflow")
+        @GET("/2.2/questions?order=desc&sort=activity")
         Call<StackOverFlowFAQ> loadQuestionsYesterday (@Query("fromdate") long fromdate,
-                                                   @Query("tagged") String tagged);
+                                                   @Query("tagged") String tagged,
+                                                       @Query("site") String site);
 
 
 

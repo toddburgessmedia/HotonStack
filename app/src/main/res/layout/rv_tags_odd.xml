@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ffcccccc"
-    card_view:cardCornerRadius="4dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="2dp"
+    app:contentPadding="2dp"
+    app:cardUseCompatPadding="true"
     >
 
     <GridLayout
@@ -13,13 +14,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="false"
         android:orientation="vertical"
-
+        android:paddingRight="23sp"
         >
 
         <TextView
             android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:id="@+id/tag_name_even"
+            android:id="@+id/tag_name"
             android:textStyle="bold"
             android:textSize="18sp"
             />
@@ -27,7 +28,7 @@
         <TextView
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/tag_count_even"
+            android:id="@+id/tag_count"
             android:textSize="10sp"
             />
 
@@ -36,7 +37,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/tag_rank_even"
+        android:id="@+id/tag_rank"
         android:gravity="right"
         android:layout_centerHorizontal="true"
         android:textSize="18sp"

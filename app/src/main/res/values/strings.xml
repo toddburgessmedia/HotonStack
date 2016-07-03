@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Hot on Stack</string>
+    <string name="app_name">Tech Dive</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- FAQ Question List Dialog -->
@@ -22,6 +22,25 @@
         <item>This Month</item>
         <item>Since Yesterday</item>
         <item>Today</item>
+    </string-array>
+
+    <string name="site_select_title">Select Site</string>
+    <string-array name="site_select_array">
+        <item>GameDev</item>
+        <item>Mathematics</item>
+        <item>Programmers</item>
+        <item>Security</item>
+        <item>StackOverflow</item>
+        <item>SuperUser</item>
+    </string-array>
+
+    <string-array name="select_select_display">
+        <item>Game Development</item>
+        <item>Mathematics</item>
+        <item>Programmers</item>
+        <item>Security</item>
+        <item>Stack Overflow</item>
+        <item>Super User</item>
     </string-array>
 
 

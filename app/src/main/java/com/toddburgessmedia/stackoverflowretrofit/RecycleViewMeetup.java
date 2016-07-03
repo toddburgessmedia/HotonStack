@@ -9,8 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
@@ -75,11 +73,11 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         MeetUpGroup t = groups.get(position);
 
-        Animation animation = AnimationUtils.loadAnimation(context,
-                (position > lastPosition) ? R.anim.up_from_bottom
-                        : R.anim.down_from_top);
-        holder.itemView.startAnimation(animation);
-        lastPosition = position;
+//        Animation animation = AnimationUtils.loadAnimation(context,
+//                (position > lastPosition) ? R.anim.up_from_bottom
+//                        : R.anim.down_from_top);
+//        holder.itemView.startAnimation(animation);
+//        lastPosition = position;
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:

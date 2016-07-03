@@ -38,6 +38,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     int searchtime = ALLTIME;
 
     String searchTag;
+    String searchsite;
 
     RecyclerView rv;
     RecycleViewFAQ adapter;
@@ -123,6 +124,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
         Intent i = getIntent();
         searchTag = i.getStringExtra("name");
+        searchsite = i.getStringExtra("sitename");
         String title = getString(R.string.app_name) + " - " + searchTag;
         setTitle(title);
 
@@ -214,18 +216,18 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         switch (searchtime) {
             case TODAY:
                 secondsPassed = delay.getTimeDelay(TimeDelay.TODAY);
-                call = faqAPI.loadQuestionsToday(secondsPassed, tag);
+                call = faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
                 break;
             case YESTERDAY:
                 secondsPassed = delay.getTimeDelay(TimeDelay.YESTERDAY);
-                call = faqAPI.loadQuestionsYesterday(secondsPassed, tag);
+                call = faqAPI.loadQuestionsYesterday(secondsPassed, tag, searchsite);
                 break;
             case THISMONTH:
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISMONTH);
-                call = faqAPI.loadQuestionsToday(secondsPassed, tag);
+                call = faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
                 break;
             default:
-                call = faqAPI.loadQuestions(tag);
+                call = faqAPI.loadQuestions(tag,searchsite);
                 break;
         }
         return call;
