@@ -17,8 +17,11 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.f2prateek.rx.preferences.Preference;
+import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
 
@@ -27,6 +30,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.functions.Action1;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -43,12 +47,18 @@ public class MainActivity extends AppCompatActivity implements
 
     String searchsite = "stackoverflow";
 
+    RxSharedPreferences rxPrefs;
+    Preference<String> rxDefaultsite;
+
+    TextView sitename;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
+        sitename = (TextView) findViewById(R.id.main_sitename);
         rv = (RecyclerView) findViewById(R.id.recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -60,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState != null) {
             tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
             searchsite = savedInstanceState.getString("searchsite");
+            setSiteName();
             if (tags != null) {
                 adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(),searchsite);
                 rv.setAdapter(adapter);
@@ -67,15 +78,26 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         tagcount = prefs.getString("tagcount","100");
+        searchsite = prefs.getString("defaultsite","stackoverflow");
 
+        rxPrefs = RxSharedPreferences.create(prefs);
+        rxDefaultsite = rxPrefs.getString("defaultsite");
+        rxDefaultsite.asObservable().subscribe(new Action1<String>() {
+            @Override
+            public void call(String s) {
+                searchsite = s;
+                setSiteName();
+                startProgressDialog();
+                getTags(tagcount);
+            }
+        });
+
+        setSiteName();
         startProgressDialog();
-
         getTags(tagcount);
-
-
-
     }
 
     private void startProgressDialog() {
@@ -164,6 +186,25 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    void setSiteName() {
+
+        String[] display = getResources().getStringArray(R.array.select_select_display);
+        String[] values = getResources().getStringArray(R.array.site_select_array);
+        boolean found = false;
+        int i = 0;
+
+        while (!found) {
+            if (values[i].equals(searchsite)) {
+                found = true;
+            } else {
+                i++;
+            }
+        }
+
+        sitename.setText(display[i]);
+
+    }
+
     @Override
     public void positiveClick(DialogFragment fragment) {
         String tag;
@@ -193,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements
         String[] sites = getResources().getStringArray(R.array.site_select_array);
         searchsite = sites[which];
 
+        setSiteName();
         startProgressDialog();
         getTags(tagcount);
 

@@ -7,5 +7,13 @@
         android:summary="How many tags to start with"
         android:defaultValue="100" />
 
+    <ListPreference
+        android:key="defaultsite"
+        android:title="Default Site"
+        android:summary="What Stack Exchange site to default to"
+        android:defaultValue="stackoverflow"
+        android:entries="@array/select_select_display"
+        android:entryValues="@array/site_select_array" />
+
 
 </PreferenceScreen>

@@ -41,6 +41,9 @@ dependencies {
     compile 'net.smartam.leeloo:oauth2-common:0.1'
     compile 'net.smartam.leeloo:oauth2-client:0.1'
 
+    compile 'com.f2prateek.rx.preferences:rx-preferences:1.0.2'
+
+
     //compile 'com.squareup.okhttp3:okhttp:3.3.1'
 
     compile 'io.reactivex:rxandroid:1.0.1'
