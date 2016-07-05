@@ -23,11 +23,11 @@ public class FAQTag implements Serializable {
         this.answerCount = answerCount;
     }
 
-    public String getCreationDate() {
+    public long getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(long creationDate) {
         this.creationDate = creationDate;
     }
 
@@ -72,8 +72,8 @@ public class FAQTag implements Serializable {
     @SerializedName("answer_count")
     private String answerCount;
 
-    @SerializedName("creationdate")
-    private String creationDate;
+    @SerializedName("creation_date")
+    private long creationDate;
 
     @Override
     public String toString() {

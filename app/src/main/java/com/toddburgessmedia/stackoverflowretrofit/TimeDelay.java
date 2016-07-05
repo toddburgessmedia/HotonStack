@@ -1,9 +1,6 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.util.Log;
-
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 17/06/16.
@@ -37,29 +34,21 @@ public class TimeDelay {
 
     private long getToday() {
 
-        DateTime now = new DateTime();
-        DateTime midnight = now.withTimeAtStartOfDay();
-        Duration duration = new Duration(midnight,now);
+        DateTime now = new DateTime().withTimeAtStartOfDay();
 
-        Log.d(MainActivity.TAG, "getToday: " + duration.toStandardSeconds().getSeconds());
-        //return duration.toStandardSeconds().getSeconds();
-
-        return (now.getSecondOfDay() - duration.toStandardSeconds().getSeconds()) * 1000;
+        return now.getMillis() / 1000L;
     }
 
     private long getYesterday() {
 
         DateTime yesterday = new DateTime().minusDays(1);
-        Log.d(MainActivity.TAG, "getYesterday: " + yesterday.getMillis() / 1000);
 
         return yesterday.getMillis() / 1000L;
-
     }
 
     private static long getMonth() {
 
         DateTime month = new DateTime().withDayOfMonth(1);
-//        DateTime month = now.withDayOfMonth(1);
 
         return month.getMillis() / 1000L;
     }
@@ -69,7 +58,6 @@ public class TimeDelay {
         DateTime year = new DateTime().withDayOfYear(1);
 
         return year.getMillis() / 1000L;
-
     }
 
 

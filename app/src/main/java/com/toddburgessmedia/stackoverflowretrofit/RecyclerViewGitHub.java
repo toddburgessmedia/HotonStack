@@ -67,12 +67,6 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         GitHubProject t = projects.get(position);
 
-//        Animation animation = AnimationUtils.loadAnimation(context,
-//                (position > lastPosition) ? R.anim.up_from_bottom
-//                        : R.anim.down_from_top);
-//        holder.itemView.startAnimation(animation);
-//        lastPosition = position;
-
         String description;
         if (t.getDescription().equals(""))
             description = context.getString(R.string.no_github_desc);
@@ -85,6 +79,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 v.title.setText(t.getFullName());
                 v.description.setText(description);
                 v.link.setText(t.getHtmlURL());
+                v.language.setText(t.getLanguage());
                 break;
             case VIEWTYPE_EVEN:
                 ViewHolderEven ve = (ViewHolderEven) holder;
@@ -98,11 +93,13 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        if ((position %2) == 0) {
-            return VIEWTYPE_EVEN;
-        } else {
-            return VIEWTYPE;
-        }
+//        if ((position %2) == 0) {
+//            return VIEWTYPE_EVEN;
+//        } else {
+//            return VIEWTYPE;
+//        }
+
+        return VIEWTYPE;
     }
 
     @Override
@@ -129,6 +126,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView title;
         TextView description;
         TextView link;
+        TextView language;
 
         public ViewHolder (View v) {
             super(v);
@@ -136,6 +134,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
             title = (TextView) v.findViewById(R.id.rv_github_odd_title);
             description = (TextView) v.findViewById(R.id.rv_github_odd_desc);
             link = (TextView) v.findViewById(R.id.rv_github_odd_link);
+            language = (TextView) v.findViewById(R.id.rv_github_odd_language);
 
         }
         @Override
@@ -152,6 +151,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView title;
         TextView description;
         TextView link;
+        TextView language;
 
         public ViewHolderEven (View v) {
             super(v);
@@ -159,6 +159,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
             title = (TextView) v.findViewById(R.id.rv_github_even_title);
             description = (TextView) v.findViewById(R.id.rv_github_even_desc);
             link = (TextView) v.findViewById(R.id.rv_github_even_link);
+
         }
 
         @Override

@@ -18,6 +18,61 @@ public class GitHubProject implements Serializable {
     @SerializedName("html_url")
     private String htmlURL;
 
+    @SerializedName("created_at")
+    private String createdAt;
+
+    @SerializedName("updated_at")
+    private String updatedAt;
+
+    @SerializedName("language")
+    private String language;
+
+    @SerializedName("forks")
+    private String forks;
+
+    @SerializedName("watchers")
+    private String watchers;
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getForks() {
+        return forks;
+    }
+
+    public void setForks(String forks) {
+        this.forks = forks;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getWatchers() {
+        return watchers;
+    }
+
+    public void setWatchers(String watchers) {
+        this.watchers = watchers;
+    }
+
     public String getFullName() {
         return fullName;
     }

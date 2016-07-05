@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.FAQTag;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 
 import java.util.List;
@@ -104,6 +107,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 vh.score.setText(tag.getScore());
                 vh.views.setText(tag.getViewCount());
                 vh.answers.setText(tag.getAnswerCount());
+                vh.createdate.setText(convertDate(tag.getCreationDate()));
                 break;
             case VIEWFAQEVEN:
                 ViewHolderEven vhe = (ViewHolderEven) holder;
@@ -119,13 +123,23 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     }
 
+    private String convertDate(long utcDate) {
+
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd KK:mm a");
+        DateTime dt = new DateTime(utcDate*1000);
+
+        return dt.toString(fmt);
+    }
+
     @Override
     public int getItemViewType(int position) {
-        if ((position % 2 ) == 0) {
-            return VIEWFAQEVEN;
-        } else {
-            return VIEWFAQODD;
-        }
+//        if ((position % 2 ) == 0) {
+//            return VIEWFAQEVEN;
+//        } else {
+//            return VIEWFAQODD;
+//        }
+
+        return VIEWFAQODD;
     }
 
     @Override
@@ -140,6 +154,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         TextView score;
         TextView views;
         TextView answers;
+        TextView createdate;
 
         public ViewHolderOdd(View view) {
 
@@ -149,6 +164,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
             score = (TextView) view.findViewById(R.id.faq_odd_score);
             views = (TextView) view.findViewById(R.id.faq_odd_views);
             answers = (TextView) view.findViewById(R.id.faq_odd_answers);
+            createdate = (TextView) view.findViewById(R.id.faq_odd_date);
 
         }
 

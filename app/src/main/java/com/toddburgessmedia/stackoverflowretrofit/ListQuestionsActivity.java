@@ -226,6 +226,10 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISMONTH);
                 call = faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
                 break;
+            case THISYEAR:
+                secondsPassed = delay.getTimeDelay(TimeDelay.THISYEAR);
+                call = faqAPI.loadQuestionsToday(secondsPassed,tag,searchsite);
+                break;
             default:
                 call = faqAPI.loadQuestions(tag,searchsite);
                 break;
