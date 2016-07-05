@@ -101,11 +101,17 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 ViewHolderOdd vh = (ViewHolderOdd) holder;
                 vh.question.setText(Jsoup.parse(tag.title).text());
                 vh.link.setText(tag.link);
+                vh.score.setText(tag.getScore());
+                vh.views.setText(tag.getViewCount());
+                vh.answers.setText(tag.getAnswerCount());
                 break;
             case VIEWFAQEVEN:
                 ViewHolderEven vhe = (ViewHolderEven) holder;
                 vhe.question.setText(Jsoup.parse(tag.title).text());
                 vhe.link.setText(tag.link);
+                vhe.score.setText(tag.getScore());
+                vhe.views.setText(tag.getViewCount());
+                vhe.answers.setText(tag.getAnswerCount());
                 break;
         }
 
@@ -131,12 +137,18 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         TextView question;
         TextView link;
+        TextView score;
+        TextView views;
+        TextView answers;
 
         public ViewHolderOdd(View view) {
 
             super(view);
             question = (TextView) view.findViewById(R.id.faq_odd);
             link = (TextView) view.findViewById(R.id.faq_link_odd);
+            score = (TextView) view.findViewById(R.id.faq_odd_score);
+            views = (TextView) view.findViewById(R.id.faq_odd_views);
+            answers = (TextView) view.findViewById(R.id.faq_odd_answers);
 
         }
 
@@ -150,12 +162,20 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         TextView question;
         TextView link;
+        TextView score;
+        TextView views;
+        TextView answers;
+
 
         public ViewHolderEven(View view) {
 
             super(view);
             question = (TextView) view.findViewById(R.id.faq_even);
             link = (TextView) view.findViewById(R.id.faq_link_even);
+            score = (TextView) view.findViewById(R.id.faq_even_score);
+            views = (TextView) view.findViewById(R.id.faq_even_views);
+            answers = (TextView) view.findViewById(R.id.faq_even_answers);
+
         }
 
         @Override

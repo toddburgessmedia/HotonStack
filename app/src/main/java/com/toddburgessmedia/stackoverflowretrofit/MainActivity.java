@@ -78,10 +78,15 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences.Editor edit = prefs.edit();
+//        edit.putString("defaultsite","StackOverflow");
+//        edit.commit();
+
         tagcount = prefs.getString("tagcount","100");
-        searchsite = prefs.getString("defaultsite","stackoverflow");
+        //tagcount = "100";
+        searchsite = prefs.getString("defaultsite","StackOverflow");
+
 
         rxPrefs = RxSharedPreferences.create(prefs);
         rxDefaultsite = rxPrefs.getString("defaultsite");
@@ -89,13 +94,14 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void call(String s) {
                 searchsite = s;
+                Log.d(TAG, "call: " + s);
                 setSiteName();
                 startProgressDialog();
                 getTags(tagcount);
             }
         });
 
-        setSiteName();
+        //setSiteName();
         startProgressDialog();
         getTags(tagcount);
     }
@@ -172,6 +178,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
                 tags = response.body();
+                if (tags == null) {
+                    return;
+                }
                 adapter = new StackTagsRecyclerView(tags.tags,getBaseContext(),searchsite);
                 rv.setAdapter(adapter);
                 progress.dismiss();
@@ -194,10 +203,15 @@ public class MainActivity extends AppCompatActivity implements
         int i = 0;
 
         while (!found) {
+            Log.d(TAG, "setSiteName: " + values[i]);
             if (values[i].equals(searchsite)) {
                 found = true;
             } else {
                 i++;
+                if (i > values.length) {
+                    i--;
+                    found = true;
+                }
             }
         }
 
