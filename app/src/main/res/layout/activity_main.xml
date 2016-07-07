@@ -15,39 +15,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/main_sitename"
         android:textAlignment="center"
-        android:textSize="18dp"
+        android:textSize="18sp"
+        android:background="#C5CAE9"
         android:paddingBottom="6dp"
         />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#000000"
-        android:minWidth="16sp"
-        android:elevation="10dp"
-        >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Tag"
-            android:textColor="#FFFFFF"
-            android:background="#000000"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Rank"
-            android:textColor="#FFFFFF"
-            android:gravity="right"
-            android:textSize="16sp"
-            />
-
-    </LinearLayout>
-
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycleview"

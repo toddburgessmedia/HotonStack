@@ -20,6 +20,7 @@
         android:id="@+id/rv_meetup_even_title"
         android:textStyle="bold"
         android:textAlignment="center"
+        android:textColor="#303F9F"
         />
 
     <TextView

@@ -2,7 +2,6 @@ package com.toddburgessmedia.stackoverflowretrofit.retrofit;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 /**
@@ -10,8 +9,8 @@ import retrofit2.http.Query;
  */
 public interface StackOverFlowFaqAPI {
 
-        @GET("/2.2/tags/{tag}/faq?pagesize=100&sort=votes")
-        Call<StackOverFlowFAQ> loadQuestions (@Path("tag") String tag, @Query("site") String site);
+        @GET("/2.2/questions?sort=votes&order=desc")
+        Call<StackOverFlowFAQ> loadQuestions (@Query("tagged") String tag, @Query("site") String site);
 
         @GET("/2.2/questions?order=desc&sort=votes")
         Call<StackOverFlowFAQ> loadQuestionsToday (@Query("fromdate") long fromdate,

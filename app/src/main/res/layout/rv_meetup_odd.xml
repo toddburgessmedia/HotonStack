@@ -20,6 +20,10 @@
         android:id="@+id/rv_meetup_odd_title"
         android:textStyle="bold"
         android:textAlignment="center"
+        android:textColor="#303F9F"
+        android:gravity="center"
+        android:background="#C5CAE9"
+        android:paddingTop="6sp"
         />
 
     <TextView
@@ -39,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:gravity="center_horizontal"
             >
 
             <TextView

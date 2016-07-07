@@ -72,33 +72,14 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             return true;
         }
 
-        progress.show();
         switch (item.getItemId()) {
             case (R.id.whatshot_timeframe):
                 TimeFrameDialog timeFrameDialog = new TimeFrameDialog();
                 timeFrameDialog.show(getFragmentManager(),"timeframe");
                 return true;
-//            case (R.id.menu_searchalltime):
-//                searchtime = ALLTIME;
-//                getQuestions(searchTag);
-//                break;
-//            case (R.id.menu_searchtoday):
-//                searchtime = TODAY;
-//                getQuestions(searchTag);
-//                break;
-//            case (R.id.menu_searchyesterday):
-//                searchtime = YESTERDAY;
-//                getQuestions(searchTag);
-//                break;
-//            case (R.id.menu_searchthismonth):
-//                searchtime = THISMONTH;
-//                getQuestions(searchTag);
-//                break;
-//            case (R.id.menu_searchthisyear):
-//                searchtime = THISYEAR;
-//                getQuestions(searchTag);
-//                break;
+
             case R.id.whats_hot_refresh:
+                progress.show();
                 getQuestions(searchTag);
                 break;
 

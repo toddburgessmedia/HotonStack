@@ -2,6 +2,7 @@ package com.toddburgessmedia.stackoverflowretrofit;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Criteria;
@@ -9,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,8 +23,6 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetupAPI;
 import java.util.HashMap;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -80,6 +80,7 @@ public class MeetupActivity extends AppCompatActivity {
         Log.d(MainActivity.TAG, "onCreate: long " + latLng.get("longitude"));
         progress.setMessage("Finding Meetup Groups");
         tagname = getIntent().getStringExtra("searchtag");
+        Log.d(TAG, "onCreate: tag" + tagname);
         getMeetupGroups(tagname);
 
     }
@@ -91,16 +92,24 @@ public class MeetupActivity extends AppCompatActivity {
             latLng = new HashMap<>();
         }
 
-        LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        boolean gps = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        Log.d(MainActivity.TAG, "getGPSLocation: " + gps);
-        boolean network = manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        Log.d(MainActivity.TAG, "getGPSLocation: " + network);
-        String provider = manager.getBestProvider(criteria, false);
-
         try {
+            LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                buildAlertMessageNoGps();
+            }
+            Criteria criteria = new Criteria();
+            boolean gps = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            Log.d(MainActivity.TAG, "getGPSLocation: " + gps);
+            boolean network = manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            Log.d(MainActivity.TAG, "getGPSLocation: " + network);
+            String provider = manager.getBestProvider(criteria, false);
+            Log.d(TAG, "getGPSLocation: " + provider);
+
             Location location = manager.getLastKnownLocation(provider);
+            if (location == null) {
+                Toast.makeText(MeetupActivity.this, "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
+                return;
+            }
             lat = location.getLatitude();
             lng = location.getLongitude();
             latLng.put("latitude",lat);
@@ -115,15 +124,9 @@ public class MeetupActivity extends AppCompatActivity {
 
     private void getMeetupGroups(String tagname) {
 
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.meetup.com")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
                 .build();
 
         MeetupAPI meetupAPI = retrofit.create(MeetupAPI.class);
@@ -138,12 +141,18 @@ public class MeetupActivity extends AppCompatActivity {
                 Log.d(TAG, "onResponse: it worked!!!");
                 groups = response.body();
                 stopProgressDialog();
+                if (groups.size() == 0) {
+                    Toast.makeText(MeetupActivity.this, "No Meetups Found", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 rv.setAdapter(adapter);
             }
 
             @Override
             public void onFailure(Call<List<MeetUpGroup>> call, Throwable t) {
+                stopProgressDialog();
+                Toast.makeText(MeetupActivity.this, "No Network Connection", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onFailure: it did not work!!! " + t.getMessage());
             }
         });
@@ -164,4 +173,24 @@ public class MeetupActivity extends AppCompatActivity {
             progress.dismiss();
         }
     }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
 }

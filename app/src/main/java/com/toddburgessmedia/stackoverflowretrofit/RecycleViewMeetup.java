@@ -73,12 +73,6 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         MeetUpGroup t = groups.get(position);
 
-//        Animation animation = AnimationUtils.loadAnimation(context,
-//                (position > lastPosition) ? R.anim.up_from_bottom
-//                        : R.anim.down_from_top);
-//        holder.itemView.startAnimation(animation);
-//        lastPosition = position;
-
         switch (getItemViewType(position)) {
             case VIEWTYPE:
                 ViewHolder v = (ViewHolder) holder;
@@ -101,11 +95,13 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public int getItemViewType(int position) {
-        if ((position %2) == 0) {
-            return VIEWTYPE_EVEN;
-        } else {
-            return VIEWTYPE;
-        }
+//        if ((position %2) == 0) {
+//            return VIEWTYPE_EVEN;
+//        } else {
+//            return VIEWTYPE;
+//        }
+
+        return VIEWTYPE;
     }
 
     @Override

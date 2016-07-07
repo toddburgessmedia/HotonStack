@@ -79,7 +79,11 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 v.title.setText(t.getFullName());
                 v.description.setText(description);
                 v.link.setText(t.getHtmlURL());
-                v.language.setText(t.getLanguage());
+                v.language.setText(setLanguage(t.getLanguage()));
+                v.createdate.setText(formatGitHubDate(t.getCreatedAt()));
+                v.updatedate.setText(formatGitHubDate(t.getUpdatedAt()));
+                v.forks.setText(t.getForks());
+                v.watchers.setText(t.getWatchers());
                 break;
             case VIEWTYPE_EVEN:
                 ViewHolderEven ve = (ViewHolderEven) holder;
@@ -89,6 +93,23 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 ve.link.setText(t.getHtmlURL());
                 break;
         }
+    }
+
+    public String setLanguage (String language) {
+
+        if (language == null) {
+            return "No Language Specified";
+        } else {
+            return language;
+        }
+
+    }
+
+    public String formatGitHubDate(String githubdate) {
+
+        String newdate = githubdate.replace('T',' ');
+        return newdate.substring(0,newdate.lastIndexOf(':'));
+
     }
 
     @Override
@@ -127,6 +148,10 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView description;
         TextView link;
         TextView language;
+        TextView createdate;
+        TextView updatedate;
+        TextView forks;
+        TextView watchers;
 
         public ViewHolder (View v) {
             super(v);
@@ -135,7 +160,10 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
             description = (TextView) v.findViewById(R.id.rv_github_odd_desc);
             link = (TextView) v.findViewById(R.id.rv_github_odd_link);
             language = (TextView) v.findViewById(R.id.rv_github_odd_language);
-
+            createdate = (TextView) v.findViewById(R.id.rv_github_odd_createdate);
+            updatedate = (TextView) v.findViewById(R.id.rv_github_odd_updatedate);
+            forks = (TextView) v.findViewById(R.id.rv_github_odd_forks);
+            watchers = (TextView) v.findViewById(R.id.rv_github_odd_watchers);
         }
         @Override
         public void onClick(View v) {

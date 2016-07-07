@@ -79,14 +79,9 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor edit = prefs.edit();
-//        edit.putString("defaultsite","StackOverflow");
-//        edit.commit();
 
         tagcount = prefs.getString("tagcount","100");
-        //tagcount = "100";
         searchsite = prefs.getString("defaultsite","StackOverflow");
-
 
         rxPrefs = RxSharedPreferences.create(prefs);
         rxDefaultsite = rxPrefs.getString("defaultsite");
@@ -94,14 +89,13 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void call(String s) {
                 searchsite = s;
-                Log.d(TAG, "call: " + s);
                 setSiteName();
                 startProgressDialog();
                 getTags(tagcount);
             }
         });
 
-        //setSiteName();
+        setSiteName();
         startProgressDialog();
         getTags(tagcount);
     }
@@ -127,15 +121,11 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_search:
-                Log.d(TAG, "onOptionsItemSelected: click!");
-
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
 
                 SearchDialog dialog = new SearchDialog();
-
                 dialog.show(getFragmentManager(),"search");
-
                 break;
             case R.id.menu_refresh:
                 startProgressDialog();
@@ -158,10 +148,7 @@ public class MainActivity extends AppCompatActivity implements
         MenuInflater inflate = getMenuInflater();
         inflate.inflate(R.menu.actionbar,menu);
         return true;
-
-        //return super.onCreateOptionsMenu(menu);
     }
-
 
     private void getTags(String tagcount) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -208,15 +195,13 @@ public class MainActivity extends AppCompatActivity implements
                 found = true;
             } else {
                 i++;
-                if (i > values.length) {
+                if (i == values.length) { // this is to catch errors
                     i--;
                     found = true;
                 }
             }
         }
-
         sitename.setText(display[i]);
-
     }
 
     @Override

@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingRight="6dp"
+        android:paddingEnd="10sp"
         >
 
         <TextView
@@ -32,13 +32,13 @@
             android:layout_height="wrap_content"
             android:id="@+id/faq_odd_score"
             android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:textColor="#448AFF"
             />
-        <TextView
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="8dp"
-            android:text="Score"
+            android:src="@drawable/ic_star"
             android:layout_gravity="center_horizontal"
             />
     </LinearLayout>
@@ -48,8 +48,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/faq_odd"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:textSize="14dp"
+        android:textColor="#303F9F"
+        android:layout_gravity="center_vertical"
         />
 
     <TextView
@@ -61,24 +63,31 @@
 
     </LinearLayout>
 
-    <LinearLayout
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:paddingTop="4sp"
+            android:paddingBottom="4sp"
+            android:background="#727272"/>
+
+
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         >
 
-        <GridLayout
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:orientation="horizontal"
             >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Views:"
-            android:textStyle="italic"
-            android:paddingRight="3dp"
-            android:textSize="12sp"
+            android:text="Views: "
+            android:textStyle="bold"
             />
 
         <TextView
@@ -86,35 +95,30 @@
             android:layout_height="wrap_content"
             android:id="@+id/faq_odd_views"
             android:paddingRight="10dp"
-            android:textSize="12sp"
             />
 
-        </GridLayout>
+        </LinearLayout>
 
-        <GridLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Answers:"
-            android:textStyle="italic"
-            android:paddingRight="3dp"
-            android:layout_gravity="right"
-            android:textSize="12sp"
+            android:text="Answers: "
+            android:textStyle="bold"
             />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/faq_odd_answers"
-            android:layout_gravity="right"
-            android:textSize="12sp"
             />
 
-        </GridLayout>
+        </LinearLayout>
 
         </LinearLayout>
 
@@ -128,15 +132,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Date Created: "
-                android:textStyle="italic"
-                android:textSize="12sp"
+                android:textStyle="bold"
                 />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/faq_odd_date"
-                android:textSize="12sp"
                 />
 
             </LinearLayout>
