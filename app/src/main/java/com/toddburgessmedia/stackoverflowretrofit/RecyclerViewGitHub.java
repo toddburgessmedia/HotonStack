@@ -21,9 +21,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<GitHubProject> projects;
 
     private final int VIEWTYPE = 1;
-    private final int VIEWTYPE_EVEN = 0;
 
-    int lastPosition = -1;
     Context context;
 
     @Override
@@ -35,12 +33,9 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
             @Override
             public void onClick(View v) {
 
-                String link;
+                String link = "";
                 if (getItemViewType(viewType) == VIEWTYPE) {
                     ViewHolder vh = new ViewHolder(v);
-                    link = vh.link.getText().toString();
-                } else {
-                    ViewHolderEven vh = new ViewHolderEven(v);
                     link = vh.link.getText().toString();
                 }
 
@@ -54,10 +49,6 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycleview_github_odd,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolder(v);
-            case VIEWTYPE_EVEN:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycleview_github_even,parent,false);
-                v.setOnClickListener(click);
-                return new ViewHolderEven(v);
         }
         return new ViewHolder(v);
     }
@@ -68,10 +59,12 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         GitHubProject t = projects.get(position);
 
         String description;
-        if (t.getDescription().equals(""))
+        if (t.getDescription().equals("")) {
             description = context.getString(R.string.no_github_desc);
-        else
+        }
+        else {
             description = t.getDescription();
+        }
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:
@@ -85,20 +78,13 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 v.forks.setText(t.getForks());
                 v.watchers.setText(t.getWatchers());
                 break;
-            case VIEWTYPE_EVEN:
-                ViewHolderEven ve = (ViewHolderEven) holder;
-
-                ve.title.setText(t.getFullName());
-                ve.description.setText(description);
-                ve.link.setText(t.getHtmlURL());
-                break;
         }
     }
 
     public String setLanguage (String language) {
 
         if (language == null) {
-            return "No Language Specified";
+            return context.getString(R.string.rv_github_no_language);
         } else {
             return language;
         }
@@ -114,11 +100,6 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-//        if ((position %2) == 0) {
-//            return VIEWTYPE_EVEN;
-//        } else {
-//            return VIEWTYPE;
-//        }
 
         return VIEWTYPE;
     }
@@ -142,7 +123,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.context = con;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView title;
         TextView description;
@@ -165,38 +146,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
             forks = (TextView) v.findViewById(R.id.rv_github_odd_forks);
             watchers = (TextView) v.findViewById(R.id.rv_github_odd_watchers);
         }
-        @Override
-        public void onClick(View v) {
 
-            Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
-            v.getContext().startActivity(i);
-
-        }
     }
-
-    public class ViewHolderEven extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        TextView title;
-        TextView description;
-        TextView link;
-        TextView language;
-
-        public ViewHolderEven (View v) {
-            super(v);
-
-            title = (TextView) v.findViewById(R.id.rv_github_even_title);
-            description = (TextView) v.findViewById(R.id.rv_github_even_desc);
-            link = (TextView) v.findViewById(R.id.rv_github_even_link);
-
-        }
-
-        @Override
-        public void onClick(View v) {
-
-            Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
-            v.getContext().startActivity(i);
-        }
-    }
-
 
 }

@@ -24,10 +24,10 @@ import java.util.List;
 public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public final int VIEWFAQODD = 1;
-    public final int VIEWFAQEVEN = 0;
+
 
     private List<FAQTag> faqTAGs;
-    protected int lastPosition = -1;
+
     protected Context context;
 
     public RecycleViewFAQ (List<FAQTag> tags, Context con) {
@@ -45,15 +45,11 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         View.OnClickListener click = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String link;
+                String link = "";
                 if (getItemViewType(viewType) == VIEWFAQODD) {
                     ViewHolderOdd vo = new ViewHolderOdd(v);
                     link = vo.link.getText().toString();
-                } else {
-                    ViewHolderEven ve = new ViewHolderEven(v);
-                    link = ve.link.getText().toString();
                 }
-
                 Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
                 v.getContext().startActivity(i);
             }
@@ -64,10 +60,6 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_faq_odd,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolderOdd(v);
-            case VIEWFAQEVEN:
-                v = LayoutInflater.from((parent.getContext())).inflate(R.layout.recycle_faq_even,parent,false);
-                v.setOnClickListener(click);
-                return new ViewHolderEven(v);
         }
         return null;
     }
@@ -89,15 +81,8 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        //int holdposition = holder.getAdapterPosition();
         int viewType = getItemViewType(position);
         FAQTag tag = faqTAGs.get(position);
-
-//        Animation animation = AnimationUtils.loadAnimation(context,
-//                (position > lastPosition) ? R.anim.up_from_bottom
-//                        : R.anim.down_from_top);
-//        holder.itemView.startAnimation(animation);
-        lastPosition = position;
 
         switch (viewType) {
             case VIEWFAQODD:
@@ -108,14 +93,6 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 vh.views.setText(tag.getViewCount());
                 vh.answers.setText(tag.getAnswerCount());
                 vh.createdate.setText(convertDate(tag.getCreationDate()));
-                break;
-            case VIEWFAQEVEN:
-                ViewHolderEven vhe = (ViewHolderEven) holder;
-                vhe.question.setText(Jsoup.parse(tag.title).text());
-                vhe.link.setText(tag.link);
-                vhe.score.setText(tag.getScore());
-                vhe.views.setText(tag.getViewCount());
-                vhe.answers.setText(tag.getAnswerCount());
                 break;
         }
 
@@ -133,11 +110,6 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemViewType(int position) {
-//        if ((position % 2 ) == 0) {
-//            return VIEWFAQEVEN;
-//        } else {
-//            return VIEWFAQODD;
-//        }
 
         return VIEWFAQODD;
     }
@@ -147,7 +119,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return faqTAGs.size();
     }
 
-    public class ViewHolderOdd extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolderOdd extends RecyclerView.ViewHolder {
 
         TextView question;
         TextView link;
@@ -167,38 +139,6 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
             createdate = (TextView) view.findViewById(R.id.faq_odd_date);
 
         }
-
-        @Override
-        public void onClick(View v) {
-
-        }
-    }
-
-    public class ViewHolderEven extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        TextView question;
-        TextView link;
-        TextView score;
-        TextView views;
-        TextView answers;
-
-
-        public ViewHolderEven(View view) {
-
-            super(view);
-            question = (TextView) view.findViewById(R.id.faq_even);
-            link = (TextView) view.findViewById(R.id.faq_link_even);
-            score = (TextView) view.findViewById(R.id.faq_even_score);
-            views = (TextView) view.findViewById(R.id.faq_even_views);
-            answers = (TextView) view.findViewById(R.id.faq_even_answers);
-
-        }
-
-        @Override
-        public void onClick(View v) {
-
-        }
-    }
-
+   }
 
 }

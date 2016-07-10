@@ -25,6 +25,7 @@
     </string-array>
 
     <string name="site_select_title">Select Site</string>
+    <string name="rv_github_no_language">No Language Specified</string>
     <string-array name="site_select_array">
         <item>GameDev</item>
         <item>Mathematics</item>

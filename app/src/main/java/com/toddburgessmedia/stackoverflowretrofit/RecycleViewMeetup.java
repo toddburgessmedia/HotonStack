@@ -23,9 +23,6 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
     private List<MeetUpGroup> groups;
 
     private final int VIEWTYPE = 1;
-    private final int VIEWTYPE_EVEN = 0;
-
-    int lastPosition = -1;
     Context context;
 
     @Override
@@ -37,12 +34,9 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
             @Override
             public void onClick(View v) {
 
-                String link;
+                String link = "";
                 if (getItemViewType(viewType) == VIEWTYPE) {
                     ViewHolder vh = new ViewHolder(v);
-                    link = vh.link.getText().toString();
-                } else {
-                    ViewHolderEven vh = new ViewHolderEven(v);
                     link = vh.link.getText().toString();
                 }
 
@@ -58,10 +52,6 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_meetup_odd,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolder(v);
-            case VIEWTYPE_EVEN:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_meetup_even,parent,false);
-                v.setOnClickListener(click);
-                return new ViewHolderEven(v);
         }
         return new ViewHolder(v);
     }
@@ -82,24 +72,11 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
                 v.city.setText(t.getCity());
                 v.members.setText(t.getMembers());
                 break;
-            case VIEWTYPE_EVEN:
-                ViewHolderEven ve = (ViewHolderEven) holder;
-                ve.name.setText(t.getName());
-                ve.description.setText(Html.fromHtml(t.getDescription()));
-                ve.link.setText(t.getLink());
-                ve.city.setText(t.getCity());
-                ve.members.setText(t.getMembers());
-                break;
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-//        if ((position %2) == 0) {
-//            return VIEWTYPE_EVEN;
-//        } else {
-//            return VIEWTYPE;
-//        }
 
         return VIEWTYPE;
     }
@@ -124,7 +101,7 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.context = con;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView name;
         TextView description;
@@ -141,38 +118,7 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
             city = (TextView) v.findViewById(R.id.rv_meetup_odd_city);
             members = (TextView) v.findViewById(R.id.rv_meetup_odd_members);
         }
-        @Override
-        public void onClick(View v) {
-
-        }
-    }
-
-    public class ViewHolderEven extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        TextView name;
-        TextView description;
-        TextView link;
-        TextView city;
-        TextView members;
-
-
-        public ViewHolderEven (View v) {
-            super(v);
-
-            name = (TextView) v.findViewById(R.id.rv_meetup_even_title);
-            description = (TextView) v.findViewById(R.id.rv_meetup_even_desciption);
-            link = (TextView) v.findViewById(R.id.rv_meetup_even_link);
-            city = (TextView) v.findViewById(R.id.rv_meetup_even_city);
-            members = (TextView) v.findViewById(R.id.rv_meetup_even_members);
-        }
-
-        @Override
-        public void onClick(View v) {
-
-
-        }
 
     }
-
 
 }

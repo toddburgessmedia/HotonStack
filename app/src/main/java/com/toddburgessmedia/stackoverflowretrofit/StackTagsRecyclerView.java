@@ -23,9 +23,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
     private List<Tag> tagList;
 
     private final int VIEWTYPE = 1;
-    private final int VIEWTYPE_EVEN = 0;
 
-    int lastPosition = -1;
     Context context;
 
     String sitename;
@@ -39,12 +37,9 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
             @Override
             public void onClick(View v) {
 
-                String tag;
+                String tag = "";
                 if (getItemViewType(viewType) == VIEWTYPE) {
                     ViewHolder vh = new ViewHolder(v);
-                    tag = vh.tagname.getText().toString();
-                } else {
-                    ViewHolderEven vh = new ViewHolderEven(v);
                     tag = vh.tagname.getText().toString();
                 }
 
@@ -70,11 +65,6 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
                 v.setOnClickListener(click);
                 v.setOnLongClickListener(longClickListener);
                 return new ViewHolder(v);
-            case VIEWTYPE_EVEN:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_even,parent,false);
-                v.setOnClickListener(click);
-                v.setOnLongClickListener(longClickListener);
-                return new ViewHolderEven(v);
             default:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
                 break;
@@ -85,40 +75,25 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        int viewType;
-        if (position == 0) {
-            viewType = VIEWTYPE_EVEN;
-        } else {
-            viewType = position % 2;
-        }
-
         Tag t = tagList.get(position);
 
         String r = Integer.valueOf(position+1).toString();
 
-        switch (viewType) {
+        switch (getItemViewType(position)) {
             case VIEWTYPE:
                 ViewHolder v = (ViewHolder) holder;
                 v.tagname.setText(Jsoup.parse(t.getName()).text());
                 v.tagcount.setText("Tag count: " + t.getCount());
                 v.tagrank.setText(r);
                 break;
-            case VIEWTYPE_EVEN:
-                ViewHolderEven ve = (ViewHolderEven) holder;
-                ve.tagname.setText(Jsoup.parse(t.getName()).text());
-                ve.tagcount.setText("Tag count: " + t.getCount());
-                ve.tagrank.setText(r);
-                break;
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if ((position %2) == 0) {
-            return VIEWTYPE_EVEN;
-        } else {
-            return VIEWTYPE;
-        }
+
+        return VIEWTYPE;
+
     }
 
     @Override
@@ -141,7 +116,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         this.sitename = site;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tagname;
         TextView tagcount;
@@ -156,36 +131,6 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
 
         }
 
-        @Override
-        public void onClick(View v) {
-
-            Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
-            v.getContext().startActivity(i);
-
-        }
     }
-
-    public class ViewHolderEven extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-        TextView tagname;
-        TextView tagcount;
-        TextView tagrank;
-
-        public ViewHolderEven (View v) {
-            super(v);
-
-            tagname = (TextView) v.findViewById(R.id.tag_name_even);
-            tagcount = (TextView) v.findViewById(R.id.tag_count_even);
-            tagrank = (TextView) v.findViewById(R.id.tag_rank_even);
-        }
-
-        @Override
-        public void onClick(View v) {
-
-            Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
-            v.getContext().startActivity(i);
-        }
-    }
-
 
 }
