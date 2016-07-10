@@ -3,7 +3,7 @@
 
     <com.toddburgessmedia.stackoverflowretrofit.EditTagCountPreference
         android:key="tagcount"
-        android:title="Number of Tags to Display"
+        android:title="Number of Tags"
         android:summary="How many tags to start with"
         android:defaultValue="100"
         />

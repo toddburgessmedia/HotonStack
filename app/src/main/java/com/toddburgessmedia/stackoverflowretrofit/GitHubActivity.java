@@ -2,11 +2,15 @@ package com.toddburgessmedia.stackoverflowretrofit;
 
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectAPI;
@@ -28,6 +32,8 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     RecyclerView rv;
     RecyclerViewGitHub adapter;
 
+    boolean searchLanguage = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +47,8 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         if (savedInstanceState != null) {
             projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
+            searchTag = savedInstanceState.getString("searchtag");
+            searchLanguage = savedInstanceState.getBoolean("search_language");
             if (projects != null) {
                 adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
                 rv.setAdapter(adapter);
@@ -49,17 +57,49 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         }
 
         searchTag = getIntent().getStringExtra("name");
-        progress = new ProgressDialog(this);
-        progress.setMessage("Loading GitHub Projects");
+        startProgressDialog();
+        getProjects(searchTag,searchLanguage);
+    }
+
+    private void startProgressDialog() {
+
+        if (progress == null) {
+            progress = new ProgressDialog(this);
+            progress.setMessage(getString(R.string.github_activity_loading));
+        }
         progress.show();
-        getProjects(searchTag,true);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
         outState.putSerializable("savedprojects",projects);
+        outState.putString("searchtag",searchTag);
+        outState.putBoolean("search_language",searchLanguage);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflate = getMenuInflater();
+        inflate.inflate(R.menu.github_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.github_menu_meetup) {
+            Intent i = new Intent(this, MeetupActivity.class);
+            i.putExtra("searchtag", searchTag);
+            startActivity(i);
+            return true;
+        } else if (item.getItemId() == R.id.github_menu_refresh) {
+            startProgressDialog();
+            getProjects(searchTag,searchLanguage);
+        }
+
+        return true;
     }
 
     private void getProjects(String language,boolean langugesearch) {
@@ -85,7 +125,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             public void onResponse(Call<GitHubProjectCollection> call, Response<GitHubProjectCollection> response) {
                 projects = response.body();
 
-                progress.dismiss();
+                stopProgressDialog();
                 if  ((response.code() != 200) || (projects==null)) {
                     NoLanguageFoundDialog nothing = new NoLanguageFoundDialog();
                     nothing.show(getFragmentManager(),"nothing");
@@ -98,19 +138,26 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
             @Override
             public void onFailure(Call<GitHubProjectCollection> call, Throwable t) {
-                progress.dismiss();
+                stopProgressDialog();
                 Toast.makeText(GitHubActivity.this, "No Network Connection", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onFailure: it failed horribly. how embarassing");
             }
         });
     }
 
+    private void stopProgressDialog() {
+        if (progress != null) {
+            progress.dismiss();
+        }
+    }
+
     @Override
     public void positiveClick(DialogFragment dialog) {
         Log.d(TAG, "positiveClick: yo yo yo ");
 
-        progress.show();
-        getProjects(searchTag,false);
+        startProgressDialog();
+        searchLanguage = false;
+        getProjects(searchTag,searchLanguage);
     }
 
     @Override

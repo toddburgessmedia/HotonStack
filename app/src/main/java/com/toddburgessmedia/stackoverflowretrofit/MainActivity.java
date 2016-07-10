@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -25,6 +26,8 @@ import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,18 +37,21 @@ import rx.functions.Action1;
 
 
 public class MainActivity extends AppCompatActivity implements
-        SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener {
+        SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener,
+        TagsLongPressDialog.TagsLongPressDialogListener, StackTagsRecyclerView.OnLongPressListener {
 
     public final static String TAG = "StackOverFlow";
 
     RecyclerView rv;
-    RecyclerView.Adapter adapter;
+    StackTagsRecyclerView adapter;
     StackOverFlowTags tags;
 
     String tagcount;
     ProgressDialog progress;
 
     String searchsite = "stackoverflow";
+
+    String searchtag;
 
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
@@ -72,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
             searchsite = savedInstanceState.getString("searchsite");
             setSiteName();
             if (tags != null) {
-                adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(),searchsite);
+                adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(),searchsite,this);
                 rv.setAdapter(adapter);
                 return;
             }
@@ -91,13 +97,13 @@ public class MainActivity extends AppCompatActivity implements
                 searchsite = s;
                 setSiteName();
                 startProgressDialog();
-                getTags(tagcount);
+                getTags(tagcount,false);
             }
         });
 
         setSiteName();
         startProgressDialog();
-        getTags(tagcount);
+        getTags(tagcount,false);
     }
 
     private void startProgressDialog() {
@@ -129,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.menu_refresh:
                 startProgressDialog();
-                getTags(tagcount);
+                getTags(tagcount,false);
                 break;
             case R.id.menu_preferences:
                 Intent i = new Intent(this,PreferencesActivity.class);
@@ -150,26 +156,45 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    private void getTags(String tagcount) {
+    private void getTags(String tagcount, boolean synonymsearch) {
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.stackexchange.com")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
         StackOverFlowAPI stackOverFlowAPI = retrofit.create(StackOverFlowAPI.class);
 
-        Call<StackOverFlowTags> call = stackOverFlowAPI.loadquestions(tagcount,searchsite);
+        Call<StackOverFlowTags> call;
+        if (!synonymsearch) {
+            call = stackOverFlowAPI.loadquestions(tagcount, searchsite);
+        } else {
+            call = stackOverFlowAPI.loadSynonyms(searchtag, searchsite);
+        }
 
         call.enqueue(new Callback<StackOverFlowTags>() {
             @Override
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
+                Log.d(TAG, "onResponse: " + response.code());
                 tags = response.body();
                 if (tags == null) {
                     return;
                 }
-                adapter = new StackTagsRecyclerView(tags.tags,getBaseContext(),searchsite);
-                rv.setAdapter(adapter);
+
+                if (adapter != null) {
+                    adapter.removeAllItems();
+                    adapter.updateAdapter(tags.tags);
+                } else {
+                    adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    rv.setAdapter(adapter);
+                }
                 progress.dismiss();
             }
 
@@ -235,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements
 
         setSiteName();
         startProgressDialog();
-        getTags(tagcount);
+        getTags(tagcount,false);
 
 
     }
@@ -243,5 +268,38 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void siteSelectnegativeClick(DialogFragment fragment, int which) {
 
+    }
+
+    @Override
+    public void longPresspositiveClick(DialogFragment fragment, int which) {
+
+        String[] values = getResources().getStringArray(R.array.tag_longpress_dialog);
+
+        Log.d(TAG, "longPresspositiveClick: " + values[which]);
+        if (values[which].equals("Load Related Tags")) {
+            startProgressDialog();
+            getTags(tagcount,true);
+        }
+
+
+    }
+
+    @Override
+    public void longPresstnegativeClick(DialogFragment fragment, int which) {
+
+    }
+
+    
+    @Override
+    public void onLongClick(View v) {
+        Log.d(TAG, "onLongClick: ");
+
+        TagsLongPressDialog dialog = new TagsLongPressDialog();
+        dialog.show(getFragmentManager(),"long press");
+    }
+
+    @Override
+    public void setSearchTag(String tag) {
+        searchtag = tag;
     }
 }

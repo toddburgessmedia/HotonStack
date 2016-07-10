@@ -15,11 +15,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetupAPI;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -73,17 +77,64 @@ public class MeetupActivity extends AppCompatActivity {
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
 
+        if (savedInstanceState != null) {
+            groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
+            tagname = savedInstanceState.getString("tagname");
+            if (groups != null) {
+                adapter = new RecycleViewMeetup(groups,getBaseContext());
+                rv.setAdapter(adapter);
+                return;
+            }
+
+        }
+
         startProgressDialog();
-        progress.setMessage("Getting GPS location");
+        progress.setMessage(getString(R.string.meetupactivity_gettingGPS));
         getGPSLocation();
         Log.d(MainActivity.TAG, "onCreate: lat " + latLng.get("latitude"));
         Log.d(MainActivity.TAG, "onCreate: long " + latLng.get("longitude"));
-        progress.setMessage("Finding Meetup Groups");
+        progress.setMessage(getString(R.string.meetupactivity_finding_groups));
         tagname = getIntent().getStringExtra("searchtag");
         Log.d(TAG, "onCreate: tag" + tagname);
         getMeetupGroups(tagname);
 
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        outState.putSerializable("meetup_groups", (Serializable) groups);
+        outState.putString("tagname",tagname);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.meetup_menu,menu);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.meetup_menu_github) {
+            Intent i = new Intent(this,GitHubActivity.class);
+            i.putExtra("name",tagname);
+            startActivity(i);
+            return true;
+        } else if (item.getItemId() == R.id.meetup_menu_refresh) {
+            startProgressDialog();
+            getMeetupGroups(tagname);
+        }
+
+        return true;
+    }
+
 
     public void getGPSLocation() {
 

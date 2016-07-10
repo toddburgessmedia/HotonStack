@@ -26,6 +26,11 @@
 
     <string name="site_select_title">Select Site</string>
     <string name="rv_github_no_language">No Language Specified</string>
+    <string name="github_menu_meetup">Meetup</string>
+    <string name="github_activity_loading">Loading GitHub Projects</string>
+    <string name="menu_meetup_github">GitHub Projects</string>
+    <string name="meetupactivity_gettingGPS">Getting GPS location</string>
+    <string name="meetupactivity_finding_groups">Finding Meetup Groups</string>
     <string-array name="site_select_array">
         <item>GameDev</item>
         <item>Mathematics</item>
@@ -42,6 +47,11 @@
         <item>Security</item>
         <item>Stack Overflow</item>
         <item>Super User</item>
+    </string-array>
+
+    <string-array name="tag_longpress_dialog">
+        <item>Load Related Tags</item>
+        <item>Load Questions</item>
     </string-array>
 
 

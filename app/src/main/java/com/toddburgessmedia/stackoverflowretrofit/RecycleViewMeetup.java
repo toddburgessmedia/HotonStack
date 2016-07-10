@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,8 +44,6 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
         };
 
-        Log.d(MainActivity.TAG, "onCreateViewHolder: making viewholders");
-
         switch (viewType) {
             case VIEWTYPE:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_meetup_odd,parent,false);
@@ -58,8 +55,6 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-        Log.d(MainActivity.TAG, "onBindViewHolder: hello");
 
         MeetUpGroup t = groups.get(position);
 
@@ -96,7 +91,6 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public RecycleViewMeetup (List<MeetUpGroup> projects, Context con) {
 
-        Log.d(MainActivity.TAG, "RecycleViewMeetup: starting up " + projects.toString());
         this.groups = projects;
         this.context = con;
     }

@@ -58,8 +58,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        Log.d("stackoverflow", "onOptionsItemSelected: event generated");
-
         if (item.getItemId() == R.id.menu_gogithub) {
             Intent i = new Intent(this,GitHubActivity.class);
             i.putExtra("name",searchTag);
@@ -79,10 +77,9 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 return true;
 
             case R.id.whats_hot_refresh:
-                progress.show();
+                startProgressDialog();
                 getQuestions(searchTag);
                 break;
-
         }
 
         return true;
@@ -125,11 +122,18 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             }
         }
 
-        progress = new ProgressDialog(this);
-        progress.setMessage("Loading questions");
-        progress.show();
+        startProgressDialog();
 
         getQuestions(searchTag);
+    }
+
+    private void startProgressDialog() {
+
+        if (progress == null) {
+            progress = new ProgressDialog(this);
+            progress.setMessage("Loading questions");
+        }
+        progress.show();
     }
 
     @Override
@@ -151,7 +155,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         final StackOverFlowFaqAPI faqAPI = retrofit.create(StackOverFlowFaqAPI.class);
 
         Call<StackOverFlowFAQ> call;
-//        Log.d(TAG, "getQuestions: " + searchtime);
         call = getStackOverFlowFAQCall(tag,faqAPI);
 
         call.enqueue(new Callback<StackOverFlowFAQ>() {
@@ -176,16 +179,23 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                     adapter = new RecycleViewFAQ(faq.faq,getBaseContext());
                     rv.setAdapter(adapter);
                 }
-                progress.dismiss();
+                stopProgressDialog();
             }
 
             @Override
             public void onFailure(Call<StackOverFlowFAQ> call, Throwable t) {
                 Toast.makeText(ListQuestionsActivity.this, "No Network Connection!", Toast.LENGTH_SHORT).show();
-                progress.dismiss();
+                stopProgressDialog();
             }
         });
 
+    }
+
+    private void stopProgressDialog() {
+
+        if (progress != null) {
+            progress.dismiss();
+        }
     }
 
     private Call<StackOverFlowFAQ> getStackOverFlowFAQCall(String tag,StackOverFlowFaqAPI faqAPI) {

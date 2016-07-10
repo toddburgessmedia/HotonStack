@@ -3,7 +3,6 @@ package com.toddburgessmedia.stackoverflowretrofit;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +27,8 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
 
     String sitename;
 
+    OnLongPressListener longClickListener;
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
 
@@ -50,12 +51,18 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
             }
         };
 
-        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+        final View.OnLongClickListener longClick = new View.OnLongClickListener() {
 
             @Override
             public boolean onLongClick(View v) {
-                Log.d(MainActivity.TAG, "onLongClick: long click!");
-                return false;
+
+                String tag = "";
+                ViewHolder vh = new ViewHolder(v);
+                tag = vh.tagname.getText().toString();
+                longClickListener.setSearchTag(tag);
+                longClickListener.onLongClick(v);
+
+                return true;
             }
         };
 
@@ -63,7 +70,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
             case VIEWTYPE:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
                 v.setOnClickListener(click);
-                v.setOnLongClickListener(longClickListener);
+                v.setOnLongClickListener(longClick);
                 return new ViewHolder(v);
             default:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
@@ -109,11 +116,18 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         }
     }
 
-    public StackTagsRecyclerView (List<Tag> tags, Context con, String site) {
+    public void updateAdapter (List<Tag> tags) {
+
+        this.tagList = tags;
+        notifyDataSetChanged();
+    }
+
+    public StackTagsRecyclerView (List<Tag> tags, Context con, String site, OnLongPressListener listener) {
 
         this.tagList = tags;
         this.context = con;
         this.sitename = site;
+        this.longClickListener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -132,5 +146,11 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         }
 
     }
+
+    public interface OnLongPressListener {
+        void onLongClick(View v);
+        void setSearchTag(String tag);
+    }
+
 
 }
