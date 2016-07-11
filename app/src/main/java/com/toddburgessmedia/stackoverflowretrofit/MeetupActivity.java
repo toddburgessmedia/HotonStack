@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -18,20 +20,33 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetupAPI;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func0;
+import rx.schedulers.Schedulers;
 
 public class MeetupActivity extends AppCompatActivity {
 
@@ -49,6 +64,10 @@ public class MeetupActivity extends AppCompatActivity {
     RecycleViewMeetup adapter;
     private ProgressDialog progress;
 
+    Subscription subscribe;
+
+    TextView meetupLoc;
+    TextView searchTerm;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -71,6 +90,8 @@ public class MeetupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetup);
 
+        meetupLoc = (TextView) findViewById(R.id.meetup_location);
+        searchTerm = (TextView) findViewById(R.id.meetup_searchterm);
         rv = (RecyclerView) findViewById(R.id.rv_meetup);
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -80,9 +101,14 @@ public class MeetupActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
             tagname = savedInstanceState.getString("tagname");
+            latLng = new HashMap<>();
+            latLng.put("latitude",savedInstanceState.getDouble("latitude"));
+            latLng.put("longitude",savedInstanceState.getDouble("longitude"));
+            meetupLoc.setText(savedInstanceState.getString("location"));
             if (groups != null) {
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 rv.setAdapter(adapter);
+                searchTerm.setText(tagname);
                 return;
             }
 
@@ -91,13 +117,49 @@ public class MeetupActivity extends AppCompatActivity {
         startProgressDialog();
         progress.setMessage(getString(R.string.meetupactivity_gettingGPS));
         getGPSLocation();
-        Log.d(MainActivity.TAG, "onCreate: lat " + latLng.get("latitude"));
-        Log.d(MainActivity.TAG, "onCreate: long " + latLng.get("longitude"));
+
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));
         tagname = getIntent().getStringExtra("searchtag");
+        searchTerm.setText(tagname);
         Log.d(TAG, "onCreate: tag" + tagname);
         getMeetupGroups(tagname);
 
+        setLocationName();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        if ((subscribe != null) && (!subscribe.isUnsubscribed())) {
+            subscribe.unsubscribe();
+        }
+
+        super.onDestroy();
+    }
+
+    private void setLocationName() {
+        subscribe = getGeoCoderObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<Address>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<Address> addresses) {
+                        for (Address a : addresses) {
+                            meetupLoc.setText(a.getLocality() + " - " + a.getCountryName());
+                        }
+                    }
+                });
     }
 
     @Override
@@ -105,6 +167,9 @@ public class MeetupActivity extends AppCompatActivity {
 
         outState.putSerializable("meetup_groups", (Serializable) groups);
         outState.putString("tagname",tagname);
+        outState.putDouble("latitude",latLng.get("latitude"));
+        outState.putDouble("longitude",latLng.get("longitude"));
+        outState.putString("location",meetupLoc.getText().toString());
 
         super.onSaveInstanceState(outState);
     }
@@ -175,9 +240,18 @@ public class MeetupActivity extends AppCompatActivity {
 
     private void getMeetupGroups(String tagname) {
 
+        int cachesize =  10 * 1024 * 1024;
+        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cache(cache)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.meetup.com")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
         MeetupAPI meetupAPI = retrofit.create(MeetupAPI.class);
@@ -243,5 +317,27 @@ public class MeetupActivity extends AppCompatActivity {
         alert.show();
     }
 
+    protected List<Address> getLocationName() {
+
+        Geocoder coder = new Geocoder(getBaseContext(), Locale.ENGLISH);
+        List<Address> addresses = null;
+        try {
+            addresses = coder.getFromLocation(latLng.get("latitude"),latLng.get("longitude"),1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return addresses;
+
+    }
+
+    protected Observable<List<Address>> getGeoCoderObservable () {
+        return Observable.defer(new Func0<Observable<List<Address>>>() {
+            @Override
+            public Observable<List<Address>> call() {
+                return Observable.just(getLocationName());
+            }
+        });
+    }
 
 }

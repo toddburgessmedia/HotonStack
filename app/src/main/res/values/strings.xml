@@ -15,6 +15,11 @@
     <string name="nothing_ok_button">OK</string>
     <string name="no_github_desc">No description available</string>
 
+    <string name="questions_time_frame">Time Frame: </string>
+
+    <string name="github_language">Language: </string>
+    <string name="github_searchterm">Search Term: </string>
+
     <string name="time_dialog_title">Select Time Period</string>
     <string-array name="time_dialog">
         <item>All Time</item>
@@ -51,7 +56,10 @@
 
     <string-array name="tag_longpress_dialog">
         <item>Load Related Tags</item>
-        <item>Load Questions</item>
+    </string-array>
+
+    <string-array name="tag_longpress_dialog_back">
+        <item>Go Back</item>
     </string-array>
 
 

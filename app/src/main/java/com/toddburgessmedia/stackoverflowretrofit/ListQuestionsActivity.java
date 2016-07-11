@@ -10,17 +10,22 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Slide;
-import android.transition.Transition;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFAQ;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFaqAPI;
 
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,10 +35,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ListQuestionsActivity extends AppCompatActivity implements TimeFrameDialog.TimeFrameDialogListener {
 
     public static final int ALLTIME = 0;
-    public static final int TODAY = 1;
-    public static final int YESTERDAY = 2;
-    public static final int THISMONTH = 3;
-    public static final int THISYEAR = 4;
+    public static final int TODAY = 4;
+    public static final int YESTERDAY = 3;
+    public static final int THISMONTH = 2;
+    public static final int THISYEAR = 1;
 
     int searchtime = ALLTIME;
 
@@ -47,12 +52,14 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     ProgressDialog progress;
 
+    TextView sitename;
+    TextView timeframe;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflate = getMenuInflater();
         inflate.inflate(R.menu.whatishot_menu,menu);
         return true;
-
     }
 
     @Override
@@ -90,22 +97,18 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-
-        Transition enter = new Slide();
-        getWindow().setEnterTransition(enter);
-        Transition reEnter = new Slide();
-        //getWindow().setReenterTransition(reEnter);
-
         setContentView(R.layout.activity_list_questions);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Intent i = getIntent();
         searchTag = i.getStringExtra("name");
         searchsite = i.getStringExtra("sitename");
-        String title = getString(R.string.app_name) + " - " + searchTag;
-        setTitle(title);
+        setTitle(getString(R.string.app_name));
 
+        sitename = (TextView) findViewById(R.id.questions_sitename);
+        setSiteName();
+        timeframe = (TextView) findViewById(R.id.questions_timeframe);
+        setTimeFrame();
 
         rv = (RecyclerView) findViewById(R.id.questions_recycleview);
         if (rv != null) {
@@ -123,9 +126,40 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         }
 
         startProgressDialog();
-
         getQuestions(searchTag);
     }
+
+    void setTimeFrame() {
+
+        String[] times = getResources().getStringArray(R.array.time_dialog);
+
+        Log.d(MainActivity.TAG, "setTimeFrame: " + times[searchtime]);
+        timeframe.setText(times[searchtime]);
+
+    }
+
+    void setSiteName() {
+
+        String[] display = getResources().getStringArray(R.array.select_select_display);
+        String[] values = getResources().getStringArray(R.array.site_select_array);
+        boolean found = false;
+        int i = 0;
+
+        while (!found) {
+            if (values[i].equals(searchsite)) {
+                found = true;
+            } else {
+                i++;
+                if (i == values.length) { // this is to catch errors
+                    i--;
+                    found = true;
+                }
+            }
+        }
+        sitename.setText(display[i] + " / " + searchTag);
+    }
+
+
 
     private void startProgressDialog() {
 
@@ -146,9 +180,18 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     private void getQuestions(String tag) {
 
+        int cachesize =  10 * 1024 * 1024;
+        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cache(cache)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.stackexchange.com")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
 
@@ -236,25 +279,23 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         switch (what[which]) {
             case "All Time":
                 searchtime = ALLTIME;
-                getQuestions(searchTag);
                 break;
             case "Today":
                 searchtime = TODAY;
-                getQuestions(searchTag);
                 break;
             case "Since Yesterday":
                 searchtime = YESTERDAY;
-                getQuestions(searchTag);
                 break;
             case "This Month":
                 searchtime = THISMONTH;
-                getQuestions(searchTag);
                 break;
             case "This Year":
                 searchtime = THISYEAR;
-                getQuestions(searchTag);
                 break;
         }
+        setTimeFrame();
+        startProgressDialog();
+        getQuestions(searchTag);
     }
 
     @Override

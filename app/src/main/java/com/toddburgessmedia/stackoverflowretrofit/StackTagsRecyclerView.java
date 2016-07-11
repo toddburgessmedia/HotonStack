@@ -59,8 +59,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
                 String tag = "";
                 ViewHolder vh = new ViewHolder(v);
                 tag = vh.tagname.getText().toString();
-                longClickListener.setSearchTag(tag);
-                longClickListener.onLongClick(v);
+                longClickListener.onLongClick(v,tag);
 
                 return true;
             }
@@ -148,8 +147,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     public interface OnLongPressListener {
-        void onLongClick(View v);
-        void setSearchTag(String tag);
+        void onLongClick(View v, String tag);
     }
 
 

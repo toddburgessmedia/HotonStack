@@ -26,8 +26,11 @@ import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
 
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,12 +54,15 @@ public class MainActivity extends AppCompatActivity implements
 
     String searchsite = "stackoverflow";
 
-    String searchtag;
+    String searchtag = "";
 
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
 
     TextView sitename;
+    TextView relatedtags;
+
+    boolean tagsearch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,13 +103,13 @@ public class MainActivity extends AppCompatActivity implements
                 searchsite = s;
                 setSiteName();
                 startProgressDialog();
-                getTags(tagcount,false);
+                getTags(tagcount,tagsearch);
             }
         });
 
         setSiteName();
         startProgressDialog();
-        getTags(tagcount,false);
+        getTags(tagcount,tagsearch);
     }
 
     private void startProgressDialog() {
@@ -135,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.menu_refresh:
                 startProgressDialog();
-                getTags(tagcount,false);
+                getTags(tagcount,tagsearch);
                 break;
             case R.id.menu_preferences:
                 Intent i = new Intent(this,PreferencesActivity.class);
@@ -156,12 +162,15 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    private void getTags(String tagcount, boolean synonymsearch) {
+    private void getTags(final String tagcount, final boolean synonymsearch) {
 
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
+        int cachesize =  10 * 1024 * 1024;
+        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cache(cache)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.stackexchange.com")
@@ -182,9 +191,15 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
-                Log.d(TAG, "onResponse: " + response.code());
                 tags = response.body();
                 if (tags == null) {
+                    return;
+                }
+
+                if (tags.tags.size() == 0) {
+                    Toast.makeText(MainActivity.this, "Tag Not Found", Toast.LENGTH_SHORT).show();
+                    tagsearch = false;
+                    setSiteName();
                     return;
                 }
 
@@ -196,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements
                     rv.setAdapter(adapter);
                 }
                 progress.dismiss();
+
             }
 
             @Override
@@ -215,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements
         int i = 0;
 
         while (!found) {
-            Log.d(TAG, "setSiteName: " + values[i]);
             if (values[i].equals(searchsite)) {
                 found = true;
             } else {
@@ -229,22 +244,30 @@ public class MainActivity extends AppCompatActivity implements
         sitename.setText(display[i]);
     }
 
+    // Search Dialog positive click
     @Override
     public void positiveClick(DialogFragment fragment) {
         String tag;
         SearchDialog search = (SearchDialog) fragment;
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         EditText text = (EditText) search.view.findViewById(R.id.search_tag);
         tag = text.getText().toString();
 
-        tag = tag.replace(' ','-');
+        tag = tag.replace(' ', '-');
+        searchtag = tag;
+        String newsite = sitename.getText() + " / " + searchtag;
+        sitename.setText(newsite);
+        tagsearch = true;
 
-        Intent i = new Intent(this,ListQuestionsActivity.class);
-        i.putExtra("name",tag);
-        i.putExtra("sitename",searchsite);
-        startActivity(i);
+        startProgressDialog();
+        getTags(tagcount, tagsearch);
+
     }
 
+
+    // Search Dialog negative click
     @Override
     public void negativeClick(DialogFragment fragment) {
 
@@ -252,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG, "negativeClick: ");
     }
 
+    // Change Site positive click
     @Override
     public void siteSelectpositiveClick(DialogFragment fragment, int which) {
 
@@ -260,30 +284,45 @@ public class MainActivity extends AppCompatActivity implements
 
         setSiteName();
         startProgressDialog();
-        getTags(tagcount,false);
+        getTags(tagcount,tagsearch);
 
 
     }
 
+    // Change site name negative click
     @Override
     public void siteSelectnegativeClick(DialogFragment fragment, int which) {
 
     }
 
+    // LongPress Dialog positive click handler
     @Override
     public void longPresspositiveClick(DialogFragment fragment, int which) {
 
-        String[] values = getResources().getStringArray(R.array.tag_longpress_dialog);
+        String[] values;
 
-        Log.d(TAG, "longPresspositiveClick: " + values[which]);
-        if (values[which].equals("Load Related Tags")) {
+        if (!searchtag.equals("")) {
+            values = getResources().getStringArray(R.array.tag_longpress_dialog);
+
+            if (values[which].equals("Load Related Tags")) {
+                String newsite = sitename.getText() + " / " + searchtag;
+                sitename.setText(newsite);
+                tagsearch = true;
+            }
             startProgressDialog();
-            getTags(tagcount,true);
+            getTags(tagcount, tagsearch);
+
+        } else {
+            setSiteName();
+            tagsearch = false;
+            startProgressDialog();
+            getTags(tagcount,tagsearch);
         }
 
 
     }
 
+    // Long Press negative handler
     @Override
     public void longPresstnegativeClick(DialogFragment fragment, int which) {
 
@@ -291,15 +330,19 @@ public class MainActivity extends AppCompatActivity implements
 
     
     @Override
-    public void onLongClick(View v) {
+    public void onLongClick(View v, String tag) {
         Log.d(TAG, "onLongClick: ");
 
+
         TagsLongPressDialog dialog = new TagsLongPressDialog();
+        if (searchtag.equals("")) {
+            searchtag = tag;
+            dialog.setTagsearch(true);
+        } else {
+            searchtag = "";
+            dialog.setTagsearch(false);
+        }
         dialog.show(getFragmentManager(),"long press");
     }
 
-    @Override
-    public void setSearchTag(String tag) {
-        searchtag = tag;
-    }
 }

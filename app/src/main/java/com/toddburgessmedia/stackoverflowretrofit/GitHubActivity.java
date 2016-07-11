@@ -11,11 +11,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectCollection;
 
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,11 +40,14 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     boolean searchLanguage = true;
 
+    TextView search;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_git_hub);
 
+        search = (TextView) findViewById(R.id.github_search);
         rv = (RecyclerView) findViewById(R.id.github_recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -52,11 +61,13 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             if (projects != null) {
                 adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
                 rv.setAdapter(adapter);
+                setSearch();
                 return;
             }
         }
 
         searchTag = getIntent().getStringExtra("name");
+        setSearch();
         startProgressDialog();
         getProjects(searchTag,searchLanguage);
     }
@@ -102,11 +113,32 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         return true;
     }
 
+    private void setSearch() {
+
+        String searchtype = "";
+        if (searchLanguage) {
+            searchtype = getString(R.string.github_language);
+        } else {
+            searchtype = getString(R.string.github_searchterm);
+        }
+
+        search.setText(searchtype + " " + searchTag);
+    }
+
     private void getProjects(String language,boolean langugesearch) {
+
+        int cachesize =  10 * 1024 * 1024;
+        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cache(cache)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
                 .build();
 
         GitHubProjectAPI projectAPI = retrofit.create(GitHubProjectAPI.class);
@@ -157,6 +189,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         startProgressDialog();
         searchLanguage = false;
+        setSearch();
         getProjects(searchTag,searchLanguage);
     }
 

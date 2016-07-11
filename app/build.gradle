@@ -44,7 +44,7 @@ dependencies {
     compile 'com.f2prateek.rx.preferences:rx-preferences:1.0.2'
 
 
-    //compile 'com.squareup.okhttp3:okhttp:3.3.1'
+    compile 'com.squareup.okhttp3:okhttp:3.3.1'
 
     compile 'io.reactivex:rxandroid:1.0.1'
     compile 'io.reactivex:rxjava:1.0.14'
