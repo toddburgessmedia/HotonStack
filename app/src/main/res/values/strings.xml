@@ -36,6 +36,7 @@
     <string name="menu_meetup_github">GitHub Projects</string>
     <string name="meetupactivity_gettingGPS">Getting GPS location</string>
     <string name="meetupactivity_finding_groups">Finding Meetup Groups</string>
+    <string name="questions_dialog_loading">Loading questions</string>
     <string-array name="site_select_array">
         <item>GameDev</item>
         <item>Mathematics</item>

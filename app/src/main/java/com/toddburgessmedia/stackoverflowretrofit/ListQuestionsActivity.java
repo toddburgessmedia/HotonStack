@@ -1,10 +1,7 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -156,16 +153,15 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 }
             }
         }
-        sitename.setText(display[i] + " / " + searchTag);
+        String displaytext = display[i] + " / " + searchTag;
+        sitename.setText(displaytext);
     }
-
-
 
     private void startProgressDialog() {
 
         if (progress == null) {
             progress = new ProgressDialog(this);
-            progress.setMessage("Loading questions");
+            progress.setMessage(getString(R.string.questions_dialog_loading));
         }
         progress.show();
     }
@@ -180,7 +176,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     private void getQuestions(String tag) {
 
-        int cachesize =  10 * 1024 * 1024;
+        int cachesize =  10 * 1024 * 1024; // 10 MB
         final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
         OkHttpClient client = new OkHttpClient.Builder()
                 .cache(cache)
@@ -193,7 +189,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-
 
         final StackOverFlowFaqAPI faqAPI = retrofit.create(StackOverFlowFaqAPI.class);
 
@@ -210,10 +205,10 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                     return;
                 }
 
-                if (faq.isEmpty()) {
-                    NothingFoundDialog nothing = new NothingFoundDialog();
-                    nothing.show(getFragmentManager(),"nothing");
-                }
+//                if (faq.isEmpty()) {
+//                    NothingFoundDialog nothing = new NothingFoundDialog();
+//                    nothing.show(getFragmentManager(),"nothing");
+//                }
 
                 if (adapter != null) {
                     adapter.removeAllItems();
@@ -243,32 +238,26 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     private Call<StackOverFlowFAQ> getStackOverFlowFAQCall(String tag,StackOverFlowFaqAPI faqAPI) {
 
-        Call<StackOverFlowFAQ> call;
         long secondsPassed;
         TimeDelay delay = new TimeDelay();
 
         switch (searchtime) {
             case TODAY:
                 secondsPassed = delay.getTimeDelay(TimeDelay.TODAY);
-                call = faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
                 break;
             case YESTERDAY:
                 secondsPassed = delay.getTimeDelay(TimeDelay.YESTERDAY);
-                call = faqAPI.loadQuestionsYesterday(secondsPassed, tag, searchsite);
                 break;
             case THISMONTH:
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISMONTH);
-                call = faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
                 break;
             case THISYEAR:
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISYEAR);
-                call = faqAPI.loadQuestionsToday(secondsPassed,tag,searchsite);
                 break;
             default:
-                call = faqAPI.loadQuestions(tag,searchsite);
-                break;
+                return faqAPI.loadQuestions(tag,searchsite);
         }
-        return call;
+        return faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
     }
 
     @Override
@@ -303,23 +292,23 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     }
 
-    public static class NothingFoundDialog extends DialogFragment {
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.nothing_dialog_title);
-            builder.setMessage(R.string.nothing_dialog_body);
-            builder.setNeutralButton(R.string.nothing_ok_button, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    getActivity().finish();
-                }
-            });
-
-            return builder.create();
-        }
-    }
+//    public static class NothingFoundDialog extends DialogFragment {
+//
+//        @Override
+//        public Dialog onCreateDialog(Bundle savedInstanceState) {
+//
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//            builder.setTitle(R.string.nothing_dialog_title);
+//            builder.setMessage(R.string.nothing_dialog_body);
+//            builder.setNeutralButton(R.string.nothing_ok_button, new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    getActivity().finish();
+//                }
+//            });
+//
+//            return builder.create();
+//        }
+//    }
 
 }
