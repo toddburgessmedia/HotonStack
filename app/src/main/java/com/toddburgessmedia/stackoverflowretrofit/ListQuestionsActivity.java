@@ -222,11 +222,11 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
             @Override
             public void onFailure(Call<StackOverFlowFAQ> call, Throwable t) {
-                Toast.makeText(ListQuestionsActivity.this, "No Network Connection!", Toast.LENGTH_SHORT).show();
+                String failure = getString(R.string.questions_failure_toast);
+                Toast.makeText(ListQuestionsActivity.this,failure, Toast.LENGTH_SHORT).show();
                 stopProgressDialog();
             }
         });
-
     }
 
     private void stopProgressDialog() {

@@ -115,14 +115,15 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     private void setSearch() {
 
-        String searchtype = "";
+        String searchtype;
         if (searchLanguage) {
             searchtype = getString(R.string.github_language);
         } else {
             searchtype = getString(R.string.github_searchterm);
         }
 
-        search.setText(searchtype + " " + searchTag);
+        String text = searchtype + " " + searchTag;
+        search.setText(text);
     }
 
     private void getProjects(String language,boolean langugesearch) {

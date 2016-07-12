@@ -54,7 +54,6 @@ public class MeetupActivity extends AppCompatActivity {
 
     HashMap<String,Double> latLng;
     String oauthtoken;
-    int MEETUPAUTH = 1;
 
     String tagname;
 
@@ -79,7 +78,7 @@ public class MeetupActivity extends AppCompatActivity {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor edit = prefs.edit();
             edit.putString("oauthtoken",data.getStringExtra("access_token"));
-            edit.commit();
+            edit.apply();
 
         }
 
@@ -156,7 +155,8 @@ public class MeetupActivity extends AppCompatActivity {
                     @Override
                     public void onNext(List<Address> addresses) {
                         for (Address a : addresses) {
-                            meetupLoc.setText(a.getLocality() + " - " + a.getCountryName());
+                            String loc = a.getLocality() + " - " + a.getCountryName();
+                            meetupLoc.setText(loc);
                         }
                     }
                 });

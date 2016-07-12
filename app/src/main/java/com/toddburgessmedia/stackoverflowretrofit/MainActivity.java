@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements
     String tagcount;
     ProgressDialog progress;
 
-    String searchsite = "stackoverflow";
+    String searchsite;
 
     String searchtag = "";
 
@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements
     Preference<String> rxDefaultsite;
 
     TextView sitename;
-    TextView relatedtags;
 
     boolean tagsearch = false;
 
@@ -74,10 +73,8 @@ public class MainActivity extends AppCompatActivity implements
         rv = (RecyclerView) findViewById(R.id.recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
+            rv.setLayoutManager(new LinearLayoutManager(this));
         }
-        rv.setLayoutManager(new LinearLayoutManager(this));
-
-        //rv.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         if (savedInstanceState != null) {
             tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
@@ -95,6 +92,14 @@ public class MainActivity extends AppCompatActivity implements
         tagcount = prefs.getString("tagcount","100");
         searchsite = prefs.getString("defaultsite","StackOverflow");
 
+        startPrefsObservables(prefs);
+
+        setSiteName();
+        startProgressDialog();
+        getTags(tagcount,tagsearch);
+    }
+
+    private void startPrefsObservables(SharedPreferences prefs) {
         rxPrefs = RxSharedPreferences.create(prefs);
         rxDefaultsite = rxPrefs.getString("defaultsite");
         rxDefaultsite.asObservable().subscribe(new Action1<String>() {
@@ -106,13 +111,10 @@ public class MainActivity extends AppCompatActivity implements
                 getTags(tagcount,tagsearch);
             }
         });
-
-        setSiteName();
-        startProgressDialog();
-        getTags(tagcount,tagsearch);
     }
 
     private void startProgressDialog() {
+
 
         if (progress == null) {
             progress = new ProgressDialog(this);
