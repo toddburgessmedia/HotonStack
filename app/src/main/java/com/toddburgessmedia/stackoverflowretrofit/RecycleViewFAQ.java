@@ -57,7 +57,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         switch (viewType) {
             case VIEWFAQODD:
-               v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycle_faq_odd,parent,false);
+               v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_faq,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolderOdd(v);
         }
@@ -132,11 +132,11 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             super(view);
             question = (TextView) view.findViewById(R.id.faq_odd);
-            link = (TextView) view.findViewById(R.id.faq_link_odd);
-            score = (TextView) view.findViewById(R.id.faq_odd_score);
+            link = (TextView) view.findViewById(R.id.faq_link);
+            score = (TextView) view.findViewById(R.id.faq_score);
             views = (TextView) view.findViewById(R.id.faq_odd_views);
-            answers = (TextView) view.findViewById(R.id.faq_odd_answers);
-            createdate = (TextView) view.findViewById(R.id.faq_odd_date);
+            answers = (TextView) view.findViewById(R.id.faq_answers);
+            createdate = (TextView) view.findViewById(R.id.faq_date);
 
         }
    }

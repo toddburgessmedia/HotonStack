@@ -30,14 +30,26 @@
     </string-array>
 
     <string name="site_select_title">Select Site</string>
-    <string name="rv_github_no_language">No Language Specified</string>
     <string name="github_menu_meetup">Meetup</string>
     <string name="github_activity_loading">Loading GitHub Projects</string>
     <string name="menu_meetup_github">GitHub Projects</string>
+
     <string name="meetupactivity_gettingGPS">Getting GPS location</string>
     <string name="meetupactivity_finding_groups">Finding Meetup Groups</string>
+
     <string name="questions_dialog_loading">Loading questions</string>
     <string name="questions_failure_toast">No Network Connection!</string>
+
+    <string name="rv_github_no_language">No Language Specified</string>
+    <string name="rv_github_language">Language:</string>
+    <string name="rv_github_created_at">Created At:</string>
+    <string name="rv_github_last_updated">Last Updated:</string>
+    <string name="rv_github_forks">Forks:</string>
+    <string name="rv_github_watchers">Watchers:</string>
+    <string name="rv_faq_views">Views:</string>
+    <string name="rv_faq_answers">Answers:</string>
+    <string name="rv_faq_date_created">Date Created:</string>
+
     <string-array name="site_select_array">
         <item>GameDev</item>
         <item>Mathematics</item>

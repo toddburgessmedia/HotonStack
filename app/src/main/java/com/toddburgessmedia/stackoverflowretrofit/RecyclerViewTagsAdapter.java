@@ -10,14 +10,12 @@ import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
 
-import org.jsoup.Jsoup;
-
 import java.util.List;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 05/06/16.
  */
-public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Tag> tagList;
 
@@ -65,19 +63,24 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
             }
         };
 
+
         switch (viewType) {
             case VIEWTYPE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags,parent,false);
                 v.setOnClickListener(click);
                 v.setOnLongClickListener(longClick);
                 return new ViewHolder(v);
             default:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_odd,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags,parent,false);
                 break;
         }
         return new ViewHolder(v);
     }
 
+    public void onItemDismiss(int position) {
+        tagList.remove(position);
+        notifyItemRemoved(position);
+    }
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
@@ -88,9 +91,9 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         switch (getItemViewType(position)) {
             case VIEWTYPE:
                 ViewHolder v = (ViewHolder) holder;
-                v.tagname.setText(Jsoup.parse(t.getName()).text());
+                v.tagname.setText(t.getName());
                 v.tagcount.setText("Tag count: " + t.getCount());
-                v.tagrank.setText(r);
+                //v.tagrank.setText(r);
                 break;
         }
     }
@@ -121,7 +124,7 @@ public class StackTagsRecyclerView extends RecyclerView.Adapter<RecyclerView.Vie
         notifyDataSetChanged();
     }
 
-    public StackTagsRecyclerView (List<Tag> tags, Context con, String site, OnLongPressListener listener) {
+    public RecyclerViewTagsAdapter(List<Tag> tags, Context con, String site, OnLongPressListener listener) {
 
         this.tagList = tags;
         this.context = con;

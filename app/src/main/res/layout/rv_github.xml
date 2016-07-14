@@ -16,7 +16,7 @@
         >
 
     <TextView
-        android:id="@+id/rv_github_odd_title"
+        android:id="@+id/rv_github_title"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:textStyle="bold"
@@ -27,14 +27,14 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/rv_github_odd_desc"
+        android:id="@+id/rv_github_desc"
         android:paddingTop="4sp"
         android:paddingBottom="4sp"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/rv_github_odd_link"
+        android:id="@+id/rv_github_link"
         android:visibility="gone"
         />
 
@@ -52,15 +52,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Language: "
+                android:text="@string/rv_github_language"
                 android:textStyle="italic"
                 />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/rv_github_odd_language"
+                android:id="@+id/rv_github_language"
                 android:textColor="#448AFF"
+                android:textStyle="bold"
                 />
 
         </LinearLayout>
@@ -74,14 +75,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Created At: "
+                android:text="@string/rv_github_created_at"
                 android:textStyle="bold"
                 />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/rv_github_odd_createdate"
+                android:id="@+id/rv_github_createdate"
                 />
 
         </LinearLayout>
@@ -95,14 +96,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Last Updated: "
+                android:text="@string/rv_github_last_updated"
                 android:textStyle="bold"
                 />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/rv_github_odd_updatedate"
+                android:id="@+id/rv_github_updatedate"
                 />
 
         </LinearLayout>
@@ -116,28 +117,28 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Forks: "
+                android:text="@string/rv_github_forks"
                 android:textStyle="bold"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/rv_github_odd_forks"
+                android:id="@+id/rv_github_forks"
                 android:paddingEnd="8sp"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Watchers: "
+                android:text="@string/rv_github_watchers"
                 android:textStyle="bold"
                 />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/rv_github_odd_watchers"
+                android:id="@+id/rv_github_watchers"
                 />
 
         </LinearLayout>

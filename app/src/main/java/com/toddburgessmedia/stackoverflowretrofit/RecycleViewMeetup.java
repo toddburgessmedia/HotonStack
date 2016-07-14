@@ -46,7 +46,7 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         switch (viewType) {
             case VIEWTYPE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_meetup_odd,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_meetup,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolder(v);
         }

@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,16 +42,16 @@ import rx.functions.Action1;
 
 public class MainActivity extends AppCompatActivity implements
         SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener,
-        TagsLongPressDialog.TagsLongPressDialogListener, StackTagsRecyclerView.OnLongPressListener {
+        TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.OnLongPressListener {
 
     public final static String TAG = "StackOverFlow";
 
     RecyclerView rv;
-    StackTagsRecyclerView adapter;
+    RecyclerViewTagsAdapter adapter;
     StackOverFlowTags tags;
 
-    String tagcount;
     ProgressDialog progress;
+    String tagcount;
 
     String searchsite;
 
@@ -74,14 +75,16 @@ public class MainActivity extends AppCompatActivity implements
         if (rv != null) {
             rv.setHasFixedSize(true);
             rv.setLayoutManager(new LinearLayoutManager(this));
+            getSwipeHandler();
         }
+
 
         if (savedInstanceState != null) {
             tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
             searchsite = savedInstanceState.getString("searchsite");
             setSiteName();
             if (tags != null) {
-                adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(),searchsite,this);
+                adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(),searchsite,this);
                 rv.setAdapter(adapter);
                 return;
             }
@@ -99,6 +102,16 @@ public class MainActivity extends AppCompatActivity implements
         getTags(tagcount,tagsearch);
     }
 
+    private void startProgressDialog() {
+
+
+        if (progress == null) {
+            progress = new ProgressDialog(this);
+            progress.setMessage("Loading Tags");
+        }
+        progress.show();
+    }
+
     private void startPrefsObservables(SharedPreferences prefs) {
         rxPrefs = RxSharedPreferences.create(prefs);
         rxDefaultsite = rxPrefs.getString("defaultsite");
@@ -111,16 +124,6 @@ public class MainActivity extends AppCompatActivity implements
                 getTags(tagcount,tagsearch);
             }
         });
-    }
-
-    private void startProgressDialog() {
-
-
-        if (progress == null) {
-            progress = new ProgressDialog(this);
-            progress.setMessage("Loading Tags");
-        }
-        progress.show();
     }
 
     @Override
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements
                     adapter.removeAllItems();
                     adapter.updateAdapter(tags.tags);
                 } else {
-                    adapter = new StackTagsRecyclerView(tags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
                     rv.setAdapter(adapter);
                 }
                 progress.dismiss();
@@ -345,6 +348,25 @@ public class MainActivity extends AppCompatActivity implements
             dialog.setTagsearch(false);
         }
         dialog.show(getFragmentManager(),"long press");
+    }
+
+    private void getSwipeHandler() {
+
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                adapter.onItemDismiss(viewHolder.getAdapterPosition());
+            }
+        };
+
+        ItemTouchHelper helper = new ItemTouchHelper(simpleCallback);
+        helper.attachToRecyclerView(rv);
+
     }
 
 }

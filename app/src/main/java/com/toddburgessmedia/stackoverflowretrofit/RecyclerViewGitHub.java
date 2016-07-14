@@ -46,7 +46,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         switch (viewType) {
             case VIEWTYPE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycleview_github_odd,parent,false);
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_github,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolder(v);
         }
@@ -137,14 +137,14 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         public ViewHolder (View v) {
             super(v);
 
-            title = (TextView) v.findViewById(R.id.rv_github_odd_title);
-            description = (TextView) v.findViewById(R.id.rv_github_odd_desc);
-            link = (TextView) v.findViewById(R.id.rv_github_odd_link);
-            language = (TextView) v.findViewById(R.id.rv_github_odd_language);
-            createdate = (TextView) v.findViewById(R.id.rv_github_odd_createdate);
-            updatedate = (TextView) v.findViewById(R.id.rv_github_odd_updatedate);
-            forks = (TextView) v.findViewById(R.id.rv_github_odd_forks);
-            watchers = (TextView) v.findViewById(R.id.rv_github_odd_watchers);
+            title = (TextView) v.findViewById(R.id.rv_github_title);
+            description = (TextView) v.findViewById(R.id.rv_github_desc);
+            link = (TextView) v.findViewById(R.id.rv_github_link);
+            language = (TextView) v.findViewById(R.id.rv_github_language);
+            createdate = (TextView) v.findViewById(R.id.rv_github_createdate);
+            updatedate = (TextView) v.findViewById(R.id.rv_github_updatedate);
+            forks = (TextView) v.findViewById(R.id.rv_github_forks);
+            watchers = (TextView) v.findViewById(R.id.rv_github_watchers);
         }
 
     }
