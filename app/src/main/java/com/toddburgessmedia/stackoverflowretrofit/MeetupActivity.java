@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -59,14 +61,14 @@ public class MeetupActivity extends AppCompatActivity {
 
     List<MeetUpGroup> groups;
 
-    RecyclerView rv;
+    @BindView(R.id.rv_meetup) RecyclerView rv;
     RecycleViewMeetup adapter;
     private ProgressDialog progress;
 
     Subscription subscribe;
 
-    TextView meetupLoc;
-    TextView searchTerm;
+    @BindView(R.id.meetup_location) TextView meetupLoc;
+    @BindView(R.id.meetup_searchterm) TextView searchTerm;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -88,10 +90,11 @@ public class MeetupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetup);
+        ButterKnife.bind(this);
 
-        meetupLoc = (TextView) findViewById(R.id.meetup_location);
-        searchTerm = (TextView) findViewById(R.id.meetup_searchterm);
-        rv = (RecyclerView) findViewById(R.id.rv_meetup);
+        //meetupLoc = (TextView) findViewById(R.id.meetup_location);
+        //searchTerm = (TextView) findViewById(R.id.meetup_searchterm);
+        //rv = (RecyclerView) findViewById(R.id.rv_meetup);
         if (rv != null) {
             rv.setHasFixedSize(true);
         }

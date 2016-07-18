@@ -21,6 +21,8 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFaqAPI;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -42,15 +44,15 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     String searchTag;
     String searchsite;
 
-    RecyclerView rv;
+    @BindView(R.id.questions_recycleview) RecyclerView rv;
     RecycleViewFAQ adapter;
 
     StackOverFlowFAQ faq;
 
     ProgressDialog progress;
 
-    TextView sitename;
-    TextView timeframe;
+    @BindView(R.id.questions_sitename) TextView sitename;
+    @BindView(R.id.questions_timeframe) TextView timeframe;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,6 +97,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_list_questions);
+        ButterKnife.bind(this);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         Intent i = getIntent();
@@ -102,12 +105,12 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         searchsite = i.getStringExtra("sitename");
         setTitle(getString(R.string.app_name));
 
-        sitename = (TextView) findViewById(R.id.questions_sitename);
+        //sitename = (TextView) findViewById(R.id.questions_sitename);
         setSiteName();
-        timeframe = (TextView) findViewById(R.id.questions_timeframe);
+        //timeframe = (TextView) findViewById(R.id.questions_timeframe);
         setTimeFrame();
 
-        rv = (RecyclerView) findViewById(R.id.questions_recycleview);
+        //rv = (RecyclerView) findViewById(R.id.questions_recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
         }

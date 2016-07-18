@@ -12,6 +12,9 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 05/06/16.
  */
@@ -134,17 +137,14 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tagname;
-        TextView tagcount;
-        TextView tagrank;
+        @BindView(R.id.tag_name) TextView tagname;
+        @BindView(R.id.tag_count) TextView tagcount;
+        @BindView(R.id.tag_rank) TextView tagrank;
 
         public ViewHolder (View v) {
             super(v);
 
-            tagname = (TextView) v.findViewById(R.id.tag_name);
-            tagcount = (TextView) v.findViewById(R.id.tag_count);
-            tagrank = (TextView) v.findViewById(R.id.tag_rank);
-
+            ButterKnife.bind(this,v);
         }
 
     }

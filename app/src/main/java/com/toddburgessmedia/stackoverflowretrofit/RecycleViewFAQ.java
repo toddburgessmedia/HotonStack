@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +15,11 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.FAQTag;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.jsoup.Jsoup;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 13/06/16.
@@ -87,7 +90,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         switch (viewType) {
             case VIEWFAQODD:
                 ViewHolderOdd vh = (ViewHolderOdd) holder;
-                vh.question.setText(Jsoup.parse(tag.title).text());
+                vh.question.setText(Html.fromHtml(tag.title));
                 vh.link.setText(tag.link);
                 vh.score.setText(tag.getScore());
                 vh.views.setText(tag.getViewCount());
@@ -121,23 +124,18 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public class ViewHolderOdd extends RecyclerView.ViewHolder {
 
-        TextView question;
-        TextView link;
-        TextView score;
-        TextView views;
-        TextView answers;
-        TextView createdate;
+        @BindView(R.id.faq_odd) TextView question;
+        @BindView(R.id.faq_link) TextView link;
+        @BindView(R.id.faq_score) TextView score;
+        @BindView(R.id.faq_odd_views) TextView views;
+        @BindView(R.id.faq_answers) TextView answers;
+        @BindView(R.id.faq_date) TextView createdate;
 
         public ViewHolderOdd(View view) {
 
             super(view);
-            question = (TextView) view.findViewById(R.id.faq_odd);
-            link = (TextView) view.findViewById(R.id.faq_link);
-            score = (TextView) view.findViewById(R.id.faq_score);
-            views = (TextView) view.findViewById(R.id.faq_odd_views);
-            answers = (TextView) view.findViewById(R.id.faq_answers);
-            createdate = (TextView) view.findViewById(R.id.faq_date);
 
+            ButterKnife.bind(this,view);
         }
    }
 

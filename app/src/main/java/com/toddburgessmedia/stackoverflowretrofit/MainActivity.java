@@ -30,6 +30,8 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -46,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public final static String TAG = "StackOverFlow";
 
-    RecyclerView rv;
+    @BindView(R.id.recycleview) RecyclerView rv;
+
     RecyclerViewTagsAdapter adapter;
     StackOverFlowTags tags;
 
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
 
-    TextView sitename;
+    @BindView(R.id.main_sitename) TextView sitename;
 
     boolean tagsearch = false;
 
@@ -69,9 +72,10 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        sitename = (TextView) findViewById(R.id.main_sitename);
-        rv = (RecyclerView) findViewById(R.id.recycleview);
+        //sitename = (TextView) findViewById(R.id.main_sitename);
+        //rv = (RecyclerView) findViewById(R.id.recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
             rv.setLayoutManager(new LinearLayoutManager(this));

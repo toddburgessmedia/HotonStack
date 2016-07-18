@@ -14,6 +14,9 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 05/06/16.
  */
@@ -97,20 +100,16 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView name;
-        TextView description;
-        TextView link;
-        TextView city;
-        TextView members;
+        @BindView(R.id.rv_meetup_odd_title) TextView name;
+        @BindView(R.id.rv_meetup_odd_desciption) TextView description;
+        @BindView(R.id.rv_meetup_odd_link) TextView link;
+        @BindView(R.id.rv_meetup_odd_city) TextView city;
+        @BindView(R.id.rv_meetup_odd_members) TextView members;
 
         public ViewHolder (View v) {
             super(v);
 
-            name = (TextView) v.findViewById(R.id.rv_meetup_odd_title);
-            description = (TextView) v.findViewById(R.id.rv_meetup_odd_desciption);
-            link = (TextView) v.findViewById(R.id.rv_meetup_odd_link);
-            city = (TextView) v.findViewById(R.id.rv_meetup_odd_city);
-            members = (TextView) v.findViewById(R.id.rv_meetup_odd_members);
+            ButterKnife.bind(this, v);
         }
 
     }

@@ -13,6 +13,9 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProject;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 05/06/16.
  */
@@ -125,26 +128,20 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView title;
-        TextView description;
-        TextView link;
-        TextView language;
-        TextView createdate;
-        TextView updatedate;
-        TextView forks;
-        TextView watchers;
+        @BindView(R.id.rv_github_title) TextView title;
+        @BindView(R.id.rv_github_desc) TextView description;
+        @BindView(R.id.rv_github_link) TextView link;
+        @BindView(R.id.rv_github_language) TextView language;
+        @BindView(R.id.rv_github_createdate) TextView createdate;
+        @BindView(R.id.rv_github_updatedate) TextView updatedate;
+        @BindView(R.id.rv_github_forks) TextView forks;
+        @BindView(R.id.rv_github_watchers) TextView watchers;
 
         public ViewHolder (View v) {
             super(v);
 
-            title = (TextView) v.findViewById(R.id.rv_github_title);
-            description = (TextView) v.findViewById(R.id.rv_github_desc);
-            link = (TextView) v.findViewById(R.id.rv_github_link);
-            language = (TextView) v.findViewById(R.id.rv_github_language);
-            createdate = (TextView) v.findViewById(R.id.rv_github_createdate);
-            updatedate = (TextView) v.findViewById(R.id.rv_github_updatedate);
-            forks = (TextView) v.findViewById(R.id.rv_github_forks);
-            watchers = (TextView) v.findViewById(R.id.rv_github_watchers);
+            ButterKnife.bind(this, v);
+
         }
 
     }

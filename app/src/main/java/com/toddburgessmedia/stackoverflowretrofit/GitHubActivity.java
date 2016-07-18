@@ -20,6 +20,8 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectCollecti
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -35,20 +37,19 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     GitHubProjectCollection projects;
     ProgressDialog progress;
 
-    RecyclerView rv;
+    @BindView(R.id.github_recycleview) RecyclerView rv;
     RecyclerViewGitHub adapter;
 
     boolean searchLanguage = true;
 
-    TextView search;
+    @BindView(R.id.github_search) TextView search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_git_hub);
+        ButterKnife.bind(this);
 
-        search = (TextView) findViewById(R.id.github_search);
-        rv = (RecyclerView) findViewById(R.id.github_recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
         }
