@@ -27,8 +27,12 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".ListQuestionsActivity" />
-        <activity android:name=".GitHubActivity" />
+        <activity android:name=".ListQuestionsActivity"
+            android:launchMode="singleTop"
+            />
+        <activity android:name=".GitHubActivity"
+            android:launchMode="singleTop"
+            />
         <activity android:name=".PreferencesActivity" />
         <activity android:name=".MeetupActivity" />
         <activity android:name=".MeetupAuthActivity">

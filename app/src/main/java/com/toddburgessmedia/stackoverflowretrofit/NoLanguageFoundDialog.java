@@ -16,9 +16,9 @@ public class NoLanguageFoundDialog extends DialogFragment {
 
         @Override
         public void onAttach(Activity activity) {
-            super.onAttach(activity);
 
             listener = (NothingFoundListener) activity;
+            super.onAttach(activity);
         }
 
         @Override

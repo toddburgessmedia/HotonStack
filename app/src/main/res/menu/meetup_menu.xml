@@ -8,11 +8,4 @@
         android:icon="@drawable/ic_refresh"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/meetup_menu_github"
-        android:orderInCategory="1"
-        android:title="@string/menu_meetup_github"
-        android:icon="@drawable/ic_github"
-        app:showAsAction="always" />
-
 </menu>

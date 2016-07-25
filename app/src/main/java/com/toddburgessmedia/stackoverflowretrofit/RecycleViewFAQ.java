@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
  */
 public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public final int VIEWFAQODD = 1;
+    public final int VIEWFAQ = 1;
 
 
     private List<FAQTag> faqTAGs;
@@ -49,7 +49,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
             @Override
             public void onClick(View v) {
                 String link = "";
-                if (getItemViewType(viewType) == VIEWFAQODD) {
+                if (getItemViewType(viewType) == VIEWFAQ) {
                     ViewHolderOdd vo = new ViewHolderOdd(v);
                     link = vo.link.getText().toString();
                 }
@@ -59,7 +59,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         };
 
         switch (viewType) {
-            case VIEWFAQODD:
+            case VIEWFAQ:
                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_faq,parent,false);
                 v.setOnClickListener(click);
                 return new ViewHolderOdd(v);
@@ -88,7 +88,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         FAQTag tag = faqTAGs.get(position);
 
         switch (viewType) {
-            case VIEWFAQODD:
+            case VIEWFAQ:
                 ViewHolderOdd vh = (ViewHolderOdd) holder;
                 vh.question.setText(Html.fromHtml(tag.title));
                 vh.link.setText(tag.link);
@@ -98,9 +98,6 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 vh.createdate.setText(convertDate(tag.getCreationDate()));
                 break;
         }
-
-//        holder.itemView.startAnimation(animation);
-
     }
 
     private String convertDate(long utcDate) {
@@ -114,7 +111,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemViewType(int position) {
 
-        return VIEWFAQODD;
+        return VIEWFAQ;
     }
 
     @Override

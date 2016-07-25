@@ -4,7 +4,10 @@
     <item
         android:title="Select Time Frame"
         android:orderInCategory="200"
-        android:id="@+id/whatshot_timeframe" />
+        android:id="@+id/whatshot_timeframe"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_clock"
+        />
 
     <item
         android:orderInCategory="0"
@@ -13,18 +16,6 @@
         android:icon="@drawable/ic_refresh"
         app:showAsAction="always" />
 
-    <item
-        android:id="@+id/menu_gogithub"
-        android:orderInCategory="1"
-        android:title="GitHub PRojects"
-        android:icon="@drawable/ic_github"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/menu_meetup"
-        android:orderInCategory="900"
-        android:title="Meetup"
-        />
 
 
 </menu>

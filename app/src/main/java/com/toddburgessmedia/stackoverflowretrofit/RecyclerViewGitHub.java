@@ -62,7 +62,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         GitHubProject t = projects.get(position);
 
         String description;
-        if (t.getDescription().equals("")) {
+        if ((t==null) || (t.getDescription().equals(""))) {
             description = context.getString(R.string.no_github_desc);
         }
         else {

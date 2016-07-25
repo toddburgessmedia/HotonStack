@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,8 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetupAPI;
 
@@ -57,7 +60,10 @@ public class MeetupActivity extends AppCompatActivity {
     HashMap<String,Double> latLng;
     String oauthtoken;
 
-    String tagname;
+    String searchTag;
+    String searchsite;
+
+    BottomBar bottomBar;
 
     List<MeetUpGroup> groups;
 
@@ -92,9 +98,7 @@ public class MeetupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_meetup);
         ButterKnife.bind(this);
 
-        //meetupLoc = (TextView) findViewById(R.id.meetup_location);
-        //searchTerm = (TextView) findViewById(R.id.meetup_searchterm);
-        //rv = (RecyclerView) findViewById(R.id.rv_meetup);
+
         if (rv != null) {
             rv.setHasFixedSize(true);
         }
@@ -102,7 +106,8 @@ public class MeetupActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
-            tagname = savedInstanceState.getString("tagname");
+            searchTag = savedInstanceState.getString("searchtag");
+            searchsite = savedInstanceState.getString("searchsite");
             latLng = new HashMap<>();
             latLng.put("latitude",savedInstanceState.getDouble("latitude"));
             latLng.put("longitude",savedInstanceState.getDouble("longitude"));
@@ -110,7 +115,7 @@ public class MeetupActivity extends AppCompatActivity {
             if (groups != null) {
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 rv.setAdapter(adapter);
-                searchTerm.setText(tagname);
+                searchTerm.setText(searchTag);
                 return;
             }
 
@@ -121,14 +126,52 @@ public class MeetupActivity extends AppCompatActivity {
         getGPSLocation();
 
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));
-        tagname = getIntent().getStringExtra("searchtag");
-        searchTerm.setText(tagname);
-        Log.d(TAG, "onCreate: tag" + tagname);
-        getMeetupGroups(tagname);
+        searchTag = getIntent().getStringExtra("searchtag");
+        searchsite = getIntent().getStringExtra("searchsite");
+        searchTerm.setText(searchTag);
+        createBottomBar(savedInstanceState);
+        Log.d(TAG, "onCreate: tag" + searchTag);
+        getMeetupGroups(searchTag);
 
         setLocationName();
 
     }
+
+    private void createBottomBar(Bundle savedInstanceState) {
+
+        NewTabListener listener = new NewTabListener();
+        listener.setSearchsite(searchsite);
+        listener.setSearchTag(searchTag);
+
+        bottomBar = BottomBar.attach(this, savedInstanceState);
+
+        bottomBar.setItemsFromMenu(R.menu.meetup_three_buttons, listener);
+
+//                new OnMenuTabSelectedListener() {
+//            @Override
+//            public void onMenuItemSelected(@IdRes int menuItemId) {
+//                Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
+//                Intent i;
+//                switch (menuItemId) {
+//                    case R.id.meetup_bottom_faq:
+//                        i = new Intent(MeetupActivity.this, ListQuestionsActivity.class);
+//                        i.putExtra("name", searchTag);
+//                        i.putExtra("searchsite", searchsite);
+//                        startActivity(i);
+//                        break;
+//                    case R.id.meetup_bottom_github:
+//                        i = new Intent(MeetupActivity.this, GitHubActivity.class);
+//                        i.putExtra("name", searchTag);
+//                        i.putExtra("searchsite", searchsite);
+//                        startActivity(i);
+//                        break;
+//                }
+//            }
+//        });
+
+        bottomBar.setDefaultTabPosition(2);
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -138,6 +181,20 @@ public class MeetupActivity extends AppCompatActivity {
         }
 
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        bottomBar.setDefaultTabPosition(2);
+
+        searchTag = getIntent().getStringExtra("searchtag");
+        searchsite = getIntent().getStringExtra("searchsite");
+        searchTerm.setText(searchTag);
+        getMeetupGroups(searchTag);
+
+        setLocationName();
     }
 
     private void setLocationName() {
@@ -159,6 +216,10 @@ public class MeetupActivity extends AppCompatActivity {
                     public void onNext(List<Address> addresses) {
                         for (Address a : addresses) {
                             String loc = a.getLocality() + " - " + a.getCountryName();
+                            if (loc.contains("null")) {
+                                loc = "Local Area";
+                            }
+
                             meetupLoc.setText(loc);
                         }
                     }
@@ -169,7 +230,7 @@ public class MeetupActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
 
         outState.putSerializable("meetup_groups", (Serializable) groups);
-        outState.putString("tagname",tagname);
+        outState.putString("searchtag", searchTag);
         outState.putDouble("latitude",latLng.get("latitude"));
         outState.putDouble("longitude",latLng.get("longitude"));
         outState.putString("location",meetupLoc.getText().toString());
@@ -190,14 +251,9 @@ public class MeetupActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.meetup_menu_github) {
-            Intent i = new Intent(this,GitHubActivity.class);
-            i.putExtra("name",tagname);
-            startActivity(i);
-            return true;
-        } else if (item.getItemId() == R.id.meetup_menu_refresh) {
+        if (item.getItemId() == R.id.meetup_menu_refresh) {
             startProgressDialog();
-            getMeetupGroups(tagname);
+            getMeetupGroups(searchTag);
         }
 
         return true;
@@ -343,4 +399,48 @@ public class MeetupActivity extends AppCompatActivity {
         });
     }
 
+    protected class NewTabListener implements OnMenuTabSelectedListener {
+
+        private String searchTag;
+        private String searchsite;
+
+        public String getSearchsite() {
+            return searchsite;
+        }
+
+        public void setSearchsite(String searchsite) {
+            this.searchsite = searchsite;
+        }
+
+        public String getSearchTag() {
+            return searchTag;
+        }
+
+        public void setSearchTag(String searchTag) {
+            this.searchTag = searchTag;
+        }
+
+        @Override
+        public void onMenuItemSelected(@IdRes int menuItemId) {
+            Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
+            Intent i;
+            switch (menuItemId) {
+                case R.id.meetup_bottom_faq:
+                    i = new Intent(MeetupActivity.this, ListQuestionsActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.putExtra("name", searchTag);
+                    i.putExtra("sitename", searchsite);
+                    startActivity(i);
+                    break;
+                case R.id.meetup_bottom_github:
+                    i = new Intent(MeetupActivity.this, GitHubActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    i.putExtra("name", searchTag);
+                    i.putExtra("searchsite", searchsite);
+                    startActivity(i);
+                    break;
+            }
+        }
+
+    }
 }

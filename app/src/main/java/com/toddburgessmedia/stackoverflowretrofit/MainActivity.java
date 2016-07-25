@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements
     RecyclerViewTagsAdapter adapter;
     StackOverFlowTags tags;
 
+
+
     ProgressDialog progress;
     String tagcount;
 

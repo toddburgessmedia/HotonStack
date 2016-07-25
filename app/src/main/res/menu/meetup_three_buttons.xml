@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/meetup_bottom_faq"
+        android:icon="@drawable/ic_star"
+        android:title="FAQ" />
+
+    <item
+        android:id="@+id/meetup_bottom_github"
+        android:icon="@drawable/ic_github"
+        android:title="Github" />
+    <item
+        android:id="@+id/meetup_bottom_meetup"
+        android:icon="@drawable/ic_meetup"
+        android:title="Meetup" />
+
+</menu>

@@ -48,6 +48,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
                 Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
                 i.putExtra("name",tag);
                 i.putExtra("sitename",sitename);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 v.getContext().startActivity(i);
             }
         };
