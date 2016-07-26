@@ -62,6 +62,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             rv.setHasFixedSize(true);
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
+        createScrollChangeListener();
 
         if (savedInstanceState != null) {
             Log.d(TAG, "onCreate: we are here");
@@ -157,30 +158,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         bottomBar.setItemsFromMenu(R.menu.github_three_buttons, listener);
 
-//                new OnMenuTabSelectedListener() {
-//            @Override
-//            public void onMenuItemSelected(@IdRes int menuItemId) {
-//                Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
-//                Intent i;
-//                switch (menuItemId) {
-//                    case R.id.github_bottom_faq:
-//                        i = new Intent(GitHubActivity.this, ListQuestionsActivity.class);
-//                        i.putExtra("searchsite", searchsite);
-//                        i.putExtra("name", searchTag);
-//                        //i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                        startActivity(i);
-//                        break;
-//                    case R.id.gitbhub_bottom_meetup:
-//                        i = new Intent(GitHubActivity.this, MeetupActivity.class);
-//                        i.putExtra("searchtag", searchTag);
-//                        i.putExtra("searchsite", searchsite);
-//                        startActivity(i);
-//                        break;
-//                }
-//            }
-//        });
-
-        //bottomBar.setDefaultTabPosition(1);
     }
 
 
@@ -252,6 +229,26 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                 stopProgressDialog();
                 Toast.makeText(GitHubActivity.this, "No Network Connection", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "onFailure: it failed horribly. how embarassing");
+            }
+        });
+    }
+
+    private void createScrollChangeListener() {
+        rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    bottomBar.hide();
+                } else {
+                    bottomBar.show();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
             }
         });
     }

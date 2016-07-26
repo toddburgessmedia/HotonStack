@@ -75,19 +75,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        if (item.getItemId() == R.id.menu_gogithub) {
-//            Intent i = new Intent(this,GitHubActivity.class);
-//            i.putExtra("name",searchTag);
-//            i.putExtra("searchsite", searchsite);
-//            startActivity(i);
-//            return true;
-//        } else if (item.getItemId() == R.id.menu_meetup) {
-//            Intent i = new Intent(this, MeetupActivity.class);
-//            i.putExtra("searchtag", searchTag);
-//            startActivity(i);
-//            return true;
-//        }
-
         switch (item.getItemId()) {
             case (R.id.whatshot_timeframe):
                 TimeFrameDialog timeFrameDialog = new TimeFrameDialog();
@@ -126,6 +113,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
 
+        createScrollChangeListener();
+
         if (savedInstanceState != null) {
             faq = (StackOverFlowFAQ) savedInstanceState.getSerializable("faqlist");
             searchTag = savedInstanceState.getString("searchtag");
@@ -141,6 +130,26 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
         startProgressDialog();
         getQuestions(searchTag);
+    }
+
+    private void createScrollChangeListener() {
+        rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    bottomBar.hide();
+                } else {
+                    bottomBar.show();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     @Override

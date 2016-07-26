@@ -103,6 +103,7 @@ public class MeetupActivity extends AppCompatActivity {
             rv.setHasFixedSize(true);
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
+        createScrollChangeListener();
 
         if (savedInstanceState != null) {
             groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
@@ -146,28 +147,6 @@ public class MeetupActivity extends AppCompatActivity {
         bottomBar = BottomBar.attach(this, savedInstanceState);
 
         bottomBar.setItemsFromMenu(R.menu.meetup_three_buttons, listener);
-
-//                new OnMenuTabSelectedListener() {
-//            @Override
-//            public void onMenuItemSelected(@IdRes int menuItemId) {
-//                Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
-//                Intent i;
-//                switch (menuItemId) {
-//                    case R.id.meetup_bottom_faq:
-//                        i = new Intent(MeetupActivity.this, ListQuestionsActivity.class);
-//                        i.putExtra("name", searchTag);
-//                        i.putExtra("searchsite", searchsite);
-//                        startActivity(i);
-//                        break;
-//                    case R.id.meetup_bottom_github:
-//                        i = new Intent(MeetupActivity.this, GitHubActivity.class);
-//                        i.putExtra("name", searchTag);
-//                        i.putExtra("searchsite", searchsite);
-//                        startActivity(i);
-//                        break;
-//                }
-//            }
-//        });
 
         bottomBar.setDefaultTabPosition(2);
     }
@@ -224,6 +203,26 @@ public class MeetupActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void createScrollChangeListener() {
+        rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    bottomBar.hide();
+                } else {
+                    bottomBar.show();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
     }
 
     @Override
