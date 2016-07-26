@@ -252,6 +252,11 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         }
+
+        if (adapter != null) {
+            adapter.setSitename(searchsite);
+        }
+
         sitename.setText(display[i]);
     }
 

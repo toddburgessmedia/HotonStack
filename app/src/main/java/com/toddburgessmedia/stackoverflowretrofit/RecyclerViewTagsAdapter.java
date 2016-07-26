@@ -26,6 +26,14 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     Context context;
 
+    public String getSitename() {
+        return sitename;
+    }
+
+    public void setSitename(String sitename) {
+        this.sitename = sitename;
+    }
+
     String sitename;
 
     OnLongPressListener longClickListener;

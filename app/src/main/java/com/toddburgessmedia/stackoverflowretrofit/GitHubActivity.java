@@ -215,6 +215,8 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                         nothing.show(getFragmentManager(), "nothing");
                     }
                     return;
+                } else if ((response.code() != 200) && (!searchLanguage)) {
+                    Toast.makeText(GitHubActivity.this, "No Github Projects Found", Toast.LENGTH_SHORT).show();
                 }
 
                 projects = response.body();
