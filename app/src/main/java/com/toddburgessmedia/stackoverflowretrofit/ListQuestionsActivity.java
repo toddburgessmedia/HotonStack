@@ -61,6 +61,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     ProgressDialog progress;
 
     BottomBar bottomBar;
+    final int TABPOS = 0;
 
     @BindView(R.id.questions_sitename) TextView sitename;
     @BindView(R.id.questions_timeframe) TextView timeframe;
@@ -107,7 +108,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         setSiteName();
         setTimeFrame();
 
-        createBottomBar(savedInstanceState);
         if (rv != null) {
             rv.setHasFixedSize(true);
         }
@@ -119,14 +119,17 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             faq = (StackOverFlowFAQ) savedInstanceState.getSerializable("faqlist");
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
+            createBottomBar(savedInstanceState);
             if (faq != null) {
                 adapter = new RecycleViewFAQ(faq.faq, getBaseContext());
                 rv.setAdapter(adapter);
+                bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
         }
 
 
+        createBottomBar(savedInstanceState);
 
         startProgressDialog();
         getQuestions(searchTag);
@@ -167,47 +170,18 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         bottomBar = BottomBar.attach(this, savedInstanceState);
 
         bottomBar.setItemsFromMenu(R.menu.three_buttons, listener);
-//
-//                new OnMenuTabSelectedListener() {
-//            @Override
-//            public void onMenuItemSelected(@IdRes int menuItemId) {
-//                Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
-//                Log.d(MainActivity.TAG, "onMenuItemSelected: " + getsearchTag());
-//                Intent i;
-//                switch (menuItemId) {
-//                    case R.id.faq_bottom_github:
-//                        i = new Intent(ListQuestionsActivity.this, GitHubActivity.class);
-//                        i.putExtra("name", searchTag);
-//                        i.putExtra("searchsite", searchsite);
-//                        startActivity(i);
-//                        break;
-//                    case R.id.faq_bottom_meetup:
-//                        i = new Intent(ListQuestionsActivity.this, MeetupActivity.class);
-//                        i.putExtra("searchtag", searchTag);
-//                        i.putExtra("searchsite", searchsite);
-//                        startActivity(i);
-//                        break;
-//                }
-//            }
-//
-//            public String getsearchTag() {
-//                return ListQuestionsActivity.this.searchTag;
-//            }
-//        });
     }
+
 
     @Override
     protected void onResume() {
 
         super.onResume();
 
-        //searchsite = getIntent().getStringExtra("searchsite");
-        //searchTag = getIntent().getStringExtra("sitename");
-
         Log.d(MainActivity.TAG, "onResume: ");
         Log.d(MainActivity.TAG, "onResume: "+ searchTag);
         Log.d(MainActivity.TAG, "onResume: " + searchsite);
-        bottomBar.setDefaultTabPosition(0);
+        bottomBar.selectTabAtPosition(TABPOS,false);
         getQuestions(searchTag);
     }
 

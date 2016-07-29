@@ -43,12 +43,16 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     BottomBar bottomBar;
     NoLanguageFoundDialog nothing;
 
+    final int TABPOS = 1;
+
     @BindView(R.id.github_recycleview) RecyclerView rv;
     RecyclerViewGitHub adapter;
 
     boolean searchLanguage = true;
 
     @BindView(R.id.github_search) TextView search;
+
+//    @BindView(R.id.github_co_layout) CoordinatorLayout colayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +74,12 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
             searchLanguage = savedInstanceState.getBoolean("search_language");
+            createBottomBar(savedInstanceState);
             if (projects != null) {
                 adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
                 rv.setAdapter(adapter);
                 setSearch();
+                bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
         }
@@ -82,10 +88,17 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         Log.d(TAG, "onCreate: " + searchTag);
         searchsite = getIntent().getStringExtra("searchsite");
         createBottomBar(savedInstanceState);
-        bottomBar.setDefaultTabPosition(1);
+        bottomBar.selectTabAtPosition(TABPOS,false);
         setSearch();
         startProgressDialog();
         getProjects(searchTag,searchLanguage);
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        bottomBar = null;
+        super.onDestroy();
     }
 
     @Override
@@ -102,12 +115,12 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         Log.d(MainActivity.TAG, "onResume: in the on Rescume!!");
 
-        bottomBar.setDefaultTabPosition(1);
+        bottomBar.selectTabAtPosition(1,false);
 
-        searchTag = getIntent().getStringExtra("name");
-        searchsite = getIntent().getStringExtra("searchsite");
-
-        getProjects(searchTag,searchLanguage);
+//        searchTag = getIntent().getStringExtra("name");
+//        searchsite = getIntent().getStringExtra("searchsite");
+//
+//        getProjects(searchTag,searchLanguage);
 
     }
 
@@ -150,13 +163,22 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     private void createBottomBar(Bundle savedInstanceState) {
 
+        if (bottomBar != null) {
+            bottomBar.selectTabAtPosition(TABPOS,false);
+            return;
+        }
+
         NewTabListener listener = new NewTabListener();
         listener.setSearchsite(searchsite);
         listener.setSearchTab(searchTag);
 
+
         bottomBar = BottomBar.attach(this, savedInstanceState);
+        //bottomBar = BottomBar.attachShy(colayout,null, savedInstanceState);
 
         bottomBar.setItemsFromMenu(R.menu.github_three_buttons, listener);
+        bottomBar.selectTabAtPosition(TABPOS,false);
+
 
     }
 

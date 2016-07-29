@@ -64,6 +64,7 @@ public class MeetupActivity extends AppCompatActivity {
     String searchsite;
 
     BottomBar bottomBar;
+    final int TABPOS = 2;
 
     List<MeetUpGroup> groups;
 
@@ -117,6 +118,8 @@ public class MeetupActivity extends AppCompatActivity {
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 rv.setAdapter(adapter);
                 searchTerm.setText(searchTag);
+                createBottomBar(savedInstanceState);
+                bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
 
@@ -147,8 +150,8 @@ public class MeetupActivity extends AppCompatActivity {
         bottomBar = BottomBar.attach(this, savedInstanceState);
 
         bottomBar.setItemsFromMenu(R.menu.meetup_three_buttons, listener);
+        bottomBar.selectTabAtPosition(TABPOS,false);
 
-        bottomBar.setDefaultTabPosition(2);
     }
 
 
@@ -166,7 +169,7 @@ public class MeetupActivity extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        bottomBar.setDefaultTabPosition(2);
+        bottomBar.selectTabAtPosition(TABPOS,false);
 
         searchTag = getIntent().getStringExtra("searchtag");
         searchsite = getIntent().getStringExtra("searchsite");
