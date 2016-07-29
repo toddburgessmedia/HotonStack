@@ -95,13 +95,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     }
 
     @Override
-    protected void onDestroy() {
-
-        bottomBar = null;
-        super.onDestroy();
-    }
-
-    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
@@ -117,10 +110,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         bottomBar.selectTabAtPosition(TABPOS,false);
 
-//        searchTag = getIntent().getStringExtra("name");
-//        searchsite = getIntent().getStringExtra("searchsite");
-//
-//        getProjects(searchTag,searchLanguage);
 
     }
 
@@ -164,25 +153,16 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     private void createBottomBar(Bundle savedInstanceState) {
 
-        if (bottomBar != null) {
-            bottomBar.selectTabAtPosition(TABPOS,false);
-            return;
-        }
-
         NewTabListener listener = new NewTabListener();
         listener.setSearchsite(searchsite);
         listener.setSearchTab(searchTag);
 
 
         bottomBar = BottomBar.attach(this, savedInstanceState);
-        //bottomBar = BottomBar.attachShy(colayout,null, savedInstanceState);
 
         bottomBar.setItemsFromMenu(R.menu.github_three_buttons, listener);
         bottomBar.selectTabAtPosition(TABPOS,false);
-
-
     }
-
 
     private void setSearch() {
 
@@ -228,8 +208,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             @Override
             public void onResponse(Call<GitHubProjectCollection> call, Response<GitHubProjectCollection> response) {
 
-                Log.d(TAG, "onResponse: code" + response.code());
-
                 stopProgressDialog();
                 if  ((response.code() != 200) && (searchLanguage)) {
 
@@ -253,7 +231,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             public void onFailure(Call<GitHubProjectCollection> call, Throwable t) {
                 stopProgressDialog();
                 Toast.makeText(GitHubActivity.this, "No Network Connection", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onFailure: it failed horribly. how embarassing");
+                Log.d(TAG, "onFailure: it failed horribly. oh the humanity");
             }
         });
     }
@@ -286,7 +264,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     @Override
     public void positiveClick(DialogFragment dialog) {
-        Log.d(TAG, "positiveClick: yo yo yo ");
         nothing.dismiss();
         startProgressDialog();
         searchLanguage = false;
