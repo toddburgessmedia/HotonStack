@@ -261,6 +261,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         outState.putSerializable("faqlist",faq);
         outState.putString("searchtag",searchTag);
         outState.putString("searchsite",searchsite);
+        bottomBar.onSaveInstanceState(outState);
 
         super.onSaveInstanceState(outState);
     }

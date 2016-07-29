@@ -113,12 +113,12 @@ public class MeetupActivity extends AppCompatActivity {
             latLng = new HashMap<>();
             latLng.put("latitude",savedInstanceState.getDouble("latitude"));
             latLng.put("longitude",savedInstanceState.getDouble("longitude"));
+            createBottomBar(savedInstanceState);
             meetupLoc.setText(savedInstanceState.getString("location"));
             if (groups != null) {
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 rv.setAdapter(adapter);
                 searchTerm.setText(searchTag);
-                createBottomBar(savedInstanceState);
                 bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
@@ -169,8 +169,8 @@ public class MeetupActivity extends AppCompatActivity {
     protected void onResume() {
 
         super.onResume();
-        bottomBar.selectTabAtPosition(TABPOS,false);
 
+        bottomBar.selectTabAtPosition(TABPOS,false);
         searchTag = getIntent().getStringExtra("searchtag");
         searchsite = getIntent().getStringExtra("searchsite");
         searchTerm.setText(searchTag);
@@ -236,7 +236,7 @@ public class MeetupActivity extends AppCompatActivity {
         outState.putDouble("latitude",latLng.get("latitude"));
         outState.putDouble("longitude",latLng.get("longitude"));
         outState.putString("location",meetupLoc.getText().toString());
-
+        bottomBar.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 

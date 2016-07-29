@@ -113,9 +113,9 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         super.onResume();
 
-        Log.d(MainActivity.TAG, "onResume: in the on Rescume!!");
+        Log.d(MainActivity.TAG, "onResume: in the on Rescume!! :)");
 
-        bottomBar.selectTabAtPosition(1,false);
+        bottomBar.selectTabAtPosition(TABPOS,false);
 
 //        searchTag = getIntent().getStringExtra("name");
 //        searchsite = getIntent().getStringExtra("searchsite");
@@ -140,6 +140,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         outState.putString("searchtag",searchTag);
         outState.putString("searchsite",searchsite);
         outState.putBoolean("search_language",searchLanguage);
+        bottomBar.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
