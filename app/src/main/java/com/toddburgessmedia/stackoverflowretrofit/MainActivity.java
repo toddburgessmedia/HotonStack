@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.f2prateek.rx.preferences.Preference;
@@ -59,13 +58,14 @@ public class MainActivity extends AppCompatActivity implements
     String tagcount;
 
     String searchsite;
+    String sitename;
 
     String searchtag = "";
 
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
 
-    @BindView(R.id.main_sitename) TextView sitename;
+    //@BindView(R.id.main_sitename) TextView sitename;
 
     boolean tagsearch = false;
 
@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements
             setSiteName();
             if (tags != null) {
                 adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(),searchsite,this);
+                adapter.setDisplaySiteName(sitename);
                 rv.setAdapter(adapter);
                 return;
             }
@@ -126,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements
             public void call(String s) {
                 searchsite = s;
                 setSiteName();
+                if (adapter != null) {
+                    adapter.setDisplaySiteName(sitename);
+                }
                 startProgressDialog();
                 getTags(tagcount,tagsearch);
             }
@@ -219,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements
                     adapter.updateAdapter(tags.tags);
                 } else {
                     adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    adapter.setDisplaySiteName(sitename);
                     rv.setAdapter(adapter);
                 }
                 progress.dismiss();
@@ -253,11 +258,13 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+        sitename = display[i];
         if (adapter != null) {
             adapter.setSitename(searchsite);
         }
 
-        sitename.setText(display[i]);
+//        sitename.setText(display[i]);
+        //adapter.setSitename(sitename);
     }
 
     // Search Dialog positive click
@@ -273,10 +280,9 @@ public class MainActivity extends AppCompatActivity implements
 
         tag = tag.replace(' ', '-');
         searchtag = tag;
-        String newsite = sitename.getText() + " / " + searchtag;
-        sitename.setText(newsite);
+        String newsite = sitename + " / " + searchtag;
         tagsearch = true;
-
+        adapter.setDisplaySiteName(sitename);
         startProgressDialog();
         getTags(tagcount, tagsearch);
 
@@ -299,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements
         searchsite = sites[which];
 
         setSiteName();
+        adapter.setDisplaySiteName(sitename);
         startProgressDialog();
         getTags(tagcount,tagsearch);
 
@@ -321,8 +328,9 @@ public class MainActivity extends AppCompatActivity implements
             values = getResources().getStringArray(R.array.tag_longpress_dialog);
 
             if (values[which].equals("Load Related Tags")) {
-                String newsite = sitename.getText() + " / " + searchtag;
-                sitename.setText(newsite);
+                String newsite = sitename + " / " + searchtag;
+                //sitename.setText(newsite);
+                adapter.setDisplaySiteName(newsite);
                 tagsearch = true;
             }
             startProgressDialog();
@@ -330,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements
 
         } else {
             setSiteName();
+            adapter.setDisplaySiteName(sitename);
             tagsearch = false;
             startProgressDialog();
             getTags(tagcount,tagsearch);

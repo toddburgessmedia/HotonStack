@@ -12,9 +12,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import net.smartam.leeloo.client.request.OAuthClientRequest;
-import net.smartam.leeloo.common.exception.OAuthSystemException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,18 +68,18 @@ public class MeetupAuthActivity extends AppCompatActivity {
         setContentView(webView);
 
         webView.getSettings().setJavaScriptEnabled(true);
-        OAuthClientRequest request = null;
-        try {
-            request = OAuthClientRequest.authorizationLocation(
-                    AUTH_URL).setClientId(
-                    CONSUMER_KEY).setRedirectURI(
-                    REDIRECT_URI).buildQueryMessage();
-        } catch (OAuthSystemException e) {
-            Log.d(TAG, "OAuth request failed", e);
-        }
-        Log.d(TAG, "onCreate: URI " + request.getLocationUri());
-        
-        webView.loadUrl(request.getLocationUri() + "&response_type=code&set_mobile=on");
+//        OAuthClientRequest request = null;
+//        try {
+//            request = OAuthClientRequest.authorizationLocation(
+//                    AUTH_URL).setClientId(
+//                    CONSUMER_KEY).setRedirectURI(
+//                    REDIRECT_URI).buildQueryMessage();
+//        } catch (OAuthSystemException e) {
+//            Log.d(TAG, "OAuth request failed", e);
+//        }
+//        Log.d(TAG, "onCreate: URI " + request.getLocationUri());
+//
+//        webView.loadUrl(request.getLocationUri() + "&response_type=code&set_mobile=on");
     }
 
     @Override

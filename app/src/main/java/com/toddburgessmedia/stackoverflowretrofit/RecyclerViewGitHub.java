@@ -3,6 +3,7 @@ package com.toddburgessmedia.stackoverflowretrofit;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,27 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
     private List<GitHubProject> projects;
 
     private final int VIEWTYPE = 1;
+    private final int VIEWTYPESTART = 0;
+
+    public static final int LANGUAGESEARCH = 0;
+    public static final int KEYWORDSEARCH = 1;
+    private int searchType;
+
+    public void setSearchword(String searchword) {
+        this.searchword = searchword;
+    }
+
+    private String searchword;
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    private String header;
+
+    public void setSearchType(int searchType) {
+        this.searchType = searchType;
+    }
 
     Context context;
 
@@ -32,7 +54,23 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         View v = null;
 
-        View.OnClickListener click = new View.OnClickListener() {
+//        View.OnClickListener click = getOnClickListener(viewType);
+
+        switch (viewType) {
+            case VIEWTYPE:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_github,parent,false);
+                v.setOnClickListener(getOnClickListener(viewType));
+                return new ViewHolder(v);
+            case VIEWTYPESTART:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_github_start, parent,false);
+                return new ViewHolderStart(v);
+        }
+        return new ViewHolder(v);
+    }
+
+    @NonNull
+    private View.OnClickListener getOnClickListener(final int viewType) {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -46,31 +84,17 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 v.getContext().startActivity(i);
             }
         };
-
-        switch (viewType) {
-            case VIEWTYPE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_github,parent,false);
-                v.setOnClickListener(click);
-                return new ViewHolder(v);
-        }
-        return new ViewHolder(v);
     }
 
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        GitHubProject t = projects.get(position);
 
-        String description;
-        if ((t==null) || (t.getDescription().equals(""))) {
-            description = context.getString(R.string.no_github_desc);
-        }
-        else {
-            description = t.getDescription();
-        }
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:
+                GitHubProject t = projects.get(position-1);
+                String description = getDescription(t);
                 ViewHolder v = (ViewHolder) holder;
                 v.title.setText(t.getFullName());
                 v.description.setText(description);
@@ -81,7 +105,35 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                 v.forks.setText(t.getForks());
                 v.watchers.setText(t.getWatchers());
                 break;
+            case VIEWTYPESTART:
+                ViewHolderStart vs = (ViewHolderStart) holder;
+                vs.searchTitle.setText(createHeader());
+                break;
         }
+    }
+
+    private String createHeader() {
+
+        String header;
+
+        if (searchType == LANGUAGESEARCH) {
+            header = "Language: ";
+        } else {
+            header = "Keyword: ";
+        }
+
+        return header + searchword;
+    }
+
+    private String getDescription(GitHubProject t) {
+        String description;
+        if ((t==null) || (t.getDescription().equals(""))) {
+            description = context.getString(R.string.no_github_desc);
+        }
+        else {
+            description = t.getDescription();
+        }
+        return description;
     }
 
     public String setLanguage (String language) {
@@ -104,7 +156,11 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemViewType(int position) {
 
-        return VIEWTYPE;
+        if (position == 0) {
+            return VIEWTYPESTART;
+        } else {
+            return VIEWTYPE;
+        }
     }
 
     @Override
@@ -146,4 +202,16 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     }
 
+    public class ViewHolderStart extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.github_start_search) TextView searchTitle;
+
+        public  ViewHolderStart (View v) {
+            super(v);
+
+            ButterKnife.bind(this, v);
+        }
+
+
+    }
 }

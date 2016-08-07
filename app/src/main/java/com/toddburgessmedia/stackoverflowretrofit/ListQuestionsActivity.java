@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
@@ -63,8 +62,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     BottomBar bottomBar;
     final int TABPOS = 0;
 
-    @BindView(R.id.questions_sitename) TextView sitename;
-    @BindView(R.id.questions_timeframe) TextView timeframe;
+//    @BindView(R.id.questions_sitename) TextView sitename;
+//    @BindView(R.id.questions_timeframe) TextView timeframe;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,10 +102,10 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         Intent i = getIntent();
         searchTag = i.getStringExtra("name");
         searchsite = i.getStringExtra("sitename");
-        setTitle(getString(R.string.app_name));
+        //setTitle(getString(R.string.app_name));
 
-        setSiteName();
-        setTimeFrame();
+        //setSiteName();
+        //setTimeFrame();
 
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -122,6 +121,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             createBottomBar(savedInstanceState);
             if (faq != null) {
                 adapter = new RecycleViewFAQ(faq.faq, getBaseContext());
+                setTimeFrame();
+                setSiteName();
                 rv.setAdapter(adapter);
                 bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
@@ -178,9 +179,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
         super.onResume();
 
-        Log.d(MainActivity.TAG, "onResume: ");
-        Log.d(MainActivity.TAG, "onResume: "+ searchTag);
-        Log.d(MainActivity.TAG, "onResume: " + searchsite);
         bottomBar.selectTabAtPosition(TABPOS,false);
         getQuestions(searchTag);
     }
@@ -190,8 +188,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         OnMenuTabSelectedListener listener = new OnMenuTabSelectedListener() {
             @Override
                 public void onMenuItemSelected(@IdRes int menuItemId) {
-                    Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
-                    Log.d(MainActivity.TAG, "onMenuItemSelected: " + searchTag);
                     Intent i;
                     switch (menuItemId) {
                         case R.id.faq_bottom_github:
@@ -220,7 +216,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         String[] times = getResources().getStringArray(R.array.time_dialog);
 
         Log.d(MainActivity.TAG, "setTimeFrame: " + times[searchtime]);
-        timeframe.setText(times[searchtime]);
+        //timeframe.setText(times[searchtime]);
+        adapter.setTimeframe(times[searchtime]);
 
     }
 
@@ -243,7 +240,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             }
         }
         String displaytext = display[i] + " / " + searchTag;
-        sitename.setText(displaytext);
+        //sitename.setText(displaytext);
+        adapter.setSitename(displaytext);
     }
 
     private void startProgressDialog() {
@@ -301,9 +299,13 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
                 if (adapter != null) {
                     adapter.removeAllItems();
+                    setTimeFrame();
+                    setSiteName();
                     adapter.updateAdapter(faq.faq);
                 } else {
                     adapter = new RecycleViewFAQ(faq.faq,getBaseContext());
+                    setTimeFrame();
+                    setSiteName();
                     rv.setAdapter(adapter);
                 }
                 stopProgressDialog();
@@ -370,9 +372,9 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 searchtime = THISYEAR;
                 break;
         }
-        setTimeFrame();
         startProgressDialog();
         getQuestions(searchTag);
+        //setTimeFrame();
     }
 
     @Override

@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
@@ -23,6 +22,7 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectCollecti
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Cache;
@@ -50,9 +50,9 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     boolean searchLanguage = true;
 
-    @BindView(R.id.github_search) TextView search;
+    //@BindView(R.id.github_search) TextView search;
 
-//    @BindView(R.id.github_co_layout) CoordinatorLayout colayout;
+    @BindString(R.string.github_activity_loading) String loadingMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         setContentView(R.layout.activity_git_hub);
         ButterKnife.bind(this);
 
-
         if (rv != null) {
             rv.setHasFixedSize(true);
         }
@@ -69,7 +68,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         createScrollChangeListener();
 
         if (savedInstanceState != null) {
-            Log.d(TAG, "onCreate: we are here");
             projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
@@ -78,14 +76,13 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             if (projects != null) {
                 adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
                 rv.setAdapter(adapter);
-                setSearch();
+                //setSearch();
                 bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
         }
 
         searchTag = getIntent().getStringExtra("name");
-        Log.d(TAG, "onCreate: " + searchTag);
         searchsite = getIntent().getStringExtra("searchsite");
         createBottomBar(savedInstanceState);
         bottomBar.selectTabAtPosition(TABPOS,false);
@@ -105,20 +102,15 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     protected void onResume() {
 
         super.onResume();
-
-        Log.d(MainActivity.TAG, "onResume: in the on Rescume!! :)");
-
         bottomBar.selectTabAtPosition(TABPOS,false);
-
-
     }
 
     private void startProgressDialog() {
 
         if (progress == null) {
             progress = new ProgressDialog(this);
-            progress.setMessage(getString(R.string.github_activity_loading));
         }
+        progress.setMessage(loadingMsg);
         progress.show();
     }
 
@@ -147,7 +139,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             startProgressDialog();
             getProjects(searchTag,searchLanguage);
         }
-
         return true;
     }
 
@@ -174,10 +165,10 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         }
 
         String text = searchtype + " " + searchTag;
-        search.setText(text);
+        //search.setText(text);
     }
 
-    private void getProjects(String language,boolean langugesearch) {
+    private void getProjects(final String language, final boolean langugesearch) {
 
         int cachesize =  10 * 1024 * 1024;
         final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
@@ -195,7 +186,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
         GitHubProjectAPI projectAPI = retrofit.create(GitHubProjectAPI.class);
 
-        String qlanguage;
+        final String qlanguage;
         if (langugesearch) {
             qlanguage = "language:" + language;
         } else {
@@ -223,9 +214,17 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                 projects = response.body();
                 if (projects != null) {
                     adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
+                    if (searchLanguage) {
+                        adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
+                    } else {
+                        adapter.setSearchType(RecyclerViewGitHub.KEYWORDSEARCH);
+                    }
+                    adapter.setSearchword(language);
                     rv.setAdapter(adapter);
                 }
             }
+
+
 
             @Override
             public void onFailure(Call<GitHubProjectCollection> call, Throwable t) {
@@ -279,19 +278,11 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     protected class NewTabListener implements OnMenuTabSelectedListener {
 
-        public String getSearchTab() {
-            return searchTab;
-        }
-
         public void setSearchTab(String searchTab) {
             this.searchTab = searchTab;
         }
 
         private String searchTab;
-
-        public String getSearchsite() {
-            return searchsite;
-        }
 
         public void setSearchsite(String searchsite) {
             this.searchsite = searchsite;
@@ -309,7 +300,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                     i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     i.putExtra("sitename", searchsite);
                     i.putExtra("name", searchTag);
-                    //i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                     break;
                 case R.id.gitbhub_bottom_meetup:

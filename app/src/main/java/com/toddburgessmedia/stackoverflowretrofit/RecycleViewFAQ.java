@@ -3,6 +3,7 @@ package com.toddburgessmedia.stackoverflowretrofit;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -27,7 +28,18 @@ import butterknife.ButterKnife;
 public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public final int VIEWFAQ = 1;
+    public final int VIEWSTART = 0;
 
+    String sitename;
+    String timeframe;
+
+    public void setSitename(String sitename) {
+        this.sitename = sitename;
+    }
+
+    public void setTimeframe(String timeframe) {
+        this.timeframe = timeframe;
+    }
 
     private List<FAQTag> faqTAGs;
 
@@ -45,26 +57,32 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         View v;
 
-        View.OnClickListener click = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String link = "";
-                if (getItemViewType(viewType) == VIEWFAQ) {
-                    ViewHolderOdd vo = new ViewHolderOdd(v);
-                    link = vo.link.getText().toString();
-                }
-                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-                v.getContext().startActivity(i);
-            }
-        };
-
         switch (viewType) {
             case VIEWFAQ:
                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_faq,parent,false);
-                v.setOnClickListener(click);
+                v.setOnClickListener(getOnClickListener(viewType));
                 return new ViewHolderOdd(v);
+            case VIEWSTART:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_faq_start, parent, false);
+                return new ViewHolderStart(v);
         }
         return null;
+    }
+
+    @NonNull
+    private View.OnClickListener getOnClickListener(final int viewType) {
+        return new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String link = "";
+                    if (getItemViewType(viewType) == VIEWFAQ) {
+                        ViewHolderOdd vo = new ViewHolderOdd(v);
+                        link = vo.link.getText().toString();
+                    }
+                    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                    v.getContext().startActivity(i);
+                }
+            };
     }
 
     public void removeAllItems() {
@@ -85,10 +103,10 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         int viewType = getItemViewType(position);
-        FAQTag tag = faqTAGs.get(position);
 
         switch (viewType) {
             case VIEWFAQ:
+                FAQTag tag = faqTAGs.get(position-1);
                 ViewHolderOdd vh = (ViewHolderOdd) holder;
                 vh.question.setText(Html.fromHtml(tag.title));
                 vh.link.setText(tag.link);
@@ -97,6 +115,10 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 vh.answers.setText(tag.getAnswerCount());
                 vh.createdate.setText(convertDate(tag.getCreationDate()));
                 break;
+            case VIEWSTART:
+                ViewHolderStart vs = (ViewHolderStart) holder;
+                vs.sitename.setText(sitename);
+                vs.timeframe.setText(timeframe);
         }
     }
 
@@ -111,7 +133,11 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemViewType(int position) {
 
-        return VIEWFAQ;
+        if (position == 0) {
+            return VIEWSTART;
+        } else {
+            return VIEWFAQ;
+        }
     }
 
     @Override
@@ -135,5 +161,18 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
             ButterKnife.bind(this,view);
         }
    }
+
+    public class ViewHolderStart extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.questions_start_sitename) TextView sitename;
+        @BindView(R.id.questions_start_timeframe) TextView timeframe;
+
+        public ViewHolderStart(View view) {
+            super(view);
+
+            ButterKnife.bind(this, view);
+        }
+
+    }
 
 }

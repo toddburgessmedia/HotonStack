@@ -16,27 +16,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/questions_sitename"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        android:background="#C5CAE9"
-        android:paddingBottom="6dp"
-        />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/questions_timeframe"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        android:background="#448AFF"
-        android:paddingBottom="6dp"
-        />
-
-
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

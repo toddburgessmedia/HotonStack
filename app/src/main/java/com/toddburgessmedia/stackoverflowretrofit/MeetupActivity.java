@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding.widget.RxTextView;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
@@ -50,6 +51,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
@@ -73,6 +75,7 @@ public class MeetupActivity extends AppCompatActivity {
     private ProgressDialog progress;
 
     Subscription subscribe;
+    Subscription locationSub;
 
     @BindView(R.id.meetup_location) TextView meetupLoc;
     @BindView(R.id.meetup_searchterm) TextView searchTerm;
@@ -88,9 +91,7 @@ public class MeetupActivity extends AppCompatActivity {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putString("oauthtoken",data.getStringExtra("access_token"));
             edit.apply();
-
         }
-
     }
 
     @Override
@@ -117,12 +118,12 @@ public class MeetupActivity extends AppCompatActivity {
             meetupLoc.setText(savedInstanceState.getString("location"));
             if (groups != null) {
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
+                adapter.setHeader(meetupLoc.getText().toString(),searchTag);
                 rv.setAdapter(adapter);
                 searchTerm.setText(searchTag);
                 bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
-
         }
 
         startProgressDialog();
@@ -135,10 +136,28 @@ public class MeetupActivity extends AppCompatActivity {
         searchTerm.setText(searchTag);
         createBottomBar(savedInstanceState);
         Log.d(TAG, "onCreate: tag" + searchTag);
-        getMeetupGroups(searchTag);
 
+        watchLocationChange();
         setLocationName();
 
+    }
+
+    private void watchLocationChange () {
+
+        if (locationSub != null) {
+            return;
+        }
+
+        locationSub = RxTextView.textChanges(meetupLoc)
+                .subscribe(new Action1<CharSequence>() {
+                    @Override
+                    public void call(CharSequence charSequence) {
+                        Log.d(TAG, "call: location updated!");
+                        if (charSequence.toString().length() > 0) {
+                            getMeetupGroups(searchTag);
+                        }
+                    }
+                });
     }
 
     private void createBottomBar(Bundle savedInstanceState) {
@@ -162,6 +181,10 @@ public class MeetupActivity extends AppCompatActivity {
             subscribe.unsubscribe();
         }
 
+        if ((locationSub != null) && (!locationSub.isUnsubscribed())) {
+            locationSub.unsubscribe();
+        }
+
         super.onDestroy();
     }
 
@@ -174,7 +197,7 @@ public class MeetupActivity extends AppCompatActivity {
         searchTag = getIntent().getStringExtra("searchtag");
         searchsite = getIntent().getStringExtra("searchsite");
         searchTerm.setText(searchTag);
-        getMeetupGroups(searchTag);
+        //getMeetupGroups(searchTag);
 
         setLocationName();
     }
@@ -201,7 +224,6 @@ public class MeetupActivity extends AppCompatActivity {
                             if (loc.contains("null")) {
                                 loc = "Local Area";
                             }
-
                             meetupLoc.setText(loc);
                         }
                     }
@@ -282,15 +304,27 @@ public class MeetupActivity extends AppCompatActivity {
             String provider = manager.getBestProvider(criteria, false);
             Log.d(TAG, "getGPSLocation: " + provider);
 
-            Location location = manager.getLastKnownLocation(provider);
-            if (location == null) {
+            if ((manager == null) || (provider == null)) {
+                stopProgressDialog();
                 Toast.makeText(MeetupActivity.this, "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
+                finish();
                 return;
             }
-            lat = location.getLatitude();
-            lng = location.getLongitude();
-            latLng.put("latitude",lat);
-            latLng.put("longitude",lng);
+
+            Location location = manager.getLastKnownLocation(provider);
+            if (location == null)  {
+                stopProgressDialog();
+                Toast.makeText(MeetupActivity.this, "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+            if (location != null) {
+                lat = location.getLatitude();
+                lng = location.getLongitude();
+                Log.d(TAG, "getGPSLocation: " + lat + " " + lng);
+                latLng.put("latitude",lat);
+                latLng.put("longitude",lng);
+            }
 
         } catch (SecurityException se) {
             Log.d(MainActivity.TAG, "getGPSLocation: no permission");
@@ -324,7 +358,6 @@ public class MeetupActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<MeetUpGroup>>() {
             @Override
             public void onResponse(Call<List<MeetUpGroup>> call, Response<List<MeetUpGroup>> response) {
-                Log.d(TAG, "onResponse: it worked!!!");
                 groups = response.body();
                 stopProgressDialog();
                 if (groups.size() == 0) {
@@ -332,6 +365,7 @@ public class MeetupActivity extends AppCompatActivity {
                     return;
                 }
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
+                adapter.setHeader(meetupLoc.getText().toString(),searchTag);
                 rv.setAdapter(adapter);
             }
 
