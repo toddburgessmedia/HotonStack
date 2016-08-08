@@ -294,7 +294,11 @@ public class MeetupActivity extends AppCompatActivity {
         try {
             LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                buildAlertMessageNoGps();
+                //buildAlertMessageNoGps();
+                stopProgressDialog();
+                Toast.makeText(MeetupActivity.this, "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
             }
             Criteria criteria = new Criteria();
             boolean gps = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
