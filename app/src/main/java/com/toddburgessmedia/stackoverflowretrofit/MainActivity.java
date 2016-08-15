@@ -294,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements
     public void negativeClick(DialogFragment fragment) {
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        Log.d(TAG, "negativeClick: ");
     }
 
     // Change Site positive click
@@ -329,7 +328,6 @@ public class MainActivity extends AppCompatActivity implements
 
             if (values[which].equals("Load Related Tags")) {
                 String newsite = sitename + " / " + searchtag;
-                //sitename.setText(newsite);
                 adapter.setDisplaySiteName(newsite);
                 tagsearch = true;
             }

@@ -294,7 +294,6 @@ public class MeetupActivity extends AppCompatActivity {
         try {
             LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-                //buildAlertMessageNoGps();
                 stopProgressDialog();
                 Toast.makeText(MeetupActivity.this, "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
                 finish();
@@ -302,11 +301,8 @@ public class MeetupActivity extends AppCompatActivity {
             }
             Criteria criteria = new Criteria();
             boolean gps = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            Log.d(MainActivity.TAG, "getGPSLocation: " + gps);
             boolean network = manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            Log.d(MainActivity.TAG, "getGPSLocation: " + network);
             String provider = manager.getBestProvider(criteria, false);
-            Log.d(TAG, "getGPSLocation: " + provider);
 
             if ((manager == null) || (provider == null)) {
                 stopProgressDialog();
@@ -377,7 +373,6 @@ public class MeetupActivity extends AppCompatActivity {
             public void onFailure(Call<List<MeetUpGroup>> call, Throwable t) {
                 stopProgressDialog();
                 Toast.makeText(MeetupActivity.this, "No Network Connection", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onFailure: it did not work!!! " + t.getMessage());
             }
         });
     }
@@ -386,7 +381,6 @@ public class MeetupActivity extends AppCompatActivity {
 
         if (progress == null) {
             progress = new ProgressDialog(this);
-            //progress.setMessage("Loading Tags");
         }
         progress.show();
     }
