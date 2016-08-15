@@ -1,10 +1,12 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -13,6 +15,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -68,6 +73,8 @@ public class MeetupActivity extends AppCompatActivity {
     BottomBar bottomBar;
     final int TABPOS = 2;
 
+    boolean hasPermission = false;
+
     List<MeetUpGroup> groups;
 
     @BindView(R.id.rv_meetup) RecyclerView rv;
@@ -100,14 +107,13 @@ public class MeetupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_meetup);
         ButterKnife.bind(this);
 
-
         if (rv != null) {
             rv.setHasFixedSize(true);
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
         createScrollChangeListener();
 
-        if (savedInstanceState != null) {
+        if ((savedInstanceState != null) && (savedInstanceState.getBoolean("hasPermission")))  {
             groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
@@ -126,10 +132,9 @@ public class MeetupActivity extends AppCompatActivity {
             }
         }
 
-        startProgressDialog();
-        progress.setMessage(getString(R.string.meetupactivity_gettingGPS));
+        //progress.setMessage(getString(R.string.meetupactivity_gettingGPS));
         getGPSLocation();
-
+        startProgressDialog();
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));
         searchTag = getIntent().getStringExtra("searchtag");
         searchsite = getIntent().getStringExtra("searchsite");
@@ -253,13 +258,40 @@ public class MeetupActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        outState.putSerializable("meetup_groups", (Serializable) groups);
-        outState.putString("searchtag", searchTag);
-        outState.putDouble("latitude",latLng.get("latitude"));
-        outState.putDouble("longitude",latLng.get("longitude"));
-        outState.putString("location",meetupLoc.getText().toString());
-        bottomBar.onSaveInstanceState(outState);
+        if (hasPermission) {
+            outState.putSerializable("meetup_groups", (Serializable) groups);
+            outState.putString("searchtag", searchTag);
+            if (latLng != null) {
+                outState.putDouble("latitude", latLng.get("latitude"));
+                outState.putDouble("longitude", latLng.get("longitude"));
+                outState.putString("location", meetupLoc.getText().toString());
+            }
+            bottomBar.onSaveInstanceState(outState);
+        }
+        outState.putBoolean("hasPermission",hasPermission);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode) {
+            case 1:
+                if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    getGPSLocation();
+
+//                    progress.setMessage(getString(R.string.meetupactivity_finding_groups));
+                    searchTerm.setText(searchTag);
+                    Log.d(TAG, "onCreate: tag" + searchTag);
+
+                    watchLocationChange();
+                    setLocationName();
+                }
+                else {
+                    finish();
+                }
+                break;
+        }
     }
 
     @Override
@@ -289,6 +321,10 @@ public class MeetupActivity extends AppCompatActivity {
         Double lat,lng;
         if (latLng == null) {
             latLng = new HashMap<>();
+        }
+
+        if (checkLocationPermission()) {
+            return;
         }
 
         try {
@@ -331,6 +367,18 @@ public class MeetupActivity extends AppCompatActivity {
             Toast.makeText(MeetupActivity.this, "No Permission", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private boolean checkLocationPermission() {
+        if ( ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+            ActivityCompat.requestPermissions( this, new String[] {  Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION },
+                    1);
+
+            return true;
+        }
+        hasPermission = true;
+        return false;
     }
 
     private void getMeetupGroups(String tagname) {
@@ -477,4 +525,7 @@ public class MeetupActivity extends AppCompatActivity {
         }
 
     }
+
+
+
 }
