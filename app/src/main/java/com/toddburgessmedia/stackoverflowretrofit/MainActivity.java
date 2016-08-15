@@ -39,6 +39,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements
 
         tagcount = prefs.getString("tagcount","100");
         searchsite = prefs.getString("defaultsite","StackOverflow");
-
+        Log.d(TAG, "onCreate: searchsite " + searchsite);
         startPrefsObservables(prefs);
 
         setSiteName();
@@ -122,18 +123,29 @@ public class MainActivity extends AppCompatActivity implements
     private void startPrefsObservables(SharedPreferences prefs) {
         rxPrefs = RxSharedPreferences.create(prefs);
         rxDefaultsite = rxPrefs.getString("defaultsite");
-        rxDefaultsite.asObservable().subscribe(new Action1<String>() {
-            @Override
-            public void call(String s) {
-                searchsite = s;
-                setSiteName();
-                if (adapter != null) {
-                    adapter.setDisplaySiteName(sitename);
+        rxDefaultsite.asObservable()
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        if (s == null) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                })
+                .subscribe(new Action1<String>() {
+                @Override
+                public void call(String s) {
+                    searchsite = s;
+                    setSiteName();
+                    if (adapter != null) {
+                        adapter.setDisplaySiteName(sitename);
+                    }
+                    startProgressDialog();
+                    getTags(tagcount,tagsearch);
                 }
-                startProgressDialog();
-                getTags(tagcount,tagsearch);
-            }
-        });
+            });
     }
 
     @Override
@@ -195,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements
 
         StackOverFlowAPI stackOverFlowAPI = retrofit.create(StackOverFlowAPI.class);
 
+        Log.d(TAG, "getTags: " + searchsite);
         Call<StackOverFlowTags> call;
         if (!synonymsearch) {
             call = stackOverFlowAPI.loadquestions(tagcount, searchsite);
@@ -207,7 +220,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
                 tags = response.body();
+                progress.dismiss();
                 if (tags == null) {
+                    Toast.makeText(MainActivity.this, "No tags found", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -304,7 +319,9 @@ public class MainActivity extends AppCompatActivity implements
         searchsite = sites[which];
 
         setSiteName();
-        adapter.setDisplaySiteName(sitename);
+        if (adapter != null) {
+            adapter.setDisplaySiteName(sitename);
+        }
         startProgressDialog();
         getTags(tagcount,tagsearch);
 
