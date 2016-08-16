@@ -122,6 +122,7 @@ public class MeetupActivity extends AppCompatActivity {
             latLng.put("longitude",savedInstanceState.getDouble("longitude"));
             createBottomBar(savedInstanceState);
             meetupLoc.setText(savedInstanceState.getString("location"));
+            hasPermission = true;
             if (groups != null) {
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 adapter.setHeader(meetupLoc.getText().toString(),searchTag);
