@@ -122,6 +122,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             case VIEWTYPESTART:
                 ViewHolderStart vs = (ViewHolderStart) holder;
                 vs.sitename.setText(displaySiteName);
+                break;
         }
     }
 
