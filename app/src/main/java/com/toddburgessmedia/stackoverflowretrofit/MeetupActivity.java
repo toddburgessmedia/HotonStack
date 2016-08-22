@@ -133,7 +133,7 @@ public class MeetupActivity extends AppCompatActivity {
             }
         }
 
-        //progress.setMessage(getString(R.string.meetupactivity_gettingGPS));
+        //progress.setMessage(gapietString(R.string.meetupactivity_gettingGPS));
         getGPSLocation();
         startProgressDialog();
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));

@@ -112,12 +112,9 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        Tag t = tagList.get(position);
-
-        String r = Integer.valueOf(position+1).toString();
-
         switch (getItemViewType(position)) {
             case VIEWTYPE:
+                Tag t = tagList.get(position-1);
                 ViewHolder v = (ViewHolder) holder;
                 v.tagname.setText(t.getName());
                 v.tagcount.setText("Tag count: " + t.getCount());
