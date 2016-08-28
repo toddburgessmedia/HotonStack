@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    tools:context="com.toddburgessmedia.stackoverflowretrofit.PrivacyPolicyActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Privacy Policy/Disclosure Statement"
+        android:textStyle="bold"
+        android:paddingBottom="14dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tech Dive uses the device GPS coordinates to find meetup groups using the meetup.com API. The GPS coordinates is shared with meetup.com as part of the API call. No other identifying information is attached to the API call."
+        android:paddingBottom="14dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="If you do not want to share your device GPS data with meetup.com you have 3 options:"
+        android:paddingBottom="14dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Disable the location permission for Tech Dive"
+        android:paddingBottom="10dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Do not use the meetup feature of Tech Dive"
+        android:paddingBottom="10dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Uninstall Tech Dive"
+        android:paddingBottom="14dp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Got it"
+        android:layout_gravity="center"
+        android:id="@+id/privacy_gotit"
+        />
+
+</LinearLayout>

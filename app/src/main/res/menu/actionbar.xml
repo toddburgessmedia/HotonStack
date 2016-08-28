@@ -24,4 +24,9 @@
         android:title="Preferences"
         android:orderInCategory="300" />
 
+    <item
+        android:id="@+id/menu_privacy"
+        android:title="Privacy Policy"
+        android:orderInCategory="400" />
+
 </menu>

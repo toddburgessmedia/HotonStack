@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
 
-    //@BindView(R.id.main_sitename) TextView sitename;
-
     boolean tagsearch = false;
 
     @Override
@@ -77,8 +75,6 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //sitename = (TextView) findViewById(R.id.main_sitename);
-        //rv = (RecyclerView) findViewById(R.id.recycleview);
         if (rv != null) {
             rv.setHasFixedSize(true);
             rv.setLayoutManager(new LinearLayoutManager(this));
@@ -177,6 +173,10 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.menu_siteselect:
                 SiteSelectDialog siteSelectDialog = new SiteSelectDialog();
                 siteSelectDialog.show(getFragmentManager(),"sitesearch");
+                break;
+            case R.id.menu_privacy:
+                Intent pi = new Intent(MainActivity.this, PrivacyPolicyActivity.class);
+                startActivity(pi);
                 break;
         }
         return true;

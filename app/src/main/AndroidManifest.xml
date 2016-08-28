@@ -27,22 +27,25 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".ListQuestionsActivity"
-            android:launchMode="singleTop"
-            />
-        <activity android:name=".GitHubActivity"
-            android:launchMode="singleTop"
-            />
+        <activity
+            android:name=".ListQuestionsActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".GitHubActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".PreferencesActivity" />
         <activity android:name=".MeetupActivity" />
         <activity android:name=".MeetupAuthActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="whatshotonstack" />
             </intent-filter>
         </activity>
+        <activity android:name=".PrivacyPolicyActivity"></activity>
     </application>
 
 </manifest>
