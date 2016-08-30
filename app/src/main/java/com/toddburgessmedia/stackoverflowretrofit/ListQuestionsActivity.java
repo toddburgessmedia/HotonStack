@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,8 +50,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     RecycleViewFAQ adapter;
 
     @Inject @Named("stackexchange") Retrofit retrofit;
-
-    CoordinatorLayout coordinatorLayout;
 
     StackOverFlowFAQ faq;
 
