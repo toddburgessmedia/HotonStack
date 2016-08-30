@@ -35,23 +35,21 @@ import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetupAPI;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -81,6 +79,8 @@ public class MeetupActivity extends AppCompatActivity {
     RecycleViewMeetup adapter;
     private ProgressDialog progress;
 
+    @Inject @Named("meetup") Retrofit retrofit;
+
     Subscription subscribe;
     Subscription locationSub;
 
@@ -106,6 +106,8 @@ public class MeetupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetup);
         ButterKnife.bind(this);
+
+        ((TechDive) getApplication()).getOkHttpComponent().inject(this);
 
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -133,7 +135,6 @@ public class MeetupActivity extends AppCompatActivity {
             }
         }
 
-        //progress.setMessage(gapietString(R.string.meetupactivity_gettingGPS));
         getGPSLocation();
         startProgressDialog();
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));
@@ -383,20 +384,6 @@ public class MeetupActivity extends AppCompatActivity {
     }
 
     private void getMeetupGroups(String tagname) {
-
-        int cachesize =  10 * 1024 * 1024;
-        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .cache(cache)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.meetup.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
 
         MeetupAPI meetupAPI = retrofit.create(MeetupAPI.class);
 

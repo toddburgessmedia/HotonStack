@@ -26,18 +26,15 @@ import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -50,10 +47,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @BindView(R.id.recycleview) RecyclerView rv;
 
+    @Inject @Named("stackexchange") Retrofit retrofit;
+
     RecyclerViewTagsAdapter adapter;
     StackOverFlowTags tags;
-
-
 
     ProgressDialog progress;
     String tagcount;
@@ -74,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        ((TechDive) getApplication()).getOkHttpComponent().inject(this);
 
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -191,23 +190,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void getTags(final String tagcount, final boolean synonymsearch) {
 
-        int cachesize =  10 * 1024 * 1024;
-        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .cache(cache)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.stackexchange.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-
         StackOverFlowAPI stackOverFlowAPI = retrofit.create(StackOverFlowAPI.class);
 
-        Log.d(TAG, "getTags: " + searchsite);
         Call<StackOverFlowTags> call;
         if (!synonymsearch) {
             call = stackOverFlowAPI.loadquestions(tagcount, searchsite);

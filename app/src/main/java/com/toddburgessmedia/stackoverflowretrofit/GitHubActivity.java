@@ -19,19 +19,16 @@ import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectCollection;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GitHubActivity extends AppCompatActivity implements NoLanguageFoundDialog.NothingFoundListener {
 
@@ -48,9 +45,9 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     @BindView(R.id.github_recycleview) RecyclerView rv;
     RecyclerViewGitHub adapter;
 
-    boolean searchLanguage = true;
+    @Inject @Named("github") Retrofit retrofit;
 
-    //@BindView(R.id.github_search) TextView search;
+    boolean searchLanguage = true;
 
     @BindString(R.string.github_activity_loading) String loadingMsg;
 
@@ -60,6 +57,8 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         Log.d(TAG, "onCreate: starting up");
         setContentView(R.layout.activity_git_hub);
         ButterKnife.bind(this);
+
+        ((TechDive) getApplication()).getOkHttpComponent().inject(this);
 
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -170,20 +169,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     private void getProjects(final String language, final boolean langugesearch) {
 
-        int cachesize =  10 * 1024 * 1024;
-        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .cache(cache)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
-
         GitHubProjectAPI projectAPI = retrofit.create(GitHubProjectAPI.class);
 
         final String qlanguage;
@@ -223,8 +208,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                     rv.setAdapter(adapter);
                 }
             }
-
-
 
             @Override
             public void onFailure(Call<GitHubProjectCollection> call, Throwable t) {

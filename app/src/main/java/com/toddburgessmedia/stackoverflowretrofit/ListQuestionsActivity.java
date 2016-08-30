@@ -21,19 +21,16 @@ import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFAQ;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFaqAPI;
 
-import java.io.File;
-import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ListQuestionsActivity extends AppCompatActivity implements TimeFrameDialog.TimeFrameDialogListener {
 
@@ -53,6 +50,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     @BindView(R.id.questions_recycleview) RecyclerView rv;
     RecycleViewFAQ adapter;
 
+    @Inject @Named("stackexchange") Retrofit retrofit;
+
     CoordinatorLayout coordinatorLayout;
 
     StackOverFlowFAQ faq;
@@ -61,9 +60,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     BottomBar bottomBar;
     final int TABPOS = 0;
-
-//    @BindView(R.id.questions_sitename) TextView sitename;
-//    @BindView(R.id.questions_timeframe) TextView timeframe;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -99,13 +95,11 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         ButterKnife.bind(this);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        ((TechDive) getApplication()).getOkHttpComponent().inject(this);
+
         Intent i = getIntent();
         searchTag = i.getStringExtra("name");
         searchsite = i.getStringExtra("sitename");
-        //setTitle(getString(R.string.app_name));
-
-        //setSiteName();
-        //setTimeFrame();
 
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -265,22 +259,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     }
 
     private void getQuestions(String tag) {
-
-        Log.d(MainActivity.TAG, "getQuestions: " + tag + " / " + searchsite);
-
-        int cachesize =  10 * 1024 * 1024; // 10 MB
-        final Cache cache = new Cache(new File(getApplicationContext().getCacheDir(), "http"), cachesize);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .cache(cache)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.stackexchange.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
-                .build();
 
         final StackOverFlowFaqAPI faqAPI = retrofit.create(StackOverFlowFaqAPI.class);
 

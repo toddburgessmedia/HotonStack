@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
@@ -54,7 +55,10 @@ dependencies {
 
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
 
-//    compile(name:'bottom-bar-debug', ext:'aar')
+    apt 'com.google.dagger:dagger-compiler:2.5'
+    compile 'com.google.dagger:dagger:2.5'
+    provided 'javax.annotation:jsr250-api:1.0'
+
 }
 
 
