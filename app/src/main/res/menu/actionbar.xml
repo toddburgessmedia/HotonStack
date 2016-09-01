@@ -15,18 +15,23 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/menu_ranking"
+        android:orderInCategory="150"
+        android:title="Sort by" />
+
+    <item
         android:id="@+id/menu_siteselect"
-        android:orderInCategory="500"
+        android:orderInCategory="200"
         android:title="Select Site" />
 
     <item
         android:id="@+id/menu_preferences"
         android:title="Preferences"
-        android:orderInCategory="300" />
+        android:orderInCategory="400" />
 
     <item
         android:id="@+id/menu_privacy"
         android:title="Privacy Policy"
-        android:orderInCategory="400" />
+        android:orderInCategory="300" />
 
 </menu>

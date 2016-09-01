@@ -50,6 +50,8 @@
     <string name="rv_faq_answers">Answers:</string>
     <string name="rv_faq_date_created">Date Created:</string>
 
+    <string name="tags_dialog_ranking">Sort by: </string>
+
     <string-array name="site_select_array">
         <item>GameDev</item>
         <item>Mathematics</item>
@@ -74,6 +76,11 @@
 
     <string-array name="tag_longpress_dialog_back">
         <item>Go Back</item>
+    </string-array>
+
+    <string-array name="tags_ranking">
+        <item>Activity</item>
+        <item>Popularity</item>
     </string-array>
 
 

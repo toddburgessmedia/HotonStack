@@ -14,6 +14,10 @@ public interface StackOverFlowAPI {
     Call<StackOverFlowTags> loadquestions(@Query("pagesize") String pagesize,
                                             @Query("site") String site);
 
+    @GET("/2.2/tags?order=desc&sort=activity")
+    Call<StackOverFlowTags> loadquestionsActivity(@Query("pagesize") String pagesize,
+                                          @Query("site") String site);
+
     @GET("/2.2/tags/{tag}/related")
     Call<StackOverFlowTags> loadSynonyms(@Path("tag") String tag, @Query("site") String site);
 

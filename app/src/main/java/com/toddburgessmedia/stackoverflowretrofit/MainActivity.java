@@ -41,7 +41,9 @@ import rx.functions.Func1;
 
 public class MainActivity extends AppCompatActivity implements
         SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener,
-        TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.OnLongPressListener {
+        TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.OnLongPressListener,
+        StackExchangeRankingDialog.StackExchangeRankingDialogListener
+        {
 
     public final static String TAG = "StackOverFlow";
 
@@ -60,8 +62,12 @@ public class MainActivity extends AppCompatActivity implements
 
     String searchtag = "";
 
+    String searchtype = "Popularity";
+
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
+
+    Menu menu;
 
     boolean tagsearch = false;
 
@@ -97,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements
 
         tagcount = prefs.getString("tagcount","100");
         searchsite = prefs.getString("defaultsite","StackOverflow");
-        Log.d(TAG, "onCreate: searchsite " + searchsite);
         startPrefsObservables(prefs);
 
         setSiteName();
@@ -177,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements
                 Intent pi = new Intent(MainActivity.this, PrivacyPolicyActivity.class);
                 startActivity(pi);
                 break;
+            case R.id.menu_ranking:
+                StackExchangeRankingDialog rankingDialog = new StackExchangeRankingDialog();
+                rankingDialog.show(getFragmentManager(),"rankingdialog");
+                break;
         }
         return true;
     }
@@ -185,6 +194,12 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflate = getMenuInflater();
         inflate.inflate(R.menu.actionbar,menu);
+        this.menu = menu;
+
+        MenuItem item = menu.findItem(R.id.menu_ranking);
+        String sortby = getString(R.string.tags_dialog_ranking) + searchtype;
+        item.setTitle(sortby);
+
         return true;
     }
 
@@ -194,7 +209,11 @@ public class MainActivity extends AppCompatActivity implements
 
         Call<StackOverFlowTags> call;
         if (!synonymsearch) {
-            call = stackOverFlowAPI.loadquestions(tagcount, searchsite);
+            if (searchtype.equals("Popularity")) {
+                call = stackOverFlowAPI.loadquestions(tagcount, searchsite);
+            } else {
+                call = stackOverFlowAPI.loadquestionsActivity(tagcount, searchsite);
+            }
         } else {
             call = stackOverFlowAPI.loadSynonyms(searchtag, searchsite);
         }
@@ -312,12 +331,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    // Change site name negative click
-    @Override
-    public void siteSelectnegativeClick(DialogFragment fragment, int which) {
-
-    }
-
     // LongPress Dialog positive click handler
     @Override
     public void longPresspositiveClick(DialogFragment fragment, int which) {
@@ -385,6 +398,21 @@ public class MainActivity extends AppCompatActivity implements
 
         ItemTouchHelper helper = new ItemTouchHelper(simpleCallback);
         helper.attachToRecyclerView(rv);
+
+    }
+
+    @Override
+    public void stackExchangeRankingpositiveClick(DialogFragment fragment, int which) {
+
+        String[] ranking = getResources().getStringArray(R.array.tags_ranking);
+
+        searchtype = ranking[which];
+
+        MenuItem item = menu.findItem(R.id.menu_ranking);
+        String sortby = getString(R.string.tags_dialog_ranking) + searchtype;
+        item.setTitle(sortby);
+
+        getTags(tagcount,tagsearch);
 
     }
 

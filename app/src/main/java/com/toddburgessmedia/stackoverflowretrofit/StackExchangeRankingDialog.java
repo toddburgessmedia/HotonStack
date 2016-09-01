@@ -11,16 +11,16 @@ import android.os.Bundle;
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 01/07/16.
  */
-public class SiteSelectDialog extends DialogFragment {
+public class StackExchangeRankingDialog extends DialogFragment {
 
-    SiteSelectDialogListener listener;
+    StackExchangeRankingDialogListener listener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
         Activity a = (Activity) context;
-        listener = (SiteSelectDialogListener) a;
+        listener = (StackExchangeRankingDialogListener) a;
 
     }
 
@@ -28,18 +28,18 @@ public class SiteSelectDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.site_select_title)
-                .setItems(R.array.select_select_display, new DialogInterface.OnClickListener() {
+                .setTitle(R.string.tags_dialog_ranking)
+                .setItems(R.array.tags_ranking, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        listener.siteSelectpositiveClick(SiteSelectDialog.this, which);
+                        listener.stackExchangeRankingpositiveClick(StackExchangeRankingDialog.this, which);
                     }
                 });
         return builder.create();
 
     }
 
-    public interface SiteSelectDialogListener {
-        void siteSelectpositiveClick(DialogFragment fragment, int which);
+    public interface StackExchangeRankingDialogListener {
+        void stackExchangeRankingpositiveClick(DialogFragment fragment, int which);
     }
 }
