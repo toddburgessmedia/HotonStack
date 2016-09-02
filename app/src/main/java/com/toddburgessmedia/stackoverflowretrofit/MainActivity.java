@@ -25,6 +25,7 @@ import com.f2prateek.rx.preferences.Preference;
 import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
+import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -41,7 +42,7 @@ import rx.functions.Func1;
 
 public class MainActivity extends AppCompatActivity implements
         SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener,
-        TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.OnLongPressListener,
+        TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.TagsAdapterListener,
         StackExchangeRankingDialog.StackExchangeRankingDialogListener
         {
 
@@ -55,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements
     StackOverFlowTags tags;
 
     ProgressDialog progress;
-    String tagcount;
+    int tagcount;
+    int pagecount = 1;
 
     String searchsite;
     String sitename;
@@ -90,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState != null) {
             tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
             searchsite = savedInstanceState.getString("searchsite");
+            tagcount = savedInstanceState.getInt("tagcount");
+            pagecount = savedInstanceState.getInt("pagecount");
             setSiteName();
             if (tags != null) {
                 adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(),searchsite,this);
@@ -101,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        tagcount = prefs.getString("tagcount","100");
+        tagcount = Integer.valueOf(prefs.getString("tagcount", "100"));
         searchsite = prefs.getString("defaultsite","StackOverflow");
         startPrefsObservables(prefs);
 
@@ -153,6 +157,8 @@ public class MainActivity extends AppCompatActivity implements
 
         outState.putSerializable("taglist",tags);
         outState.putString("searchsite",searchsite);
+        outState.putInt("tagcount", tagcount);
+        outState.putInt("pagecount", pagecount);
         super.onSaveInstanceState(outState);
     }
 
@@ -168,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.menu_refresh:
                 startProgressDialog();
+                pagecount = 1;
                 getTags(tagcount,tagsearch);
                 break;
             case R.id.menu_preferences:
@@ -203,16 +210,16 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
-    private void getTags(final String tagcount, final boolean synonymsearch) {
+    private void getTags(final int tagcount, final boolean synonymsearch) {
 
         StackOverFlowAPI stackOverFlowAPI = retrofit.create(StackOverFlowAPI.class);
 
         Call<StackOverFlowTags> call;
         if (!synonymsearch) {
             if (searchtype.equals("Popularity")) {
-                call = stackOverFlowAPI.loadquestions(tagcount, searchsite);
+                call = stackOverFlowAPI.loadquestions(tagcount, searchsite, pagecount);
             } else {
-                call = stackOverFlowAPI.loadquestionsActivity(tagcount, searchsite);
+                call = stackOverFlowAPI.loadquestionsActivity(tagcount, searchsite, pagecount);
             }
         } else {
             call = stackOverFlowAPI.loadSynonyms(searchtag, searchsite);
@@ -223,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
                 tags = response.body();
+                Log.d(TAG, "onResponse: " + tags.isHasMore());
                 progress.dismiss();
                 if (tags == null) {
                     Toast.makeText(MainActivity.this, "No tags found", Toast.LENGTH_SHORT).show();
@@ -236,11 +244,17 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
 
-                if (adapter != null) {
+                tags.tags.add(new Tag());
+                if ((adapter != null) && pagecount > 1) {
+                    adapter.addItems(tags.tags);
+                    adapter.setHasmore(tags.isHasMore());
+                } else if (adapter != null) {
                     adapter.removeAllItems();
                     adapter.updateAdapter(tags.tags);
+                    adapter.setHasmore(tags.isHasMore());
                 } else {
                     adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    adapter.setHasmore(tags.isHasMore());
                     adapter.setDisplaySiteName(sitename);
                     rv.setAdapter(adapter);
                 }
@@ -382,7 +396,18 @@ public class MainActivity extends AppCompatActivity implements
         dialog.show(getFragmentManager(),"long press");
     }
 
-    private void getSwipeHandler() {
+    @Override
+    public void loadMoreTags(View view) {
+
+        pagecount += tagcount;
+        if (progress != null) {
+            progress.show();
+        }
+        getTags(tagcount,tagsearch);
+
+    }
+
+            private void getSwipeHandler() {
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -406,12 +431,20 @@ public class MainActivity extends AppCompatActivity implements
 
         String[] ranking = getResources().getStringArray(R.array.tags_ranking);
 
+        if (searchtype.equals(ranking[which])) {
+            return;
+        }
+
+        pagecount = 1;
         searchtype = ranking[which];
 
         MenuItem item = menu.findItem(R.id.menu_ranking);
         String sortby = getString(R.string.tags_dialog_ranking) + searchtype;
         item.setTitle(sortby);
 
+        if (progress != null) {
+            progress.show();
+        }
         getTags(tagcount,tagsearch);
 
     }

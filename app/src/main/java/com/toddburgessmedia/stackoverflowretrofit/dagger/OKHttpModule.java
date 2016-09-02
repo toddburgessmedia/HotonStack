@@ -1,6 +1,8 @@
 package com.toddburgessmedia.stackoverflowretrofit.dagger;
 
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +29,13 @@ public class OKHttpModule {
     public OKHttpModule (Application application) {
         app = application;
     }
+
+    @Provides
+    @Singleton
+    public SharedPreferences getPreferences () {
+        return PreferenceManager.getDefaultSharedPreferences(app);
+    }
+
 
     @Provides
     @Singleton

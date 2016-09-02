@@ -8,6 +8,13 @@
         android:defaultValue="100"
         />
 
+    <com.toddburgessmedia.stackoverflowretrofit.QuestionPageSizePreference
+        android:key="faqpagesize"
+        android:title="Minimum questions to load"
+        android:summary="Minimum number of questons"
+        android:defaultValue="30"
+        />
+
     <ListPreference
         android:key="defaultsite"
         android:title="Default Site"

@@ -11,12 +11,14 @@ import retrofit2.http.Query;
 public interface StackOverFlowAPI {
 
     @GET("/2.2/tags?order=desc&sort=popular")
-    Call<StackOverFlowTags> loadquestions(@Query("pagesize") String pagesize,
-                                            @Query("site") String site);
+    Call<StackOverFlowTags> loadquestions(@Query("pagesize") int pagesize,
+                                            @Query("site") String site,
+                                            @Query("page") int page);
 
     @GET("/2.2/tags?order=desc&sort=activity")
-    Call<StackOverFlowTags> loadquestionsActivity(@Query("pagesize") String pagesize,
-                                          @Query("site") String site);
+    Call<StackOverFlowTags> loadquestionsActivity(@Query("pagesize") int pagesize,
+                                          @Query("site") String site,
+                                          @Query("page") int page);
 
     @GET("/2.2/tags/{tag}/related")
     Call<StackOverFlowTags> loadSynonyms(@Path("tag") String tag, @Query("site") String site);

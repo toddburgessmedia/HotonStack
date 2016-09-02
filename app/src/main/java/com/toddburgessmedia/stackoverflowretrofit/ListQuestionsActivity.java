@@ -3,6 +3,7 @@ package com.toddburgessmedia.stackoverflowretrofit;
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
@@ -50,10 +51,14 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     RecycleViewFAQ adapter;
 
     @Inject @Named("stackexchange") Retrofit retrofit;
+    @Inject SharedPreferences prefs;
 
     StackOverFlowFAQ faq;
 
     ProgressDialog progress;
+
+    int faqpagesize;
+    int pagecount = 1;
 
     BottomBar bottomBar;
     final int TABPOS = 0;
@@ -120,6 +125,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             }
         }
 
+        faqpagesize = Integer.valueOf(prefs.getString("faqpagesize", "30"));
 
         createBottomBar(savedInstanceState);
 
@@ -320,9 +326,9 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISYEAR);
                 break;
             default:
-                return faqAPI.loadQuestions(tag,searchsite);
+                return faqAPI.loadQuestions(tag,searchsite, pagecount, faqpagesize);
         }
-        return faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite);
+        return faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite, pagecount, faqpagesize);
     }
 
     @Override

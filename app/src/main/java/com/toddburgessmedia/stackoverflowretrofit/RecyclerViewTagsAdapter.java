@@ -25,6 +25,9 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private final int VIEWTYPE = 1;
     private final int VIEWTYPESTART = 0;
+    private final int VIEWTYPEHASMORE = 2;
+
+    boolean hasmore = false;
 
     Context context;
 
@@ -36,6 +39,8 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.sitename = sitename;
     }
 
+    public void setHasmore(boolean hasmore) { this.hasmore = hasmore; }
+
     String sitename;
 
     public void setDisplaySiteName(String displaySiteName) {
@@ -44,7 +49,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     String displaySiteName;
 
-    OnLongPressListener longClickListener;
+    TagsAdapterListener longClickListener;
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, final int viewType) {
@@ -60,6 +65,10 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             case VIEWTYPESTART:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_start,parent,false);
                 return new ViewHolderStart(v);
+            case VIEWTYPEHASMORE:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags_hasmore, parent, false);
+                v.setOnClickListener(loadMoreTagsListener());
+                return new ViewHolderHasMore(v);
             default:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_tags,parent,false);
                 break;
@@ -105,9 +114,34 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             };
     }
 
+    @NonNull
+    private View.OnClickListener loadMoreTagsListener() {
+        return new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                ViewHolderHasMore vh = new ViewHolderHasMore(view);
+                longClickListener.loadMoreTags(view);
+            }
+        };
+    }
+
     public void onItemDismiss(int position) {
         tagList.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void addItems (List<Tag> tags) {
+
+        int position = tagList.size();
+        onItemDismiss(position-1);
+        position--;
+
+        for (int i = 0; i < tags.size(); i++) {
+            tagList.add(tags.get(i));
+            position++;
+            notifyItemInserted(position);
+        }
     }
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -131,6 +165,8 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         if (position == 0) {
             return VIEWTYPESTART;
+        } else if ((position == tagList.size()-1) && (hasmore)) {
+            return VIEWTYPEHASMORE;
         } else {
             return VIEWTYPE;
         }
@@ -156,7 +192,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyDataSetChanged();
     }
 
-    public RecyclerViewTagsAdapter(List<Tag> tags, Context con, String site, OnLongPressListener listener) {
+    public RecyclerViewTagsAdapter(List<Tag> tags, Context con, String site, TagsAdapterListener listener) {
 
         this.tagList = tags;
         this.context = con;
@@ -190,9 +226,24 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         }
     }
 
-    public interface OnLongPressListener {
+    public class ViewHolderHasMore extends RecyclerView.ViewHolder {
 
-        public void onLongClick(View view, String tag);
+        @BindView(R.id.rv_tags_hasmore_title) TextView title;
+
+        public ViewHolderHasMore (View view) {
+
+            super(view);
+
+            ButterKnife.bind(this, view);
+
+        }
+    }
+
+    public interface TagsAdapterListener {
+
+        void onLongClick(View view, String tag);
+
+        void loadMoreTags(View view);
     }
 
 

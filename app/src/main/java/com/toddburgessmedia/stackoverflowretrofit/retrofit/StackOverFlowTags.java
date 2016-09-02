@@ -13,6 +13,17 @@ public class StackOverFlowTags implements Serializable {
     @SerializedName("items")
     public List<Tag> tags;
 
+    public boolean isHasMore() {
+        return hasMore;
+    }
+
+    public void setHasMore(boolean hasMore) {
+        this.hasMore = hasMore;
+    }
+
+    @SerializedName("has_more")
+    private boolean hasMore;
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
