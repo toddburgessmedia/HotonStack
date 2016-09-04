@@ -25,7 +25,6 @@ import com.f2prateek.rx.preferences.Preference;
 import com.f2prateek.rx.preferences.RxSharedPreferences;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
-import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -229,34 +228,37 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onResponse(Call<StackOverFlowTags> call, Response<StackOverFlowTags> response) {
 
-                tags = response.body();
-                Log.d(TAG, "onResponse: " + tags.isHasMore());
+                StackOverFlowTags callTags = response.body();
+
                 progress.dismiss();
-                if (tags == null) {
+                if (callTags == null) {
                     Toast.makeText(MainActivity.this, "No tags found", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (tags.tags.size() == 0) {
+                if (callTags.tags.size() == 0) {
                     Toast.makeText(MainActivity.this, "Tag Not Found", Toast.LENGTH_SHORT).show();
                     tagsearch = false;
                     setSiteName();
                     return;
                 }
 
-                tags.tags.add(new Tag());
+                //callTags.tags.add(new Tag());
                 if ((adapter != null) && pagecount > 1) {
-                    adapter.addItems(tags.tags);
+                    adapter.addItems(callTags.tags);
                     adapter.setHasmore(tags.isHasMore());
+                    tags.mergeTags(callTags);
                 } else if (adapter != null) {
                     adapter.removeAllItems();
-                    adapter.updateAdapter(tags.tags);
+                    adapter.updateAdapter(callTags.tags);
                     adapter.setHasmore(tags.isHasMore());
+                    tags = callTags;
                 } else {
-                    adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
-                    adapter.setHasmore(tags.isHasMore());
+                    adapter = new RecyclerViewTagsAdapter(callTags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    adapter.setHasmore(callTags.isHasMore());
                     adapter.setDisplaySiteName(sitename);
                     rv.setAdapter(adapter);
+                    tags = callTags;
                 }
                 progress.dismiss();
 

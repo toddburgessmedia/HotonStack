@@ -149,6 +149,9 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         switch (getItemViewType(position)) {
             case VIEWTYPE:
                 Tag t = tagList.get(position-1);
+                if (t.getCount() == null) {
+                    break;
+                }
                 ViewHolder v = (ViewHolder) holder;
                 v.tagname.setText(t.getName());
                 v.tagcount.setText("Tag count: " + t.getCount());

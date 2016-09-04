@@ -197,6 +197,10 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                 }
 
                 projects = response.body();
+
+//                Headers headers = response.headers();
+//                Log.d(TAG, "onResponse: " + headers.get("Link"));
+
                 if (projects != null) {
                     adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
                     if (searchLanguage) {

@@ -36,4 +36,11 @@ public class StackOverFlowTags implements Serializable {
     public Tag getTag (int position) {
         return tags.get(position);
     }
+
+    public void mergeTags(StackOverFlowTags newtags) {
+
+        for (int i = 0; i < newtags.tags.size(); i++) {
+            tags.add(newtags.tags.get(i));
+        }
+    }
 }

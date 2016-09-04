@@ -29,9 +29,15 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public final int VIEWFAQ = 1;
     public final int VIEWSTART = 0;
+    public final int VIEWHASMORE = 2;
 
     String sitename;
     String timeframe;
+
+
+    boolean hasmore = false;
+
+    RvFaqListener rvFaqListener;
 
     public void setSitename(String sitename) {
         this.sitename = sitename;
@@ -41,14 +47,20 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.timeframe = timeframe;
     }
 
+    public void setHasmore(boolean hasmore) {
+        this.hasmore = hasmore;
+    }
+
     private List<FAQTag> faqTAGs;
 
     protected Context context;
 
-    public RecycleViewFAQ (List<FAQTag> tags, Context con) {
+    public RecycleViewFAQ (List<FAQTag> tags, Context con, RvFaqListener rvFaqListener) {
 
         this.faqTAGs = tags;
         this.context = con;
+
+        this.rvFaqListener = rvFaqListener;
 
     }
 
@@ -65,6 +77,10 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case VIEWSTART:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_faq_start, parent, false);
                 return new ViewHolderStart(v);
+            case VIEWHASMORE:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_faq_hasmore, parent, false);
+                v.setOnClickListener(getHasMoreClickListener(viewType));
+                return new ViewHolderHasMore(v);
         }
         return null;
     }
@@ -85,6 +101,17 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
             };
     }
 
+    @NonNull View.OnClickListener getHasMoreClickListener(final int viewType) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (rvFaqListener != null) {
+                    rvFaqListener.onClick(view);
+                }
+            }
+        };
+    }
+
     public void removeAllItems() {
         for (int i = 0; i < faqTAGs.size(); i++) {
             faqTAGs.remove(i);
@@ -99,6 +126,24 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
+    public void onItemDismiss(int position) {
+        faqTAGs.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void addItems (List<FAQTag> tags) {
+
+        int position = faqTAGs.size();
+        onItemDismiss(position-1);
+        position--;
+
+        for (int i = 0; i < tags.size(); i++) {
+            faqTAGs.add(tags.get(i));
+            position++;
+            notifyItemInserted(position);
+        }
+    }
+
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
@@ -107,6 +152,9 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         switch (viewType) {
             case VIEWFAQ:
                 FAQTag tag = faqTAGs.get(position-1);
+                if (tag.title == null) {
+                    break;
+                }
                 ViewHolderOdd vh = (ViewHolderOdd) holder;
                 vh.question.setText(Html.fromHtml(tag.title));
                 vh.link.setText(tag.link);
@@ -135,6 +183,8 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if (position == 0) {
             return VIEWSTART;
+        } else if ((position == faqTAGs.size()-1) && (hasmore)) {
+            return VIEWHASMORE;
         } else {
             return VIEWFAQ;
         }
@@ -175,4 +225,20 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     }
 
+    public class ViewHolderHasMore extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.rv_faq_hasmore_title) TextView hasmore;
+
+        public ViewHolderHasMore (View view) {
+            super(view);
+
+            ButterKnife.bind(this, view);
+        }
+    }
+
+    public interface RvFaqListener {
+
+        void onClick (View v);
+
+    }
 }

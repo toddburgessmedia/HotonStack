@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -32,7 +33,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class ListQuestionsActivity extends AppCompatActivity implements TimeFrameDialog.TimeFrameDialogListener {
+public class ListQuestionsActivity extends AppCompatActivity implements TimeFrameDialog.TimeFrameDialogListener,
+                            RecycleViewFAQ.RvFaqListener
+{
 
     public static final int ALLTIME = 0;
     public static final int TODAY = 4;
@@ -80,6 +83,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 return true;
 
             case R.id.whats_hot_refresh:
+                pagecount = 1;
                 startProgressDialog();
                 getQuestions(searchTag);
                 break;
@@ -114,9 +118,11 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             faq = (StackOverFlowFAQ) savedInstanceState.getSerializable("faqlist");
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
+            faqpagesize = savedInstanceState.getInt("faqpagesize");
+            pagecount = savedInstanceState.getInt("pagecount");
             createBottomBar(savedInstanceState);
             if (faq != null) {
-                adapter = new RecycleViewFAQ(faq.faq, getBaseContext());
+                adapter = new RecycleViewFAQ(faq.faq, getBaseContext(),this);
                 setTimeFrame();
                 setSiteName();
                 rv.setAdapter(adapter);
@@ -125,7 +131,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             }
         }
 
-        faqpagesize = Integer.valueOf(prefs.getString("faqpagesize", "30"));
+        faqpagesize = Integer.parseInt(prefs.getString("faqpagesize", "30"));
 
         createBottomBar(savedInstanceState);
 
@@ -237,7 +243,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             }
         }
         String displaytext = display[i] + " / " + searchTag;
-        //sitename.setText(displaytext);
         adapter.setSitename(displaytext);
     }
 
@@ -256,6 +261,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         outState.putSerializable("faqlist",faq);
         outState.putString("searchtag",searchTag);
         outState.putString("searchsite",searchsite);
+        outState.putInt("pagecount",pagecount);
+        outState.putInt("faqpagesize",faqpagesize);
         bottomBar.onSaveInstanceState(outState);
 
         super.onSaveInstanceState(outState);
@@ -273,20 +280,31 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             @Override
             public void onResponse(Call<StackOverFlowFAQ> call, Response<StackOverFlowFAQ> response) {
 
-                faq = response.body();
-                if (faq == null) {
+                StackOverFlowFAQ newFaq = response.body();
+
+                //faq = response.body();
+                if (newFaq == null) {
                     return;
                 }
 
-                if (adapter != null) {
+//                newFaq.faq.add(new FAQTag());
+                if ((adapter != null) && (pagecount > 1)) {
+                    adapter.addItems(newFaq.faq);
+                    adapter.setHasmore(faq.isHasmore());
+                    faq.mergeTags(newFaq);
+                } else if (adapter != null) {
+                    faq = newFaq;
                     adapter.removeAllItems();
                     setTimeFrame();
                     setSiteName();
                     adapter.updateAdapter(faq.faq);
+                    adapter.setHasmore(faq.isHasmore());
                 } else {
-                    adapter = new RecycleViewFAQ(faq.faq,getBaseContext());
+                    faq = newFaq;
+                    adapter = new RecycleViewFAQ(faq.faq,getBaseContext(), ListQuestionsActivity.this);
                     setTimeFrame();
                     setSiteName();
+                    adapter.setHasmore(faq.isHasmore());
                     rv.setAdapter(adapter);
                 }
                 stopProgressDialog();
@@ -361,6 +379,15 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     @Override
     public void negativeClick(DialogFragment fragment, int which) {
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        Log.d(MainActivity.TAG, "onClick: ");
+
+        pagecount += faqpagesize;
+        startProgressDialog();
+        getQuestions(searchTag);
     }
 
 

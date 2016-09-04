@@ -49,7 +49,7 @@ public class QuestionPageSizePreference extends EditTextPreference {
         }
 
         if (tags > 50) {
-            Toast.makeText(context, "Maximum Questions is 100", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Maximum Questions is 50", Toast.LENGTH_SHORT).show();
             returnString = "30";
         } else if (tags < 1) {
             Toast.makeText(context, "Minimum Questions is 1", Toast.LENGTH_SHORT).show();

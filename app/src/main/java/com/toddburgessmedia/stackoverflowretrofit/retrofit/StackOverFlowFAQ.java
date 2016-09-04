@@ -13,6 +13,9 @@ public class StackOverFlowFAQ implements Serializable {
     @SerializedName("items")
     public List<FAQTag> faq;
 
+    @SerializedName("has_more")
+    boolean hasmore;
+
     @Override
     public String toString() {
 
@@ -29,6 +32,21 @@ public class StackOverFlowFAQ implements Serializable {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public boolean isHasmore() {
+        return hasmore;
+    }
+
+    public void setHasmore(boolean hasmore) {
+        this.hasmore = hasmore;
+    }
+
+    public void mergeTags (StackOverFlowFAQ newtags) {
+
+        for (int i = 0; i < newtags.faq.size(); i++) {
+            faq.add(newtags.faq.get(i));
         }
     }
 }
