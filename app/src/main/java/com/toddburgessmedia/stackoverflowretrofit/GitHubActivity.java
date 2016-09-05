@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
@@ -25,12 +26,15 @@ import javax.inject.Named;
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class GitHubActivity extends AppCompatActivity implements NoLanguageFoundDialog.NothingFoundListener {
+public class GitHubActivity extends AppCompatActivity implements NoLanguageFoundDialog.NothingFoundListener,
+                RecyclerViewGitHub.GitHubOnClickListener {
 
     String TAG = MainActivity.TAG;
     String searchTag;
@@ -39,6 +43,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     ProgressDialog progress;
     BottomBar bottomBar;
     NoLanguageFoundDialog nothing;
+    GitHubLink gitHubLink;
 
     final int TABPOS = 1;
 
@@ -46,8 +51,11 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     RecyclerViewGitHub adapter;
 
     @Inject @Named("github") Retrofit retrofit;
+    @Inject OkHttpClient httpClient;
 
     boolean searchLanguage = true;
+
+    boolean loadmore = false;
 
     @BindString(R.string.github_activity_loading) String loadingMsg;
 
@@ -73,7 +81,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             searchLanguage = savedInstanceState.getBoolean("search_language");
             createBottomBar(savedInstanceState);
             if (projects != null) {
-                adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
+                adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
                 rv.setAdapter(adapter);
                 //setSearch();
                 bottomBar.selectTabAtPosition(TABPOS,false);
@@ -169,7 +177,9 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     private void getProjects(final String language, final boolean langugesearch) {
 
-        GitHubProjectAPI projectAPI = retrofit.create(GitHubProjectAPI.class);
+        GitHubProjectAPI projectAPI;
+
+        projectAPI = retrofit.create(GitHubProjectAPI.class);
 
         final String qlanguage;
         if (langugesearch) {
@@ -198,11 +208,20 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
                 projects = response.body();
 
-//                Headers headers = response.headers();
-//                Log.d(TAG, "onResponse: " + headers.get("Link"));
+                Headers headers = response.headers();
+                Log.d(TAG, "onResponse: " + headers.get("Link"));
+
+                try {
+                    gitHubLink = new GitHubLink(headers.get("Link"));
+//                    Log.d(TAG, "onResponse: " + gitHubLink.hasMore());
+//                    Log.d(TAG, "onResponse: " + gitHubLink.getNextLink());
+                } catch (Exception e) { // hopefully this never happens
+                    Toast.makeText(GitHubActivity.this, "GitHub API Error", Toast.LENGTH_SHORT).show();
+                }
 
                 if (projects != null) {
-                    adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
+                    adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
+                    adapter.setHasMore(gitHubLink.hasMore());
                     if (searchLanguage) {
                         adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
                     } else {
@@ -299,4 +318,10 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             }
         }
     }
+
+    @Override
+    public void onClick(View view) {
+        Log.d(TAG, "onClick: ");
+    }
+
 }

@@ -26,16 +26,21 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     private final int VIEWTYPE = 1;
     private final int VIEWTYPESTART = 0;
+    private final int VIEWTYPEHASMORE = 2;
 
     public static final int LANGUAGESEARCH = 0;
     public static final int KEYWORDSEARCH = 1;
     private int searchType;
+
+    GitHubOnClickListener gitHubOnClickListener;
 
     public void setSearchword(String searchword) {
         this.searchword = searchword;
     }
 
     private String searchword;
+
+    private boolean hasMore;
 
     public void setHeader(String header) {
         this.header = header;
@@ -46,6 +51,11 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void setSearchType(int searchType) {
         this.searchType = searchType;
     }
+
+    public void setHasMore(boolean more) {
+        hasMore = more;
+    }
+
 
     Context context;
 
@@ -64,6 +74,10 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
             case VIEWTYPESTART:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_github_start, parent,false);
                 return new ViewHolderStart(v);
+            case VIEWTYPEHASMORE:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rv_github_hasmore, parent, false);
+                v.setOnClickListener(getHasMoreClickListener(viewType));
+                return new ViewHolderHasMore(v);
         }
         return new ViewHolder(v);
     }
@@ -82,6 +96,16 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
                 Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
                 v.getContext().startActivity(i);
+            }
+        };
+    }
+
+    @NonNull
+    private View.OnClickListener getHasMoreClickListener (final int viewType) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gitHubOnClickListener.onClick(view);
             }
         };
     }
@@ -158,6 +182,8 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (position == 0) {
             return VIEWTYPESTART;
+        } else if ((position == projects.size()-1) && (hasMore)) {
+            return VIEWTYPEHASMORE;
         } else {
             return VIEWTYPE;
         }
@@ -176,10 +202,11 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public RecyclerViewGitHub (List<GitHubProject> projects, Context con) {
+    public RecyclerViewGitHub (List<GitHubProject> projects, Context con, GitHubOnClickListener listener) {
 
         this.projects = projects;
         this.context = con;
+        this.gitHubOnClickListener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -211,7 +238,22 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             ButterKnife.bind(this, v);
         }
+    }
 
+    public class ViewHolderHasMore extends RecyclerView.ViewHolder {
 
+        @BindView(R.id.rv_github_hasmore_title) TextView title;
+
+        public  ViewHolderHasMore (View v) {
+            super(v);
+
+            ButterKnife.bind(this, v);
+
+        }
+    }
+
+    public interface GitHubOnClickListener {
+
+        void onClick(View view);
     }
 }
