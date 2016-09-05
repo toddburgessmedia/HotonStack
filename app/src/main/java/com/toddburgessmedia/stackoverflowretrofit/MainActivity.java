@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements
             if (tags != null) {
                 adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(),searchsite,this);
                 adapter.setDisplaySiteName(sitename);
+                adapter.setHasmore(tags.isHasMore());
                 rv.setAdapter(adapter);
                 return;
             }
@@ -230,7 +231,9 @@ public class MainActivity extends AppCompatActivity implements
 
                 StackOverFlowTags callTags = response.body();
 
-                progress.dismiss();
+                if (progress != null) {
+                    progress.dismiss();
+                }
                 if (callTags == null) {
                     Toast.makeText(MainActivity.this, "No tags found", Toast.LENGTH_SHORT).show();
                     return;
@@ -260,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements
                     rv.setAdapter(adapter);
                     tags = callTags;
                 }
-                progress.dismiss();
 
             }
 

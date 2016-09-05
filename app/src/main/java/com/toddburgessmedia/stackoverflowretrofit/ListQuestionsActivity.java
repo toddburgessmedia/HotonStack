@@ -123,6 +123,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
             createBottomBar(savedInstanceState);
             if (faq != null) {
                 adapter = new RecycleViewFAQ(faq.faq, getBaseContext(),this);
+                adapter.setHasmore(faq.isHasmore());
                 setTimeFrame();
                 setSiteName();
                 rv.setAdapter(adapter);
