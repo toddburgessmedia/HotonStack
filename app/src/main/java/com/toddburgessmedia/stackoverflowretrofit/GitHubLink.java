@@ -1,5 +1,10 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
+import android.net.Uri;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -16,13 +21,9 @@ public class GitHubLink {
     private String nextPage;
     private String lastPage;
 
-    public GitHubLink (String linkheader) throws Exception {
+    public GitHubLink (String linkheader) {
 
         StringTokenizer st = new StringTokenizer(linkheader, ",");
-
-        if (st.countTokens() != 2) {
-            throw new Exception("Something is wrong with Link header");
-        }
 
         processNextLink(st.nextToken());
 
@@ -40,6 +41,22 @@ public class GitHubLink {
         } else {
             hasMore = false;
         }
+    }
+
+    public HashMap<String,String> getParamterHashMap() {
+
+        Uri uri = Uri.parse(nextPage);
+        Set<String> queryParameters = uri.getQueryParameterNames();
+        HashMap<String, String> map = new HashMap<>();
+        Iterator<String> iterator = queryParameters.iterator();
+
+        String queryname, queryParamater;
+        while (iterator.hasNext()) {
+            queryname = iterator.next();
+            queryParamater = uri.getQueryParameter(queryname);
+            map.put(queryname, queryParamater);
+        }
+        return map;
     }
 
     public boolean hasMore() {

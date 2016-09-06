@@ -56,6 +56,8 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     boolean searchLanguage = true;
 
     boolean loadmore = false;
+    int page = 1;
+
 
     @BindString(R.string.github_activity_loading) String loadingMsg;
 
@@ -83,7 +85,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             if (projects != null) {
                 adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
                 rv.setAdapter(adapter);
-                //setSearch();
                 bottomBar.selectTabAtPosition(TABPOS,false);
                 return;
             }
@@ -143,6 +144,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.github_menu_refresh) {
+            page = 1;
             startProgressDialog();
             getProjects(searchTag,searchLanguage);
         }
@@ -155,9 +157,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         listener.setSearchsite(searchsite);
         listener.setSearchTab(searchTag);
 
-
         bottomBar = BottomBar.attach(this, savedInstanceState);
-
         bottomBar.setItemsFromMenu(R.menu.github_three_buttons, listener);
         bottomBar.selectTabAtPosition(TABPOS,false);
     }
@@ -172,7 +172,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         }
 
         String text = searchtype + " " + searchTag;
-        //search.setText(text);
     }
 
     private void getProjects(final String language, final boolean langugesearch) {
@@ -188,7 +187,12 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             qlanguage = language;
         }
 
-        Call<GitHubProjectCollection> call = projectAPI.getProjects(qlanguage);
+        Call<GitHubProjectCollection> call;
+        if (page == 1) {
+            call = projectAPI.getProjects(qlanguage);
+        } else {
+            call = projectAPI.getProjectsNextPage(gitHubLink.getParamterHashMap());
+        }
 
         call.enqueue(new Callback<GitHubProjectCollection>() {
             @Override
@@ -206,20 +210,29 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                     Toast.makeText(GitHubActivity.this, "No Github Projects Found", Toast.LENGTH_SHORT).show();
                 }
 
-                projects = response.body();
+                GitHubProjectCollection newprojects = response.body();
+
+                if (newprojects == null) {
+                    Toast.makeText(GitHubActivity.this, "Unable to retrieve projects", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 Headers headers = response.headers();
                 Log.d(TAG, "onResponse: " + headers.get("Link"));
 
-                try {
-                    gitHubLink = new GitHubLink(headers.get("Link"));
-//                    Log.d(TAG, "onResponse: " + gitHubLink.hasMore());
-//                    Log.d(TAG, "onResponse: " + gitHubLink.getNextLink());
-                } catch (Exception e) { // hopefully this never happens
-                    Toast.makeText(GitHubActivity.this, "GitHub API Error", Toast.LENGTH_SHORT).show();
-                }
+                gitHubLink = new GitHubLink(headers.get("Link"));
 
-                if (projects != null) {
+                if ((adapter != null) && (page > 1)) {
+                    adapter.addItems(newprojects.getProjects());
+                    adapter.setHasMore(gitHubLink.hasMore());
+                    projects.mergeProjects(newprojects);
+                } else if (adapter != null) {
+                    projects = newprojects;
+                    adapter.removeAllItems();
+                    adapter.updateAdapter(projects.getProjects());
+                    adapter.setHasMore(gitHubLink.hasMore());
+                } else {
+                    projects = newprojects;
                     adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
                     adapter.setHasMore(gitHubLink.hasMore());
                     if (searchLanguage) {
@@ -321,7 +334,10 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
     @Override
     public void onClick(View view) {
-        Log.d(TAG, "onClick: ");
+
+        page++;
+        startProgressDialog();
+        getProjects(searchTag,searchLanguage);
     }
 
 }

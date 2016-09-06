@@ -110,14 +110,42 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         };
     }
 
+    public void updateAdapter (List<GitHubProject> tags) {
+
+        this.projects = tags;
+        notifyDataSetChanged();
+    }
+
+    public void onItemDismiss(int position) {
+        projects.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void addItems (List<GitHubProject> tags) {
+
+        int position = projects.size();
+        onItemDismiss(position-1);
+        position--;
+
+        for (int i = 0; i < tags.size(); i++) {
+            projects.add(tags.get(i));
+            position++;
+            notifyItemInserted(position);
+        }
+    }
+
+
+
+
 
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:
                 GitHubProject t = projects.get(position-1);
+                if (t.getDescription() == null) {
+                    break;
+                }
                 String description = getDescription(t);
                 ViewHolder v = (ViewHolder) holder;
                 v.title.setText(t.getFullName());

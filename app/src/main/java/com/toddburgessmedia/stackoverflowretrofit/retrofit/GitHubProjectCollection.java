@@ -37,4 +37,13 @@ public class GitHubProjectCollection implements Serializable {
         else
             return false;
     }
+
+    public void mergeProjects(GitHubProjectCollection collection) {
+
+        List<GitHubProject> newprojects = collection.getProjects();
+
+        for (int i = 0; i < newprojects.size(); i++) {
+            projects.add(newprojects.get(i));
+        }
+    }
 }
