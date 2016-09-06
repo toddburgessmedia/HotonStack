@@ -115,21 +115,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         createScrollChangeListener();
 
         if (savedInstanceState != null) {
-            faq = (StackOverFlowFAQ) savedInstanceState.getSerializable("faqlist");
-            searchTag = savedInstanceState.getString("searchtag");
-            searchsite = savedInstanceState.getString("searchsite");
-            faqpagesize = savedInstanceState.getInt("faqpagesize");
-            pagecount = savedInstanceState.getInt("pagecount");
-            createBottomBar(savedInstanceState);
-            if (faq != null) {
-                adapter = new RecycleViewFAQ(faq.faq, getBaseContext(),this);
-                adapter.setHasmore(faq.isHasmore());
-                setTimeFrame();
-                setSiteName();
-                rv.setAdapter(adapter);
-                bottomBar.selectTabAtPosition(TABPOS,false);
-                return;
-            }
+            return;
         }
 
         faqpagesize = Integer.parseInt(prefs.getString("faqpagesize", "30"));
@@ -138,6 +124,26 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
         startProgressDialog();
         getQuestions(searchTag);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        faq = (StackOverFlowFAQ) savedInstanceState.getSerializable("faqlist");
+        searchTag = savedInstanceState.getString("searchtag");
+        searchsite = savedInstanceState.getString("searchsite");
+        faqpagesize = savedInstanceState.getInt("faqpagesize");
+        pagecount = savedInstanceState.getInt("pagecount");
+        createBottomBar(savedInstanceState);
+        if (faq != null) {
+            adapter = new RecycleViewFAQ(faq.faq, getBaseContext(),this);
+            adapter.setHasmore(faq.isHasmore());
+            setTimeFrame();
+            setSiteName();
+            rv.setAdapter(adapter);
+            bottomBar.selectTabAtPosition(TABPOS,false);
+        }
     }
 
     private void createScrollChangeListener() {

@@ -75,18 +75,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         createScrollChangeListener();
 
         if (savedInstanceState != null) {
-            projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
-            searchTag = savedInstanceState.getString("searchtag");
-            searchsite = savedInstanceState.getString("searchsite");
-            searchLanguage = savedInstanceState.getBoolean("search_language");
-            page = savedInstanceState.getInt("page");
-            createBottomBar(savedInstanceState);
-            if (projects != null) {
-                adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
-                rv.setAdapter(adapter);
-                bottomBar.selectTabAtPosition(TABPOS,false);
-                return;
-            }
+            return;
         }
 
         searchTag = getIntent().getStringExtra("name");
@@ -96,6 +85,31 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         setSearch();
         startProgressDialog();
         getProjects(searchTag,searchLanguage);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
+        searchTag = savedInstanceState.getString("searchtag");
+        searchsite = savedInstanceState.getString("searchsite");
+        searchLanguage = savedInstanceState.getBoolean("search_language");
+        page = savedInstanceState.getInt("page");
+        gitHubLink = (GitHubLink) savedInstanceState.getSerializable("githublink");
+        createBottomBar(savedInstanceState);
+        if (projects != null) {
+            adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
+            if (searchLanguage) {
+                adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
+            } else {
+                adapter.setSearchType(RecyclerViewGitHub.KEYWORDSEARCH);
+            }
+            adapter.setSearchword(searchTag);
+            adapter.setHasMore(gitHubLink.hasMore());
+            rv.setAdapter(adapter);
+            bottomBar.selectTabAtPosition(TABPOS,false);
+        }
     }
 
     @Override
@@ -129,6 +143,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         outState.putString("searchsite",searchsite);
         outState.putBoolean("search_language",searchLanguage);
         outState.putInt("page", page);
+        outState.putSerializable("githublink",gitHubLink);
         bottomBar.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }

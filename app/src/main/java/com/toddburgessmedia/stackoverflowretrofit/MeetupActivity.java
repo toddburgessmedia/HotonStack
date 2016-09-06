@@ -3,7 +3,6 @@ package com.toddburgessmedia.stackoverflowretrofit;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,7 +17,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -63,7 +61,6 @@ public class MeetupActivity extends AppCompatActivity {
     String TAG = MainActivity.TAG;
 
     HashMap<String,Double> latLng;
-    String oauthtoken;
 
     String searchTag;
     String searchsite;
@@ -113,9 +110,50 @@ public class MeetupActivity extends AppCompatActivity {
             rv.setHasFixedSize(true);
         }
         rv.setLayoutManager(new LinearLayoutManager(this));
-        createScrollChangeListener();
 
-        if ((savedInstanceState != null) && (savedInstanceState.getBoolean("hasPermission")))  {
+        createScrollChangeListener();
+        if (savedInstanceState != null) {
+            return;
+        }
+
+//        if ((savedInstanceState != null) && (savedInstanceState.getBoolean("hasPermission")))  {
+//            groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
+//            searchTag = savedInstanceState.getString("searchtag");
+//            searchsite = savedInstanceState.getString("searchsite");
+//            latLng = new HashMap<>();
+//            latLng.put("latitude",savedInstanceState.getDouble("latitude"));
+//            latLng.put("longitude",savedInstanceState.getDouble("longitude"));
+//            createBottomBar(savedInstanceState);
+//            meetupLoc.setText(savedInstanceState.getString("location"));
+//            hasPermission = true;
+//            if (groups != null) {
+//                adapter = new RecycleViewMeetup(groups,getBaseContext());
+//                adapter.setHeader(meetupLoc.getText().toString(),searchTag);
+//                rv.setAdapter(adapter);
+//                searchTerm.setText(searchTag);
+//                bottomBar.selectTabAtPosition(TABPOS,false);
+//                return;
+//            }
+//        }
+
+        getGPSLocation();
+        startProgressDialog();
+        progress.setMessage(getString(R.string.meetupactivity_finding_groups));
+        searchTag = getIntent().getStringExtra("searchtag");
+        searchsite = getIntent().getStringExtra("searchsite");
+        searchTerm.setText(searchTag);
+        createBottomBar(savedInstanceState);
+
+        watchLocationChange();
+        setLocationName();
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState.getBoolean("hasPermission"))  {
             groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
@@ -131,21 +169,8 @@ public class MeetupActivity extends AppCompatActivity {
                 rv.setAdapter(adapter);
                 searchTerm.setText(searchTag);
                 bottomBar.selectTabAtPosition(TABPOS,false);
-                return;
             }
         }
-
-        getGPSLocation();
-        startProgressDialog();
-        progress.setMessage(getString(R.string.meetupactivity_finding_groups));
-        searchTag = getIntent().getStringExtra("searchtag");
-        searchsite = getIntent().getStringExtra("searchsite");
-        searchTerm.setText(searchTag);
-        createBottomBar(savedInstanceState);
-
-        watchLocationChange();
-        setLocationName();
-
     }
 
     private void watchLocationChange () {
@@ -337,11 +362,9 @@ public class MeetupActivity extends AppCompatActivity {
                 return;
             }
             Criteria criteria = new Criteria();
-            boolean gps = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            boolean network = manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             String provider = manager.getBestProvider(criteria, false);
 
-            if ((manager == null) || (provider == null)) {
+            if (provider == null) {
                 stopProgressDialog();
                 Toast.makeText(MeetupActivity.this, "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
                 finish();
@@ -355,13 +378,12 @@ public class MeetupActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            if (location != null) {
-                lat = location.getLatitude();
-                lng = location.getLongitude();
-                Log.d(TAG, "getGPSLocation: " + lat + " " + lng);
-                latLng.put("latitude",lat);
-                latLng.put("longitude",lng);
-            }
+
+            lat = location.getLatitude();
+            lng = location.getLongitude();
+            Log.d(TAG, "getGPSLocation: " + lat + " " + lng);
+            latLng.put("latitude",lat);
+            latLng.put("longitude",lng);
 
         } catch (SecurityException se) {
             Log.d(MainActivity.TAG, "getGPSLocation: no permission");
@@ -431,23 +453,6 @@ public class MeetupActivity extends AppCompatActivity {
         }
     }
 
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
 
     protected List<Address> getLocationName() {
 
@@ -477,16 +482,8 @@ public class MeetupActivity extends AppCompatActivity {
         private String searchTag;
         private String searchsite;
 
-        public String getSearchsite() {
-            return searchsite;
-        }
-
         public void setSearchsite(String searchsite) {
             this.searchsite = searchsite;
-        }
-
-        public String getSearchTag() {
-            return searchTag;
         }
 
         public void setSearchTag(String searchTag) {

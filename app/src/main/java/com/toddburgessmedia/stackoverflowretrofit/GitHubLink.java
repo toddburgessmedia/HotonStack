@@ -2,6 +2,7 @@ package com.toddburgessmedia.stackoverflowretrofit;
 
 import android.net.Uri;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -10,7 +11,7 @@ import java.util.StringTokenizer;
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 05/09/16.
  */
-public class GitHubLink {
+public class GitHubLink implements Serializable {
 
     public final String HASMORE = "next";
     public final String END = "last";

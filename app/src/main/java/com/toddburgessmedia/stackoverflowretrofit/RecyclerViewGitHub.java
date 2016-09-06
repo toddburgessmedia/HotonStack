@@ -134,10 +134,6 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-
-
-
-
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         switch (getItemViewType(position)) {
