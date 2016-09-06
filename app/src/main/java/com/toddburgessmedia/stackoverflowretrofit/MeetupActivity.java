@@ -116,26 +116,6 @@ public class MeetupActivity extends AppCompatActivity {
             return;
         }
 
-//        if ((savedInstanceState != null) && (savedInstanceState.getBoolean("hasPermission")))  {
-//            groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
-//            searchTag = savedInstanceState.getString("searchtag");
-//            searchsite = savedInstanceState.getString("searchsite");
-//            latLng = new HashMap<>();
-//            latLng.put("latitude",savedInstanceState.getDouble("latitude"));
-//            latLng.put("longitude",savedInstanceState.getDouble("longitude"));
-//            createBottomBar(savedInstanceState);
-//            meetupLoc.setText(savedInstanceState.getString("location"));
-//            hasPermission = true;
-//            if (groups != null) {
-//                adapter = new RecycleViewMeetup(groups,getBaseContext());
-//                adapter.setHeader(meetupLoc.getText().toString(),searchTag);
-//                rv.setAdapter(adapter);
-//                searchTerm.setText(searchTag);
-//                bottomBar.selectTabAtPosition(TABPOS,false);
-//                return;
-//            }
-//        }
-
         getGPSLocation();
         startProgressDialog();
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));
