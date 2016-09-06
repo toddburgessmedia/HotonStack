@@ -208,17 +208,19 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                     return;
                 } else if ((response.code() != 200) && (!searchLanguage)) {
                     Toast.makeText(GitHubActivity.this, "No Github Projects Found", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
                 }
 
                 GitHubProjectCollection newprojects = response.body();
 
                 if (newprojects == null) {
                     Toast.makeText(GitHubActivity.this, "Unable to retrieve projects", Toast.LENGTH_SHORT).show();
+                    finish();
                     return;
                 }
 
                 Headers headers = response.headers();
-                Log.d(TAG, "onResponse: " + headers.get("Link"));
 
                 gitHubLink = new GitHubLink(headers.get("Link"));
 

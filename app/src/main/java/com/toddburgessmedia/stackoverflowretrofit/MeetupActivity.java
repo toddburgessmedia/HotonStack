@@ -397,6 +397,7 @@ public class MeetupActivity extends AppCompatActivity {
                 stopProgressDialog();
                 if (groups.size() == 0) {
                     Toast.makeText(MeetupActivity.this, "No Meetups Found", Toast.LENGTH_SHORT).show();
+                    finish();
                     return;
                 }
                 MeetUpGroup holder = new MeetUpGroup();

@@ -23,6 +23,11 @@ public class GitHubLink {
 
     public GitHubLink (String linkheader) {
 
+        if (linkheader == null) {
+            hasMore = false;
+            return;
+        }
+
         StringTokenizer st = new StringTokenizer(linkheader, ",");
 
         processNextLink(st.nextToken());
