@@ -223,16 +223,19 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                 gitHubLink = new GitHubLink(headers.get("Link"));
 
                 if ((adapter != null) && (page > 1)) {
+                    newprojects.insertLastPlaceHolder();
                     adapter.addItems(newprojects.getProjects());
                     adapter.setHasMore(gitHubLink.hasMore());
                     projects.mergeProjects(newprojects);
                 } else if (adapter != null) {
                     projects = newprojects;
+                    projects.insertPlaceHolders();
                     adapter.removeAllItems();
                     adapter.updateAdapter(projects.getProjects());
                     adapter.setHasMore(gitHubLink.hasMore());
                 } else {
                     projects = newprojects;
+                    projects.insertPlaceHolders();
                     adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
                     adapter.setHasMore(gitHubLink.hasMore());
                     if (searchLanguage) {

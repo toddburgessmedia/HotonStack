@@ -33,6 +33,8 @@ public class GitHubProject implements Serializable {
     @SerializedName("watchers")
     private String watchers;
 
+    private boolean placeholder = false;
+
     public String getCreatedAt() {
         return createdAt;
     }
@@ -102,5 +104,13 @@ public class GitHubProject implements Serializable {
     @Override
     public String toString() {
         return fullName;
+    }
+
+    public boolean isPlaceholder() {
+        return placeholder;
+    }
+
+    public void setPlaceholder(boolean placeholder) {
+        this.placeholder = placeholder;
     }
 }

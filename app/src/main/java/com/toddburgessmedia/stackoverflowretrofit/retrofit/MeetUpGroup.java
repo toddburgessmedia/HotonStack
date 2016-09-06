@@ -27,6 +27,8 @@ public class MeetUpGroup implements Serializable {
     @SerializedName("plain_text_description")
     private String plainText;
 
+    private boolean placeholder = false;
+
     public String getCity() {
         return city;
     }
@@ -73,6 +75,14 @@ public class MeetUpGroup implements Serializable {
 
     public void setPlainText(String plainText) {
         this.plainText = plainText;
+    }
+
+    public boolean isPlaceholder() {
+        return placeholder;
+    }
+
+    public void setPlaceholder(boolean placeholder) {
+        this.placeholder = placeholder;
     }
 }
 

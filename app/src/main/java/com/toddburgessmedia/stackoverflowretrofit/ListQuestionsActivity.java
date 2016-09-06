@@ -288,13 +288,14 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                     return;
                 }
 
-//                newFaq.faq.add(new FAQTag());
                 if ((adapter != null) && (pagecount > 1)) {
+                    newFaq.insertLastPlaceHolder();
                     adapter.addItems(newFaq.faq);
                     adapter.setHasmore(faq.isHasmore());
                     faq.mergeTags(newFaq);
                 } else if (adapter != null) {
                     faq = newFaq;
+                    faq.insertPlaceHolders();
                     adapter.removeAllItems();
                     setTimeFrame();
                     setSiteName();
@@ -302,6 +303,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                     adapter.setHasmore(faq.isHasmore());
                 } else {
                     faq = newFaq;
+                    faq.insertLastPlaceHolder();
                     adapter = new RecycleViewFAQ(faq.faq,getBaseContext(), ListQuestionsActivity.this);
                     setTimeFrame();
                     setSiteName();

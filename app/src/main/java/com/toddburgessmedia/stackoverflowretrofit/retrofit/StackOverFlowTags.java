@@ -43,4 +43,21 @@ public class StackOverFlowTags implements Serializable {
             tags.add(newtags.tags.get(i));
         }
     }
+
+    public void insertPlaceHolders() {
+
+        Tag holder = new Tag();
+        holder.setPlaceholder(true);
+
+        tags.add(0, holder);
+        tags.add(tags.size(), holder);
+    }
+
+    public void insertLastPlaceHolder() {
+
+        Tag holder = new Tag();
+        holder.setPlaceholder(true);
+
+        tags.add(tags.size(), holder);
+    }
 }

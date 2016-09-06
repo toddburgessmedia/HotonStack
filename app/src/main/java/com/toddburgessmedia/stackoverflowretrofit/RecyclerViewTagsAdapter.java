@@ -148,7 +148,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:
-                Tag t = tagList.get(position-1);
+                Tag t = tagList.get(position);
                 if (t.getCount() == null) {
                     break;
                 }

@@ -400,6 +400,9 @@ public class MeetupActivity extends AppCompatActivity {
                     Toast.makeText(MeetupActivity.this, "No Meetups Found", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                MeetUpGroup holder = new MeetUpGroup();
+                holder.setPlaceholder(true);
+                groups.add(0,holder);
                 adapter = new RecycleViewMeetup(groups,getBaseContext());
                 adapter.setHeader(meetupLoc.getText().toString(),searchTag);
                 rv.setAdapter(adapter);

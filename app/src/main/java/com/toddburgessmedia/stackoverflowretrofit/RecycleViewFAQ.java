@@ -151,8 +151,8 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         switch (viewType) {
             case VIEWFAQ:
-                FAQTag tag = faqTAGs.get(position-1);
-                if (tag.title == null) {
+                FAQTag tag = faqTAGs.get(position);
+                if ((tag.title == null) || (tag.isPlaceholder())) {
                     break;
                 }
                 ViewHolderOdd vh = (ViewHolderOdd) holder;

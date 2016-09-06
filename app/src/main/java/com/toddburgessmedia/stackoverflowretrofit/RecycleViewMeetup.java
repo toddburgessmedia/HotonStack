@@ -79,7 +79,10 @@ public class RecycleViewMeetup extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:
-                MeetUpGroup t = groups.get(position-1);
+                MeetUpGroup t = groups.get(position);
+                if ((t.getName() == null) || (t.isPlaceholder())) {
+                    break;
+                 }
                 ViewHolder v = (ViewHolder) holder;
                 v.name.setText(t.getName());
                 v.description.setText(Html.fromHtml(t.getDescription()));

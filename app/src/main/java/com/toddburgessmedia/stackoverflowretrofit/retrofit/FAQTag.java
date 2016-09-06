@@ -15,6 +15,8 @@ public class FAQTag implements Serializable {
     @SerializedName("link")
     public String link;
 
+    private boolean placeholder = false;
+
     public String getAnswerCount() {
         return answerCount;
     }
@@ -78,5 +80,13 @@ public class FAQTag implements Serializable {
     @Override
     public String toString() {
         return title;
+    }
+
+    public boolean isPlaceholder() {
+        return placeholder;
+    }
+
+    public void setPlaceholder(boolean placeholder) {
+        this.placeholder = placeholder;
     }
 }

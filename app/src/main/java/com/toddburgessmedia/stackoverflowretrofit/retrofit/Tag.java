@@ -14,6 +14,16 @@ public class Tag implements Serializable {
         @SerializedName("name")
         private String name;
 
+        private boolean placeholder = false;
+
+        public boolean isPlaceholder() {
+                return placeholder;
+        }
+
+        public void setPlaceholder(boolean placeholder) {
+                this.placeholder = placeholder;
+        }
+
         @Override
         public String toString() {
             return name + " " + count;

@@ -246,8 +246,8 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
 
-                //callTags.tags.add(new Tag());
                 if ((adapter != null) && pagecount > 1) {
+                    callTags.insertLastPlaceHolder();
                     adapter.addItems(callTags.tags);
                     adapter.setHasmore(tags.isHasMore());
                     tags.mergeTags(callTags);
@@ -256,12 +256,14 @@ public class MainActivity extends AppCompatActivity implements
                     adapter.updateAdapter(callTags.tags);
                     adapter.setHasmore(tags.isHasMore());
                     tags = callTags;
+                    tags.insertPlaceHolders();
                 } else {
-                    adapter = new RecyclerViewTagsAdapter(callTags.tags, getBaseContext(), searchsite, MainActivity.this);
-                    adapter.setHasmore(callTags.isHasMore());
+                    tags = callTags;
+                    tags.insertPlaceHolders();
+                    adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    adapter.setHasmore(tags.isHasMore());
                     adapter.setDisplaySiteName(sitename);
                     rv.setAdapter(adapter);
-                    tags = callTags;
                 }
 
             }

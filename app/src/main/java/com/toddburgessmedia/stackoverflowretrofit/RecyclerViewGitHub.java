@@ -142,8 +142,8 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         switch (getItemViewType(position)) {
             case VIEWTYPE:
-                GitHubProject t = projects.get(position-1);
-                if (t.getDescription() == null) {
+                GitHubProject t = projects.get(position);
+                if ((t.getDescription() == null) || (t.isPlaceholder())) {
                     break;
                 }
                 String description = getDescription(t);

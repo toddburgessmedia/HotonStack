@@ -46,4 +46,21 @@ public class GitHubProjectCollection implements Serializable {
             projects.add(newprojects.get(i));
         }
     }
+
+    public void insertPlaceHolders () {
+
+        GitHubProject holder = new GitHubProject();
+        holder.setPlaceholder(true);
+
+        projects.add(0,holder);
+        projects.add(projects.size(), holder);
+    }
+
+    public void insertLastPlaceHolder() {
+
+        GitHubProject holder = new GitHubProject();
+        holder.setPlaceholder(true);
+
+        projects.add(projects.size(), holder);
+    }
 }

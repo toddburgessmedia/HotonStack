@@ -49,4 +49,22 @@ public class StackOverFlowFAQ implements Serializable {
             faq.add(newtags.faq.get(i));
         }
     }
+
+    public void insertPlaceHolders() {
+
+        FAQTag tag = new FAQTag();
+        tag.setPlaceholder(true);
+
+        faq.add(0,tag);
+        faq.add(faq.size(), tag);
+
+    }
+
+    public void insertLastPlaceHolder() {
+
+        FAQTag tag = new FAQTag();
+        tag.setPlaceholder(true);
+
+        faq.add(faq.size(), tag);
+    }
 }
