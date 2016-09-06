@@ -142,7 +142,6 @@ public class MeetupActivity extends AppCompatActivity {
         searchsite = getIntent().getStringExtra("searchsite");
         searchTerm.setText(searchTag);
         createBottomBar(savedInstanceState);
-        Log.d(TAG, "onCreate: tag" + searchTag);
 
         watchLocationChange();
         setLocationName();

@@ -27,7 +27,6 @@ import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Headers;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,7 +50,6 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     RecyclerViewGitHub adapter;
 
     @Inject @Named("github") Retrofit retrofit;
-    @Inject OkHttpClient httpClient;
 
     boolean searchLanguage = true;
 
@@ -81,6 +79,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
             searchTag = savedInstanceState.getString("searchtag");
             searchsite = savedInstanceState.getString("searchsite");
             searchLanguage = savedInstanceState.getBoolean("search_language");
+            page = savedInstanceState.getInt("page");
             createBottomBar(savedInstanceState);
             if (projects != null) {
                 adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
@@ -129,6 +128,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         outState.putString("searchtag",searchTag);
         outState.putString("searchsite",searchsite);
         outState.putBoolean("search_language",searchLanguage);
+        outState.putInt("page", page);
         bottomBar.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
