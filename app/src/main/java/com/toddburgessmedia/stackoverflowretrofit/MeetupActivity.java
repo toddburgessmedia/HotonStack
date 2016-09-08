@@ -284,11 +284,13 @@ public class MeetupActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1:
                 if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+
+//                    Intent i = new Intent(MeetupActivity.this,PrivacyPolicyActivity.class);
+//                    startActivity(i);
+
                     getGPSLocation();
 
-//                    progress.setMessage(getString(R.string.meetupactivity_finding_groups));
                     searchTerm.setText(searchTag);
-                    Log.d(TAG, "onCreate: tag" + searchTag);
 
                     watchLocationChange();
                     setLocationName();
@@ -313,9 +315,19 @@ public class MeetupActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.meetup_menu_refresh) {
-            startProgressDialog();
-            getMeetupGroups(searchTag);
+        switch (item.getItemId()) {
+            case R.id.meetup_menu_refresh:
+                startProgressDialog();
+                getMeetupGroups(searchTag);
+                break;
+            case R.id.meetup_menu_preferences:
+                Intent i = new Intent(this,PreferencesActivity.class);
+                startActivity(i);
+                break;
+            case R.id.meetup_menu_privacy:
+                Intent pi = new Intent(MeetupActivity.this, PrivacyPolicyActivity.class);
+                startActivity(pi);
+                break;
         }
 
         return true;

@@ -87,6 +87,14 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
                 startProgressDialog();
                 getQuestions(searchTag);
                 break;
+            case R.id.whats_hot_preferences:
+                Intent i = new Intent(this,PreferencesActivity.class);
+                startActivity(i);
+                break;
+            case R.id.whats_hot_privacy:
+                Intent pi = new Intent(ListQuestionsActivity.this, PrivacyPolicyActivity.class);
+                startActivity(pi);
+                break;
         }
 
         return true;

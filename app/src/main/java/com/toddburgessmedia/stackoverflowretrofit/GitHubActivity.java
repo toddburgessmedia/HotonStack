@@ -158,10 +158,20 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.github_menu_refresh) {
-            page = 1;
-            startProgressDialog();
-            getProjects(searchTag,searchLanguage);
+        switch (item.getItemId()) {
+            case R.id.github_menu_refresh:
+                page = 1;
+                startProgressDialog();
+                getProjects(searchTag,searchLanguage);
+                break;
+            case R.id.github_menu_preferences:
+                Intent i = new Intent(this,PreferencesActivity.class);
+                startActivity(i);
+                break;
+            case R.id.github_menu_privacy:
+                Intent pi = new Intent(GitHubActivity.this, PrivacyPolicyActivity.class);
+                startActivity(pi);
+                break;
         }
         return true;
     }
