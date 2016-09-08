@@ -1,0 +1,30 @@
+
+MainActivity
+- show tags rank
+- sort alphabetically
+- implement time frames 
+
+ListQuestionsActivity
+- get related questions
+- search questions
+
+GithubActivity
+- find some features to imlement
+
+Meetup Activity
+- expand search radius
+- search by related tags
+
+- Collapsabsible top tool bar
+
+- WebView for links
+
+- handle throttle limits (Service???)
+
+- OAuth authentication -- make it work
+
+- MVP
+
+- Do some test cases 
+
+
