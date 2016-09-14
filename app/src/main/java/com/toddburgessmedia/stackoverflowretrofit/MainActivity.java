@@ -256,9 +256,11 @@ public class MainActivity extends AppCompatActivity implements
                     adapter.updateAdapter(callTags.tags);
                     adapter.setHasmore(tags.isHasMore());
                     tags = callTags;
+                    tags.rankTags();
                     tags.insertPlaceHolders();
                 } else {
                     tags = callTags;
+                    tags.rankTags();
                     tags.insertPlaceHolders();
                     adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
                     adapter.setHasmore(tags.isHasMore());

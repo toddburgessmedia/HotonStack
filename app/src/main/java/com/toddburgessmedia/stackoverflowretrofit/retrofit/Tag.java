@@ -16,6 +16,16 @@ public class Tag implements Serializable {
 
         private boolean placeholder = false;
 
+        public int getRank() {
+                return rank;
+        }
+
+        public void setRank(int rank) {
+                this.rank = rank;
+        }
+
+        private int rank = 1;
+
         public boolean isPlaceholder() {
                 return placeholder;
         }

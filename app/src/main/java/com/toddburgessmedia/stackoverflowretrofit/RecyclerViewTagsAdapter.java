@@ -2,7 +2,6 @@ package com.toddburgessmedia.stackoverflowretrofit;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,7 +75,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         return new ViewHolder(v);
     }
 
-    @NonNull
+
     private View.OnClickListener getOnClickListener(final int viewType) {
         return new View.OnClickListener() {
                 @Override
@@ -97,7 +96,6 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             };
     }
 
-    @NonNull
     private View.OnLongClickListener getLongClickListener() {
         return new View.OnLongClickListener() {
 
@@ -114,7 +112,6 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             };
     }
 
-    @NonNull
     private View.OnClickListener loadMoreTagsListener() {
         return new View.OnClickListener() {
 
@@ -155,6 +152,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ViewHolder v = (ViewHolder) holder;
                 v.tagname.setText(t.getName());
                 v.tagcount.setText("Tag count: " + t.getCount());
+                v.tagrank.setText(String.valueOf(t.getRank()));
                 break;
             case VIEWTYPESTART:
                 ViewHolderStart vs = (ViewHolderStart) holder;

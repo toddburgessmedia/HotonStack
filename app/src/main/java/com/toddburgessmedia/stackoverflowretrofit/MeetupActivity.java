@@ -285,9 +285,6 @@ public class MeetupActivity extends AppCompatActivity {
             case 1:
                 if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
 
-//                    Intent i = new Intent(MeetupActivity.this,PrivacyPolicyActivity.class);
-//                    startActivity(i);
-
                     getGPSLocation();
 
                     searchTerm.setText(searchTag);
