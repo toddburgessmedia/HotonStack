@@ -232,9 +232,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
     void setTimeFrame() {
 
         String[] times = getResources().getStringArray(R.array.time_dialog);
-
-        Log.d(MainActivity.TAG, "setTimeFrame: " + times[searchtime]);
-        //timeframe.setText(times[searchtime]);
         adapter.setTimeframe(times[searchtime]);
 
     }
@@ -297,7 +294,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
                 StackOverFlowFAQ newFaq = response.body();
 
-                //faq = response.body();
                 if (newFaq == null) {
                     return;
                 }
@@ -400,9 +396,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     @Override
     public void onClick(View v) {
-        Log.d(MainActivity.TAG, "onClick: ");
-
-        pagecount += faqpagesize;
+        pagecount++;
         startProgressDialog();
         getQuestions(searchTag);
     }

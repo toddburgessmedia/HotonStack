@@ -20,6 +20,13 @@ public interface StackOverFlowAPI {
                                           @Query("site") String site,
                                           @Query("page") int page);
 
+    @GET("/2.2/tags?order=desc")
+    Call<StackOverFlowTags> loadsquestionsByDate(@Query("pagesize") int pagesize,
+                                            @Query("sort") String sort,
+                                            @Query("site") String site,
+                                            @Query("page") int page,
+                                            @Query("fromdate") long fromDate);
+
     @GET("/2.2/tags/{tag}/related")
     Call<StackOverFlowTags> loadSynonyms(@Path("tag") String tag, @Query("site") String site);
 

@@ -1,9 +1,9 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -15,10 +15,12 @@ public class TimeFrameDialog extends DialogFragment {
     TimeFrameDialogListener listener;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        listener = (TimeFrameDialogListener) activity;
+        if (context instanceof TimeFrameDialogListener) {
+            listener = (TimeFrameDialogListener) context;
+        }
     }
 
     @Override

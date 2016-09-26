@@ -12,7 +12,9 @@ android {
         targetSdkVersion 24
         versionCode 6
         versionName "1.2"
+
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -24,7 +26,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    
+
     // joda time library
     // http://mvnrepository.com/artifact/joda-time/joda-time
     compile group: 'joda-time', name: 'joda-time', version: '2.7'
@@ -65,8 +67,11 @@ dependencies {
     compile 'com.google.dagger:dagger:2.5'
     provided 'javax.annotation:jsr250-api:1.0'
 
+    // Branch Metrics dependencies
+//    compile 'io.branch.sdk.android:library:2.+'
+
     // Debugging Retrofit calls
-    //compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
 
 }
 

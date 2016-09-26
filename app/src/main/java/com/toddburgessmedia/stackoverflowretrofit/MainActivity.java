@@ -42,10 +42,20 @@ import rx.functions.Func1;
 public class MainActivity extends AppCompatActivity implements
         SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener,
         TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.TagsAdapterListener,
-        StackExchangeRankingDialog.StackExchangeRankingDialogListener
+        StackExchangeRankingDialog.StackExchangeRankingDialogListener,
+        StackExchangeSortDialog.StackExchangeSortDialogListener,
+        TimeFrameDialog.TimeFrameDialogListener
         {
 
     public final static String TAG = "StackOverFlow";
+
+    public static final int ALLTIME = 0;
+    public static final int TODAY = 4;
+    public static final int YESTERDAY = 3;
+    public static final int THISMONTH = 2;
+    public static final int THISYEAR = 1;
+
+    int searchtime = ALLTIME;
 
     @BindView(R.id.recycleview) RecyclerView rv;
 
@@ -58,12 +68,14 @@ public class MainActivity extends AppCompatActivity implements
     int tagcount;
     int pagecount = 1;
 
+
     String searchsite;
     String sitename;
 
     String searchtag = "";
 
     String searchtype = "Popularity";
+    String sorttype = "Usage";
 
     RxSharedPreferences rxPrefs;
     Preference<String> rxDefaultsite;
@@ -115,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startProgressDialog() {
-
 
         if (progress == null) {
             progress = new ProgressDialog(this);
@@ -193,6 +204,10 @@ public class MainActivity extends AppCompatActivity implements
                 StackExchangeRankingDialog rankingDialog = new StackExchangeRankingDialog();
                 rankingDialog.show(getFragmentManager(),"rankingdialog");
                 break;
+            case R.id.timeframe:
+                TimeFrameDialog timeFrameDialog = new TimeFrameDialog();
+                timeFrameDialog.show(getFragmentManager(), "timeframedialog");
+                break;
         }
         return true;
     }
@@ -204,8 +219,12 @@ public class MainActivity extends AppCompatActivity implements
         this.menu = menu;
 
         MenuItem item = menu.findItem(R.id.menu_ranking);
-        String sortby = getString(R.string.tags_dialog_ranking) + searchtype;
-        item.setTitle(sortby);
+        String rankby = getString(R.string.tags_dialog_ranking) + searchtype;
+        item.setTitle(rankby);
+
+//        MenuItem sortItem = menu.findItem(R.id.menu_sortby);
+//        String sortby = getString(R.string.tags_dialog_sort) + sorttype;
+//        sortItem.setTitle(sortby);
 
         return true;
     }
@@ -216,11 +235,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Call<StackOverFlowTags> call;
         if (!synonymsearch) {
-            if (searchtype.equals("Popularity")) {
-                call = stackOverFlowAPI.loadquestions(tagcount, searchsite, pagecount);
-            } else {
-                call = stackOverFlowAPI.loadquestionsActivity(tagcount, searchsite, pagecount);
-            }
+            call = getStackOverFlowFAQCall(stackOverFlowAPI);
         } else {
             call = stackOverFlowAPI.loadSynonyms(searchtag, searchsite);
         }
@@ -240,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 if (callTags.tags.size() == 0) {
-                    Toast.makeText(MainActivity.this, "Tag Not Found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "No more tags to load!", Toast.LENGTH_SHORT).show();
                     tagsearch = false;
                     setSiteName();
                     return;
@@ -252,19 +267,29 @@ public class MainActivity extends AppCompatActivity implements
                     adapter.setHasmore(tags.isHasMore());
                     tags.mergeTags(callTags);
                 } else if (adapter != null) {
-                    adapter.removeAllItems();
-                    adapter.updateAdapter(callTags.tags);
-                    adapter.setHasmore(tags.isHasMore());
                     tags = callTags;
-                    tags.rankTags();
                     tags.insertPlaceHolders();
+                    adapter.removeAllItems();
+                    tags.rankTags();
+                    setTimeFrame();
+                    adapter.updateAdapter(callTags.tags);
+                    if (tags.tags.size() <= tagcount) {
+                        adapter.setHasmore(false);
+                    } else {
+                        adapter.setHasmore(tags.isHasMore());
+                    }
                 } else {
                     tags = callTags;
                     tags.rankTags();
                     tags.insertPlaceHolders();
                     adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
-                    adapter.setHasmore(tags.isHasMore());
+                    if (tags.tags.size() <= tagcount) {
+                        adapter.setHasmore(false);
+                    } else {
+                        adapter.setHasmore(tags.isHasMore());
+                    }
                     adapter.setDisplaySiteName(sitename);
+                    setTimeFrame();
                     rv.setAdapter(adapter);
                 }
 
@@ -277,6 +302,41 @@ public class MainActivity extends AppCompatActivity implements
                 progress.dismiss();
             }
         });
+    }
+
+    private Call<StackOverFlowTags> getStackOverFlowFAQCall(StackOverFlowAPI faqAPI) {
+
+        long secondsPassed;
+        TimeDelay delay = new TimeDelay();
+
+        String sort;
+        if (searchtype.equals("Popularity")) {
+            sort = "popular";
+        } else {
+            sort = "activity";
+        }
+
+        switch (searchtime) {
+            case TODAY:
+                secondsPassed = delay.getTimeDelay(TimeDelay.TODAY);
+                break;
+            case YESTERDAY:
+                secondsPassed = delay.getTimeDelay(TimeDelay.YESTERDAY);
+                break;
+            case THISMONTH:
+                secondsPassed = delay.getTimeDelay(TimeDelay.THISMONTH);
+                break;
+            case THISYEAR:
+                secondsPassed = delay.getTimeDelay(TimeDelay.THISYEAR);
+                break;
+            default:
+                if (searchtype.equals("Popularity")) {
+                    return faqAPI.loadquestions(tagcount, searchsite, pagecount);
+                } else {
+                    return faqAPI.loadquestionsActivity(tagcount, searchsite, pagecount);
+                }
+        }
+        return faqAPI.loadsquestionsByDate(tagcount, sort, searchsite, pagecount, secondsPassed);
     }
 
     void setSiteName() {
@@ -303,8 +363,6 @@ public class MainActivity extends AppCompatActivity implements
             adapter.setSitename(searchsite);
         }
 
-//        sitename.setText(display[i]);
-        //adapter.setSitename(sitename);
     }
 
     // Search Dialog positive click
@@ -407,15 +465,20 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void loadMoreTags(View view) {
 
-        pagecount += tagcount;
-        if (progress != null) {
-            progress.show();
-        }
+        pagecount++;
+        startProgressDialog();
         getTags(tagcount,tagsearch);
 
     }
 
-            private void getSwipeHandler() {
+    void setTimeFrame() {
+
+        String[] times = getResources().getStringArray(R.array.time_dialog);
+        adapter.setTimeframe(times[searchtime]);
+
+    }
+
+    private void getSwipeHandler() {
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -454,6 +517,54 @@ public class MainActivity extends AppCompatActivity implements
             progress.show();
         }
         getTags(tagcount,tagsearch);
+
+    }
+
+    @Override
+    public void stackExchangeSortpositiveClick(DialogFragment fragment, int which) {
+
+        String[] sortOptions = getResources().getStringArray(R.array.tags_sortby);
+
+        if (sorttype.equals(sortOptions[which])) {
+            return;
+        }
+
+        sorttype = sortOptions[which];
+
+
+
+    }
+
+    @Override
+    public void positiveClick(DialogFragment fragment, int which) {
+        String[] what = getResources().getStringArray(R.array.time_dialog);
+
+        switch (what[which]) {
+            case "All Time":
+                searchtime = ALLTIME;
+                break;
+            case "Today":
+                searchtime = TODAY;
+                break;
+            case "Since Yesterday":
+                searchtime = YESTERDAY;
+                break;
+            case "This Month":
+                searchtime = THISMONTH;
+                break;
+            case "This Year":
+                searchtime = THISYEAR;
+                break;
+
+        }
+        pagecount = 1;
+        startProgressDialog();
+        getTags(tagcount,tagsearch);
+
+    }
+
+    @Override
+    public void negativeClick(DialogFragment fragment, int which) {
 
     }
 

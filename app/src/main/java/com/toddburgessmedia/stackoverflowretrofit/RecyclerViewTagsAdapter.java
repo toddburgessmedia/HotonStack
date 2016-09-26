@@ -30,6 +30,12 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     Context context;
 
+    String timeframe;
+
+    public void setTimeframe(String timeframe) {
+        this.timeframe = timeframe;
+    }
+
     public String getSitename() {
         return sitename;
     }
@@ -39,6 +45,8 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
     public void setHasmore(boolean hasmore) { this.hasmore = hasmore; }
+
+
 
     String sitename;
 
@@ -157,6 +165,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             case VIEWTYPESTART:
                 ViewHolderStart vs = (ViewHolderStart) holder;
                 vs.sitename.setText(displaySiteName);
+                vs.timeframe.setText(timeframe);
                 break;
         }
     }
@@ -199,6 +208,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.context = con;
         this.sitename = site;
         this.longClickListener = listener;
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -218,6 +228,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
     public class ViewHolderStart extends RecyclerView.ViewHolder {
 
         @BindView(R.id.rv_tags_start_sitename) TextView sitename;
+        @BindView(R.id.rv_tags_start_timeframe) TextView timeframe;
 
         public ViewHolderStart (View view) {
 

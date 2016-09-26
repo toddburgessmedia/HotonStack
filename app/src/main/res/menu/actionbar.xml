@@ -8,16 +8,30 @@
         app:showAsAction="always"/>
 
     <item
+        android:title="Select Time Frame"
+        android:orderInCategory="201"
+        android:id="@+id/timeframe"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_clock"
+        />
+
+
+    <item
         android:id="@+id/menu_refresh"
         android:icon="@drawable/ic_refresh"
         android:title="Refresh"
         android:orderInCategory="100"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_ranking"
         android:orderInCategory="150"
         android:title="Sort by" />
+
+    <!--<item-->
+        <!--android:id="@+id/menu_sortby"-->
+        <!--android:orderInCategory="151"-->
+        <!--android:title="@string/tags_dialog_sort" />-->
 
     <item
         android:id="@+id/menu_siteselect"

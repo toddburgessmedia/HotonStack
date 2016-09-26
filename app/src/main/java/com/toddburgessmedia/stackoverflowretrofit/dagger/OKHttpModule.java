@@ -1,6 +1,7 @@
 package com.toddburgessmedia.stackoverflowretrofit.dagger;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -36,6 +37,10 @@ public class OKHttpModule {
         return PreferenceManager.getDefaultSharedPreferences(app);
     }
 
+    @Provides
+    public Context getContext () {
+        return app.getApplicationContext();
+    }
 
     @Provides
     @Singleton
@@ -43,6 +48,7 @@ public class OKHttpModule {
 
         int cachesize = 10 * 1024 * 1024;
         final Cache cache = new Cache(new File(app.getApplicationContext().getCacheDir(), "http"), cachesize);
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .cache(cache)
                 .readTimeout(30, TimeUnit.SECONDS)
