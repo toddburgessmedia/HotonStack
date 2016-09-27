@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.jakewharton.rxbinding.widget.RxTextView;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
@@ -52,7 +51,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
@@ -124,7 +122,7 @@ public class MeetupActivity extends AppCompatActivity {
         searchTerm.setText(searchTag);
         createBottomBar(savedInstanceState);
 
-        watchLocationChange();
+        //watchLocationChange();
         setLocationName();
 
     }
@@ -153,23 +151,23 @@ public class MeetupActivity extends AppCompatActivity {
         }
     }
 
-    private void watchLocationChange () {
-
-        if (locationSub != null) {
-            return;
-        }
-
-        locationSub = RxTextView.textChanges(meetupLoc)
-                .subscribe(new Action1<CharSequence>() {
-                    @Override
-                    public void call(CharSequence charSequence) {
-                        Log.d(TAG, "call: location updated!");
-                        if (charSequence.toString().length() > 0) {
-                            getMeetupGroups(searchTag);
-                        }
-                    }
-                });
-    }
+//    private void watchLocationChange () {
+//
+//        if (locationSub != null) {
+//            return;
+//        }
+//
+//        locationSub = RxTextView.textChanges(meetupLoc)
+//                .subscribe(new Action1<CharSequence>() {
+//                    @Override
+//                    public void call(CharSequence charSequence) {
+//                        Log.d(TAG, "call: location updated!");
+//                        if (charSequence.toString().length() > 0) {
+//                            getMeetupGroups(searchTag);
+//                        }
+//                    }
+//                });
+//    }
 
     private void createBottomBar(Bundle savedInstanceState) {
 
@@ -208,7 +206,6 @@ public class MeetupActivity extends AppCompatActivity {
         searchTag = getIntent().getStringExtra("searchtag");
         searchsite = getIntent().getStringExtra("searchsite");
         searchTerm.setText(searchTag);
-        //getMeetupGroups(searchTag);
 
         setLocationName();
     }
@@ -220,7 +217,7 @@ public class MeetupActivity extends AppCompatActivity {
                 .subscribe(new Subscriber<List<Address>>() {
                     @Override
                     public void onCompleted() {
-
+                        getMeetupGroups(searchTag);
                     }
 
                     @Override
@@ -289,7 +286,7 @@ public class MeetupActivity extends AppCompatActivity {
 
                     searchTerm.setText(searchTag);
 
-                    watchLocationChange();
+                    //watchLocationChange();
                     setLocationName();
                 }
                 else {
