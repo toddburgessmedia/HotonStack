@@ -261,31 +261,33 @@ public class MainActivity extends AppCompatActivity implements
                     return;
                 }
 
-                if ((adapter != null) && pagecount > 1) {
+                if ((adapter != null) && (pagecount > 1) && (!synonymsearch)) {
                     callTags.insertLastPlaceHolder();
                     adapter.addItems(callTags.tags);
                     adapter.setHasmore(tags.isHasMore());
                     tags.mergeTags(callTags);
                 } else if (adapter != null) {
                     tags = callTags;
-                    tags.insertPlaceHolders();
                     adapter.removeAllItems();
                     tags.rankTags();
                     setTimeFrame();
                     adapter.updateAdapter(callTags.tags);
-                    if (tags.tags.size() <= tagcount) {
+                    if ((tags.tags.size() < tagcount) || (synonymsearch)) {
+                        tags.insertFirstPlaceHolder();
                         adapter.setHasmore(false);
                     } else {
+                        tags.insertPlaceHolders();
                         adapter.setHasmore(tags.isHasMore());
                     }
                 } else {
                     tags = callTags;
                     tags.rankTags();
-                    tags.insertPlaceHolders();
                     adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
-                    if (tags.tags.size() <= tagcount) {
+                    if (tags.tags.size() < tagcount) {
                         adapter.setHasmore(false);
+                        tags.insertFirstPlaceHolder();
                     } else {
+                        tags.insertPlaceHolders();
                         adapter.setHasmore(tags.isHasMore());
                     }
                     adapter.setDisplaySiteName(sitename);
@@ -432,6 +434,7 @@ public class MainActivity extends AppCompatActivity implements
             setSiteName();
             adapter.setDisplaySiteName(sitename);
             tagsearch = false;
+            pagecount = 1;
             startProgressDialog();
             getTags(tagcount,tagsearch);
         }
