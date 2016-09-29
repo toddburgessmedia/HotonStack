@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -113,7 +115,8 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
                     String tag = "";
                     ViewHolder vh = new ViewHolder(v);
                     tag = vh.tagname.getText().toString();
-                    longClickListener.onLongClick(v,tag);
+//                    longClickListener.onLongClick(v,tag);
+                    EventBus.getDefault().post(new OnLongClickMessage(tag));
 
                     return true;
                 }
@@ -126,7 +129,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
             @Override
             public void onClick(View view) {
                 ViewHolderHasMore vh = new ViewHolderHasMore(view);
-                longClickListener.loadMoreTags(view);
+                EventBus.getDefault().post(new LoadMoreTagsMessage());
             }
         };
     }
@@ -202,12 +205,10 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyDataSetChanged();
     }
 
-    public RecyclerViewTagsAdapter(List<Tag> tags, Context con, String site, TagsAdapterListener listener) {
+    public RecyclerViewTagsAdapter(List<Tag> tags, Context con) {
 
         this.tagList = tags;
         this.context = con;
-        this.sitename = site;
-        this.longClickListener = listener;
 
     }
 
@@ -253,10 +254,34 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public interface TagsAdapterListener {
 
-        void onLongClick(View view, String tag);
+        //void onLongClick(View view, String tag);
 
-        void loadMoreTags(View view);
+        //void loadMoreTags(View view);
     }
 
 
+    public class OnLongClickMessage {
+
+        String tag;
+
+        public OnLongClickMessage(String tag) {
+            this.tag = tag;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
+    }
+
+    public class LoadMoreTagsMessage {
+
+        public LoadMoreTagsMessage () {
+
+        }
+
+    }
 }

@@ -1,18 +1,20 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.MainActivityLongPressMessage;
+
+import org.greenrobot.eventbus.EventBus;
+
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 01/07/16.
  */
 public class TagsLongPressDialog extends DialogFragment {
 
-    TagsLongPressDialogListener listener;
     String tagname;
 
     public boolean isTagsearch() {
@@ -24,13 +26,6 @@ public class TagsLongPressDialog extends DialogFragment {
     }
 
     boolean tagsearch;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        listener = (TagsLongPressDialogListener) activity;
-    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -48,7 +43,8 @@ public class TagsLongPressDialog extends DialogFragment {
                 .setItems(searchmenu, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        listener.longPresspositiveClick(TagsLongPressDialog.this, which);
+                        //listener.longPresspositiveClick(TagsLongPressDialog.this, which);
+                        EventBus.getDefault().post(new MainActivityLongPressMessage(which));
                     }
                 });
         return builder.create();
@@ -63,9 +59,4 @@ public class TagsLongPressDialog extends DialogFragment {
         this.tagname = tagname;
     }
 
-    public interface TagsLongPressDialogListener {
-        public void longPresspositiveClick(DialogFragment fragment, int which);
-
-        public void longPresstnegativeClick(DialogFragment fragment, int which);
-    }
 }

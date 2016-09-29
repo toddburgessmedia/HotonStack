@@ -1,6 +1,5 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,16 +14,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.f2prateek.rx.preferences.Preference;
 import com.f2prateek.rx.preferences.RxSharedPreferences;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.MainActivityLongPressMessage;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.SearchDialogMessage;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.SelectSiteMessage;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.StackExchangeRankingMessage;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.TimeFrameDialogMessage;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,13 +44,7 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 
-public class MainActivity extends AppCompatActivity implements
-        SearchDialog.SearchDialogListener, SiteSelectDialog.SiteSelectDialogListener,
-        TagsLongPressDialog.TagsLongPressDialogListener, RecyclerViewTagsAdapter.TagsAdapterListener,
-        StackExchangeRankingDialog.StackExchangeRankingDialogListener,
-        StackExchangeSortDialog.StackExchangeSortDialogListener,
-        TimeFrameDialog.TimeFrameDialogListener
-        {
+public class MainActivity extends AppCompatActivity {
 
     public final static String TAG = "StackOverFlow";
 
@@ -85,6 +84,22 @@ public class MainActivity extends AppCompatActivity implements
     boolean tagsearch = false;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -92,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
 
         ((TechDive) getApplication()).getOkHttpComponent().inject(this);
+
+
 
         if (rv != null) {
             rv.setHasFixedSize(true);
@@ -101,18 +118,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
         if (savedInstanceState != null) {
-            tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
-            searchsite = savedInstanceState.getString("searchsite");
-            tagcount = savedInstanceState.getInt("tagcount");
-            pagecount = savedInstanceState.getInt("pagecount");
-            setSiteName();
-            if (tags != null) {
-                adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(),searchsite,this);
-                adapter.setDisplaySiteName(sitename);
-                adapter.setHasmore(tags.isHasMore());
-                rv.setAdapter(adapter);
-                return;
-            }
+            return;
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -126,7 +132,29 @@ public class MainActivity extends AppCompatActivity implements
         getTags(tagcount,tagsearch);
     }
 
-    private void startProgressDialog() {
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
+        searchsite = savedInstanceState.getString("searchsite");
+        tagcount = savedInstanceState.getInt("tagcount");
+        pagecount = savedInstanceState.getInt("pagecount");
+        tagsearch = savedInstanceState.getBoolean("tagsearch");
+        setSiteName();
+        if (tags != null) {
+            adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext());
+            adapter.setDisplaySiteName(sitename);
+            if (tagsearch) {
+                adapter.setHasmore(false);
+            } else {
+                adapter.setHasmore(tags.isHasMore());
+            }
+            rv.setAdapter(adapter);
+        }
+    }
+
+            private void startProgressDialog() {
 
         if (progress == null) {
             progress = new ProgressDialog(this);
@@ -170,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements
         outState.putString("searchsite",searchsite);
         outState.putInt("tagcount", tagcount);
         outState.putInt("pagecount", pagecount);
+        outState.putBoolean("tagsearch",tagsearch);
         super.onSaveInstanceState(outState);
     }
 
@@ -282,7 +311,8 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
                     tags = callTags;
                     tags.rankTags();
-                    adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext(), searchsite, MainActivity.this);
+                    adapter = new RecyclerViewTagsAdapter(tags.tags, getBaseContext());
+                    adapter.setSitename(searchsite);
                     if (tags.tags.size() < tagcount) {
                         adapter.setHasmore(false);
                         tags.insertFirstPlaceHolder();
@@ -368,37 +398,31 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // Search Dialog positive click
-    @Override
-    public void positiveClick(DialogFragment fragment) {
-        String tag;
-        SearchDialog search = (SearchDialog) fragment;
+    @Subscribe
+    public void positiveClick(SearchDialogMessage message) {
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        EditText text = (EditText) search.view.findViewById(R.id.search_tag);
-        tag = text.getText().toString();
+        if (message.isNegativeClick()) {
+            return;
+        }
 
+        String tag = message.getSearch();
         tag = tag.replace(' ', '-');
         searchtag = tag;
         String newsite = sitename + " / " + searchtag;
         tagsearch = true;
-        adapter.setDisplaySiteName(sitename);
+        adapter.setDisplaySiteName(sitename + "/" + tag);
         startProgressDialog();
         getTags(tagcount, tagsearch);
 
     }
 
-
-    // Search Dialog negative click
-    @Override
-    public void negativeClick(DialogFragment fragment) {
-
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    }
-
     // Change Site positive click
-    @Override
-    public void siteSelectpositiveClick(DialogFragment fragment, int which) {
+    @Subscribe
+    public void siteSelectpositiveClick(SelectSiteMessage message) {
+
+        int which = message.getPosition();
 
         String[] sites = getResources().getStringArray(R.array.site_select_array);
         searchsite = sites[which];
@@ -414,10 +438,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     // LongPress Dialog positive click handler
-    @Override
-    public void longPresspositiveClick(DialogFragment fragment, int which) {
+    @Subscribe
+    public void longPresspositiveClick(MainActivityLongPressMessage message) {
 
         String[] values;
+        int which = message.getPosition();
 
         if (!searchtag.equals("")) {
             values = getResources().getStringArray(R.array.tag_longpress_dialog);
@@ -442,17 +467,10 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    // Long Press negative handler
-    @Override
-    public void longPresstnegativeClick(DialogFragment fragment, int which) {
+    @Subscribe
+    public void onLongClick(RecyclerViewTagsAdapter.OnLongClickMessage message) {
 
-    }
-
-    
-    @Override
-    public void onLongClick(View v, String tag) {
-        Log.d(TAG, "onLongClick: ");
-
+        String tag = message.getTag();
 
         TagsLongPressDialog dialog = new TagsLongPressDialog();
         if (searchtag.equals("")) {
@@ -465,8 +483,8 @@ public class MainActivity extends AppCompatActivity implements
         dialog.show(getFragmentManager(),"long press");
     }
 
-    @Override
-    public void loadMoreTags(View view) {
+    @Subscribe
+    public void loadMoreTags(RecyclerViewTagsAdapter.LoadMoreTagsMessage message) {
 
         pagecount++;
         startProgressDialog();
@@ -500,10 +518,11 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void stackExchangeRankingpositiveClick(DialogFragment fragment, int which) {
+    @Subscribe
+    public void stackExchangeRankingpositiveClick(StackExchangeRankingMessage message) {
 
         String[] ranking = getResources().getStringArray(R.array.tags_ranking);
+        int which = message.getPosition();
 
         if (searchtype.equals(ranking[which])) {
             return;
@@ -523,24 +542,10 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void stackExchangeSortpositiveClick(DialogFragment fragment, int which) {
-
-        String[] sortOptions = getResources().getStringArray(R.array.tags_sortby);
-
-        if (sorttype.equals(sortOptions[which])) {
-            return;
-        }
-
-        sorttype = sortOptions[which];
-
-
-
-    }
-
-    @Override
-    public void positiveClick(DialogFragment fragment, int which) {
+    @Subscribe
+    public void positiveClick(TimeFrameDialogMessage message) {
         String[] what = getResources().getStringArray(R.array.time_dialog);
+        int which = message.getPosition();
 
         switch (what[which]) {
             case "All Time":
@@ -566,9 +571,5 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void negativeClick(DialogFragment fragment, int which) {
-
-    }
 
 }

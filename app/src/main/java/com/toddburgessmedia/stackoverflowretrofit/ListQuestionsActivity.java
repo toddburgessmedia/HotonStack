@@ -1,6 +1,5 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,8 +18,12 @@ import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.TimeFrameDialogMessage;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFAQ;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFaqAPI;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,7 +36,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class ListQuestionsActivity extends AppCompatActivity implements TimeFrameDialog.TimeFrameDialogListener,
+public class ListQuestionsActivity extends AppCompatActivity implements
                             RecycleViewFAQ.RvFaqListener
 {
 
@@ -65,6 +68,22 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
 
     BottomBar bottomBar;
     final int TABPOS = 0;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        EventBus.getDefault().unregister(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -362,10 +381,11 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         return faqAPI.loadQuestionsToday(secondsPassed, tag, searchsite, pagecount, faqpagesize);
     }
 
-    @Override
-    public void positiveClick(DialogFragment fragment, int which) {
+    @Subscribe
+    public void positiveClick(TimeFrameDialogMessage message) {
 
         String[] what = getResources().getStringArray(R.array.time_dialog);
+        int which = message.getPosition();
 
         switch (what[which]) {
             case "All Time":
@@ -387,11 +407,6 @@ public class ListQuestionsActivity extends AppCompatActivity implements TimeFram
         startProgressDialog();
         getQuestions(searchTag);
         //setTimeFrame();
-    }
-
-    @Override
-    public void negativeClick(DialogFragment fragment, int which) {
-
     }
 
     @Override
