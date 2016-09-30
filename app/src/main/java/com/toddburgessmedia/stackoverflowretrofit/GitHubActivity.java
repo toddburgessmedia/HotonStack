@@ -1,6 +1,5 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,13 +11,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.NoLanguageFoundMessage;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProjectCollection;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,8 +34,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class GitHubActivity extends AppCompatActivity implements NoLanguageFoundDialog.NothingFoundListener,
-                RecyclerViewGitHub.GitHubOnClickListener {
+public class GitHubActivity extends AppCompatActivity {
 
     String TAG = MainActivity.TAG;
     String searchTag;
@@ -58,6 +59,22 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
 
 
     @BindString(R.string.github_activity_loading) String loadingMsg;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        EventBus.getDefault().unregister(this);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +116,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         gitHubLink = (GitHubLink) savedInstanceState.getSerializable("githublink");
         createBottomBar(savedInstanceState);
         if (projects != null) {
-            adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
+            adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
             if (searchLanguage) {
                 adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
             } else {
@@ -263,7 +280,7 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
                 } else {
                     projects = newprojects;
                     projects.insertPlaceHolders();
-                    adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext(),GitHubActivity.this);
+                    adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
                     adapter.setHasMore(gitHubLink.hasMore());
                     if (searchLanguage) {
                         adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
@@ -310,20 +327,20 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         }
     }
 
-    @Override
-    public void positiveClick(DialogFragment dialog) {
+    @Subscribe
+    public void positiveClick(NoLanguageFoundMessage message) {
+
+        if (!message.isTopicsearch()) {
+            finish();
+            return;
+        }
+
         nothing.dismiss();
         startProgressDialog();
         searchLanguage = false;
         setSearch();
         getProjects(searchTag,searchLanguage);
     }
-
-    @Override
-    public void negativeClick(DialogFragment dialog) {
-        finish();
-    }
-
 
     protected class NewTabListener implements OnMenuTabSelectedListener {
 
@@ -362,8 +379,8 @@ public class GitHubActivity extends AppCompatActivity implements NoLanguageFound
         }
     }
 
-    @Override
-    public void onClick(View view) {
+    @Subscribe
+    public void onClick(RecyclerViewGitHub.RecyclerViewGitHubMessage message) {
 
         page++;
         startProgressDialog();

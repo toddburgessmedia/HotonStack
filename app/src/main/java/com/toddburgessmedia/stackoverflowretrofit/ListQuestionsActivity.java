@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -36,9 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class ListQuestionsActivity extends AppCompatActivity implements
-                            RecycleViewFAQ.RvFaqListener
-{
+public class ListQuestionsActivity extends AppCompatActivity {
 
     public static final int ALLTIME = 0;
     public static final int TODAY = 4;
@@ -164,7 +161,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements
         pagecount = savedInstanceState.getInt("pagecount");
         createBottomBar(savedInstanceState);
         if (faq != null) {
-            adapter = new RecycleViewFAQ(faq.faq, getBaseContext(),this);
+            adapter = new RecycleViewFAQ(faq.faq, getBaseContext());
             adapter.setHasmore(faq.isHasmore());
             setTimeFrame();
             setSiteName();
@@ -333,7 +330,7 @@ public class ListQuestionsActivity extends AppCompatActivity implements
                 } else {
                     faq = newFaq;
                     faq.insertLastPlaceHolder();
-                    adapter = new RecycleViewFAQ(faq.faq,getBaseContext(), ListQuestionsActivity.this);
+                    adapter = new RecycleViewFAQ(faq.faq,getBaseContext());
                     setTimeFrame();
                     setSiteName();
                     adapter.setHasmore(faq.isHasmore());
@@ -409,8 +406,8 @@ public class ListQuestionsActivity extends AppCompatActivity implements
         //setTimeFrame();
     }
 
-    @Override
-    public void onClick(View v) {
+    @Subscribe
+    public void onClick(RecycleViewFAQ.RecycleViewFAQMessage message) {
         pagecount++;
         startProgressDialog();
         getQuestions(searchTag);

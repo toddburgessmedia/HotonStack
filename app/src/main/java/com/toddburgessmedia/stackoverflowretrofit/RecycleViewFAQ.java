@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.FAQTag;
 
+import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -37,8 +38,6 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     boolean hasmore = false;
 
-    RvFaqListener rvFaqListener;
-
     public void setSitename(String sitename) {
         this.sitename = sitename;
     }
@@ -55,12 +54,10 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     protected Context context;
 
-    public RecycleViewFAQ (List<FAQTag> tags, Context con, RvFaqListener rvFaqListener) {
+    public RecycleViewFAQ (List<FAQTag> tags, Context con) {
 
         this.faqTAGs = tags;
         this.context = con;
-
-        this.rvFaqListener = rvFaqListener;
 
     }
 
@@ -105,9 +102,7 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (rvFaqListener != null) {
-                    rvFaqListener.onClick(view);
-                }
+                EventBus.getDefault().post(new RecycleViewFAQMessage());
             }
         };
     }
@@ -236,9 +231,10 @@ public class RecycleViewFAQ extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public interface RvFaqListener {
+    public class RecycleViewFAQMessage {
 
-        void onClick (View v);
+        public RecycleViewFAQMessage() {
 
+        }
     }
 }

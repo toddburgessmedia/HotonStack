@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProject;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,8 +33,6 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final int LANGUAGESEARCH = 0;
     public static final int KEYWORDSEARCH = 1;
     private int searchType;
-
-    GitHubOnClickListener gitHubOnClickListener;
 
     public void setSearchword(String searchword) {
         this.searchword = searchword;
@@ -105,7 +105,7 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                gitHubOnClickListener.onClick(view);
+                EventBus.getDefault().post(new RecyclerViewGitHubMessage());
             }
         };
     }
@@ -226,11 +226,10 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public RecyclerViewGitHub (List<GitHubProject> projects, Context con, GitHubOnClickListener listener) {
+    public RecyclerViewGitHub (List<GitHubProject> projects, Context con) {
 
         this.projects = projects;
         this.context = con;
-        this.gitHubOnClickListener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -276,8 +275,10 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    public interface GitHubOnClickListener {
+    public class RecyclerViewGitHubMessage {
 
-        void onClick(View view);
+        public RecyclerViewGitHubMessage () {
+
+        }
     }
 }

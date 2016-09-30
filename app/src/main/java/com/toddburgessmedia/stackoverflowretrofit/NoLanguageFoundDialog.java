@@ -1,25 +1,19 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.NoLanguageFoundMessage;
+
+import org.greenrobot.eventbus.EventBus;
+
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 26/06/16.
  */
 public class NoLanguageFoundDialog extends DialogFragment {
-
-        NothingFoundListener listener;
-
-        @Override
-        public void onAttach(Activity activity) {
-
-            listener = (NothingFoundListener) activity;
-            super.onAttach(activity);
-        }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -30,25 +24,20 @@ public class NoLanguageFoundDialog extends DialogFragment {
             builder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            listener.positiveClick(NoLanguageFoundDialog.this);
+                            EventBus.getDefault().post(new NoLanguageFoundMessage(true));
                         }
                     }
             );
             builder.setNegativeButton("Go Back", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    listener.negativeClick(NoLanguageFoundDialog.this);
+                    EventBus.getDefault().post(new NoLanguageFoundMessage(false));
                 }
             });
 
             return builder.create();
         }
 
-        public interface NothingFoundListener {
-            public void positiveClick (DialogFragment dialog);
-            public void negativeClick (DialogFragment dialog);
-
-        }
     }
 
 
