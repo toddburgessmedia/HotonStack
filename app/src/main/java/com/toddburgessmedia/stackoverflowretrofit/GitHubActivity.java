@@ -79,7 +79,6 @@ public class GitHubActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: starting up");
         setContentView(R.layout.activity_git_hub);
         ButterKnife.bind(this);
 
@@ -105,36 +104,10 @@ public class GitHubActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
-        searchTag = savedInstanceState.getString("searchtag");
-        searchsite = savedInstanceState.getString("searchsite");
-        searchLanguage = savedInstanceState.getBoolean("search_language");
-        page = savedInstanceState.getInt("page");
-        gitHubLink = (GitHubLink) savedInstanceState.getSerializable("githublink");
-        createBottomBar(savedInstanceState);
-        if (projects != null) {
-            adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
-            if (searchLanguage) {
-                adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
-            } else {
-                adapter.setSearchType(RecyclerViewGitHub.KEYWORDSEARCH);
-            }
-            adapter.setSearchword(searchTag);
-            adapter.setHasMore(gitHubLink.hasMore());
-            rv.setAdapter(adapter);
-            bottomBar.selectTabAtPosition(TABPOS,false);
-        }
-    }
-
-    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
     }
-
 
     @Override
     protected void onResume() {
@@ -142,6 +115,7 @@ public class GitHubActivity extends AppCompatActivity {
         super.onResume();
         bottomBar.selectTabAtPosition(TABPOS,false);
     }
+
 
     private void startProgressDialog() {
 
@@ -202,6 +176,31 @@ public class GitHubActivity extends AppCompatActivity {
         bottomBar = BottomBar.attach(this, savedInstanceState);
         bottomBar.setItemsFromMenu(R.menu.github_three_buttons, listener);
         bottomBar.selectTabAtPosition(TABPOS,false);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        projects = (GitHubProjectCollection) savedInstanceState.getSerializable("savedprojects");
+        searchTag = savedInstanceState.getString("searchtag");
+        searchsite = savedInstanceState.getString("searchsite");
+        searchLanguage = savedInstanceState.getBoolean("search_language");
+        page = savedInstanceState.getInt("page");
+        gitHubLink = (GitHubLink) savedInstanceState.getSerializable("githublink");
+        createBottomBar(savedInstanceState);
+        if (projects != null) {
+            adapter = new RecyclerViewGitHub(projects.getProjects(), getBaseContext());
+            if (searchLanguage) {
+                adapter.setSearchType(RecyclerViewGitHub.LANGUAGESEARCH);
+            } else {
+                adapter.setSearchType(RecyclerViewGitHub.KEYWORDSEARCH);
+            }
+            adapter.setSearchword(searchTag);
+            adapter.setHasMore(gitHubLink.hasMore());
+            rv.setAdapter(adapter);
+            bottomBar.selectTabAtPosition(TABPOS,false);
+        }
     }
 
     private void setSearch() {

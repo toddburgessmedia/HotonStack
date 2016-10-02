@@ -151,24 +151,6 @@ public class MeetupActivity extends AppCompatActivity {
         }
     }
 
-//    private void watchLocationChange () {
-//
-//        if (locationSub != null) {
-//            return;
-//        }
-//
-//        locationSub = RxTextView.textChanges(meetupLoc)
-//                .subscribe(new Action1<CharSequence>() {
-//                    @Override
-//                    public void call(CharSequence charSequence) {
-//                        Log.d(TAG, "call: location updated!");
-//                        if (charSequence.toString().length() > 0) {
-//                            getMeetupGroups(searchTag);
-//                        }
-//                    }
-//                });
-//    }
-
     private void createBottomBar(Bundle savedInstanceState) {
 
         NewTabListener listener = new NewTabListener();
