@@ -12,12 +12,17 @@
     tools:context="com.toddburgessmedia.stackoverflowretrofit.GitHubActivity">
 
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/github_presenter">
+    </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/github_recycleview"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-
+        android:visibility="gone"
         />
 
 
