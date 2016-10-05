@@ -16,7 +16,9 @@ import dagger.Provides;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 30/08/16.
@@ -76,6 +78,21 @@ public class OKHttpModule {
     public Retrofit getRetrofitGitHub (OkHttpClient client) {
 
         Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.github.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        return retrofit;
+    }
+
+    @Provides
+    @Named("githubrx")
+    @Singleton
+    public Retrofit getRetrofitGitHubRx (OkHttpClient client) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .baseUrl("https://api.github.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
