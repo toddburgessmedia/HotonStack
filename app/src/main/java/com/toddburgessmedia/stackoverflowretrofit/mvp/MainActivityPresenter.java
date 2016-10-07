@@ -37,6 +37,7 @@ import com.toddburgessmedia.stackoverflowretrofit.TimeFrameDialog;
 import com.toddburgessmedia.stackoverflowretrofit.eventbus.MainActivityLongPressMessage;
 import com.toddburgessmedia.stackoverflowretrofit.eventbus.SearchDialogMessage;
 import com.toddburgessmedia.stackoverflowretrofit.eventbus.SelectSiteMessage;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.StackExchangeRankingMessage;
 import com.toddburgessmedia.stackoverflowretrofit.eventbus.TimeFrameDialogMessage;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowAPI;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowTags;
@@ -90,7 +91,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
     private boolean synonymsearch;
     private int searchtime = TimeDelay.ALLTIME;
     private int pagecount = 1;
-    private String searchtag;
+    private String searchtag = "";
     private Menu menu;
     private boolean tagsearch = false;
 
@@ -159,6 +160,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         rxPrefs = RxSharedPreferences.create(prefs);
         rxDefaultsite = rxPrefs.getString("defaultsite");
         rxDefaultsite.asObservable()
+                .skip(1)
                 .filter(new Func1<String, Boolean>() {
                     @Override
                     public Boolean call(String s) {
@@ -265,6 +267,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
                 .subscribe(new Subscriber<Response<StackOverFlowTags>>() {
                     @Override
                     public void onCompleted() {
+                        renderModel();
 
                     }
 
@@ -283,7 +286,6 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
                         }
 
                         callTags = response.body();
-                        renderModel();
                     }
                 });
 
@@ -441,6 +443,28 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
 
     }
 
+    @Subscribe
+    public void stackExchangeRankingpositiveClick(StackExchangeRankingMessage message) {
+
+        String[] ranking = getResources().getStringArray(R.array.tags_ranking);
+        int which = message.getPosition();
+
+        if (searchtype.equals(ranking[which])) {
+            return;
+        }
+
+        pagecount = 1;
+        searchtype = ranking[which];
+
+        MenuItem item = menu.findItem(R.id.menu_ranking);
+        String sortby = getString(R.string.tags_dialog_ranking) + searchtype;
+        item.setTitle(sortby);
+
+        fetchRestSource();
+
+    }
+
+
 
     // Change Site positive click
     @Subscribe
@@ -455,11 +479,12 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         if (adapter != null) {
             adapter.setDisplaySiteName(sitename);
         }
+        pagecount = 1;
         searchtime = TimeDelay.ALLTIME;
         fetchRestSource();
     }
 
-// LongPress Dialog positive click handler
+    // LongPress Dialog positive click handler
     @Subscribe
     public void longPresspositiveClick(MainActivityLongPressMessage message) {
 
@@ -472,20 +497,20 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
             if (values[which].equals("Load Related Tags")) {
                 String newsite = sitename + " / " + searchtag;
                 adapter.setDisplaySiteName(newsite);
-                tagsearch = true;
+                synonymsearch = true;
             }
             fetchRestSource();
 
         } else {
             setSiteName();
             adapter.setDisplaySiteName(sitename);
-            tagsearch = false;
+            synonymsearch = false;
             pagecount = 1;
             fetchRestSource();
         }
     }
 
-    //    @Subscribe
+    @Subscribe
     public void onLongClick(RecyclerViewTagsAdapter.OnLongClickMessage message) {
 
         String tag = message.getTag();
