@@ -11,10 +11,11 @@ public class TimeDelay {
 //        throw new IllegalAccessError("Can not be instaniated");
 //    }
 
-    public static final int TODAY = 0;
-    public static final int YESTERDAY = 1;
+    public static final int TODAY = 4;
+    public static final int YESTERDAY = 3;
     public static final int THISMONTH = 2;
-    public static final int THISYEAR = 3;
+    public static final int THISYEAR = 1;
+    public static final int ALLTIME = 0;
 
     public long getTimeDelay(int timedelay) {
 

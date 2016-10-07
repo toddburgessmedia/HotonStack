@@ -1,5 +1,6 @@
 package com.toddburgessmedia.stackoverflowretrofit.mvp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,7 +20,6 @@ import android.widget.Toast;
 
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
-import com.toddburgessmedia.stackoverflowretrofit.GitHubActivity;
 import com.toddburgessmedia.stackoverflowretrofit.GitHubLink;
 import com.toddburgessmedia.stackoverflowretrofit.ListQuestionsActivity;
 import com.toddburgessmedia.stackoverflowretrofit.MainActivity;
@@ -40,6 +40,7 @@ import org.greenrobot.eventbus.Subscribe;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Response;
@@ -52,7 +53,7 @@ import rx.android.schedulers.AndroidSchedulers;
  * Created by Todd Burgess (todd@toddburgessmedia.com on 04/10/16.
  */
 
-public class GitHubPresenter extends Fragment {
+public class GitHubPresenter extends Fragment implements TechDiveMVP {
 
     String TAG = MainActivity.TAG;
     String searchTag;
@@ -66,6 +67,7 @@ public class GitHubPresenter extends Fragment {
     GitHubProjectCollection projects;
     GitHubProjectCollection newprojects;
     Response<GitHubProjectCollection> response;
+    ProgressDialog progress;
 
     BottomBar bottomBar;
     int TABPOS = 1;
@@ -79,6 +81,9 @@ public class GitHubPresenter extends Fragment {
 
     @BindView(R.id.github_fragment_recycleview)
     RecyclerView rv;
+
+    @BindString(R.string.github_activity_loading) String loadingMsg;
+
 
     @Override
     public void onStart() {
@@ -99,8 +104,7 @@ public class GitHubPresenter extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TechDive techDive = (TechDive) ((GitHubActivity) getActivity()).getApplication();
-        techDive.getOkHttpComponent().inject(this);
+        ((TechDive) getActivity().getApplication()).getOkHttpComponent().inject(this);
 
         searchTag = getArguments().getString("searchtag");
         searchsite = getArguments().getString("searchsite");
@@ -149,7 +153,7 @@ public class GitHubPresenter extends Fragment {
 
 
         setSearch();
-        getProjects();
+        fetchRestSource();
         return view;
     }
 
@@ -185,13 +189,14 @@ public class GitHubPresenter extends Fragment {
         String text = searchtype + " " + searchTag;
     }
 
-    private void getProjects() {
+    public void fetchRestSource() {
 
+        startProgressDialog();
         GitHubProjectAPI projectAPI;
 
         projectAPI = retrofit.create(GitHubProjectAPI.class);
 
-        Log.d(TAG, "getProjects: " + searchTag);
+        Log.d(TAG, "fetchRestSource: " + searchTag);
         final String qlanguage;
         if (searchLanguage) {
             qlanguage = "language:" + searchTag;
@@ -214,13 +219,12 @@ public class GitHubPresenter extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Toast.makeText(context, "Unable to retrieve projects", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(Response<GitHubProjectCollection> response) {
-
-                        Log.d(TAG, "onNext: " + response.code());
+                        stopProgressDialog();
                         if  ((response.code() != 200) && (searchLanguage)) {
 
                             if (nothing == null) {
@@ -242,7 +246,7 @@ public class GitHubPresenter extends Fragment {
                 });
     }
 
-    private void renderModel () {
+    public void renderModel () {
 
 
         if ((adapter != null) && (page > 1)) {
@@ -284,7 +288,7 @@ public class GitHubPresenter extends Fragment {
             case R.id.github_menu_refresh:
                 page = 1;
                 //startProgressDialog();
-                getProjects();
+                fetchRestSource();
                 break;
             case R.id.github_menu_preferences:
                 Intent i = new Intent(getActivity(),PreferencesActivity.class);
@@ -309,6 +313,21 @@ public class GitHubPresenter extends Fragment {
         bottomBar.selectTabAtPosition(TABPOS,false);
     }
 
+    private void startProgressDialog() {
+
+        if (progress == null) {
+            progress = new ProgressDialog(getActivity());
+        }
+        progress.setMessage(loadingMsg);
+        progress.show();
+    }
+
+    private void stopProgressDialog() {
+        if (progress != null) {
+            progress.dismiss();
+        }
+    }
+
     @Subscribe
     public void positiveClick(NoLanguageFoundMessage message) {
 
@@ -321,7 +340,7 @@ public class GitHubPresenter extends Fragment {
         //startProgressDialog();
         searchLanguage = false;
         setSearch();
-        getProjects();
+        fetchRestSource();
     }
 
     @Subscribe
@@ -329,7 +348,7 @@ public class GitHubPresenter extends Fragment {
 
         page++;
         //startProgressDialog();
-        getProjects();
+        fetchRestSource();
     }
 
     private void createScrollChangeListener() {
