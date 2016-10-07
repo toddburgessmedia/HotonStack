@@ -189,6 +189,7 @@ public class GitHubPresenter extends Fragment implements TechDiveMVP {
         String text = searchtype + " " + searchTag;
     }
 
+
     public void fetchRestSource() {
 
         startProgressDialog();
