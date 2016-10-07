@@ -15,17 +15,6 @@ import org.greenrobot.eventbus.EventBus;
  */
 public class SiteSelectDialog extends DialogFragment {
 
-    SiteSelectDialogListener listener;
-
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//
-//        Activity a = (Activity) context;
-//        listener = (SiteSelectDialogListener) a;
-//
-//    }
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -34,15 +23,10 @@ public class SiteSelectDialog extends DialogFragment {
                 .setItems(R.array.select_select_display, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //listener.siteSelectpositiveClick(SiteSelectDialog.this, which);
                         EventBus.getDefault().post(new SelectSiteMessage(which));
                     }
                 });
         return builder.create();
 
-    }
-
-    public interface SiteSelectDialogListener {
-        void siteSelectpositiveClick(DialogFragment fragment, int which);
     }
 }

@@ -1,6 +1,5 @@
 package com.toddburgessmedia.stackoverflowretrofit;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -8,24 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.toddburgessmedia.stackoverflowretrofit.mvp.GitHubPresenter;
 
-import butterknife.BindString;
-import butterknife.ButterKnife;
-
 public class GitHubActivity extends AppCompatActivity {
 
     String TAG = MainActivity.TAG;
-    ProgressDialog progress;
 
     GitHubPresenter presenter;
-
-    @BindString(R.string.github_activity_loading) String loadingMsg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_git_hub);
-
-        ButterKnife.bind(this);
 
         if (savedInstanceState != null) {
             presenter = (GitHubPresenter) getSupportFragmentManager().getFragment(savedInstanceState, "presenter");
@@ -52,14 +43,7 @@ public class GitHubActivity extends AppCompatActivity {
         setIntent(intent);
     }
 
-    private void startProgressDialog() {
 
-        if (progress == null) {
-            progress = new ProgressDialog(this);
-        }
-        progress.setMessage(loadingMsg);
-        progress.show();
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -68,9 +52,5 @@ public class GitHubActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    private void stopProgressDialog() {
-        if (progress != null) {
-            progress.dismiss();
-        }
-    }
+
 }

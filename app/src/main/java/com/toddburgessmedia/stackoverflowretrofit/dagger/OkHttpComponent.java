@@ -1,11 +1,11 @@
 package com.toddburgessmedia.stackoverflowretrofit.dagger;
 
-import com.toddburgessmedia.stackoverflowretrofit.GitHubActivity;
 import com.toddburgessmedia.stackoverflowretrofit.ListQuestionsActivity;
 import com.toddburgessmedia.stackoverflowretrofit.MainActivity;
 import com.toddburgessmedia.stackoverflowretrofit.MeetupActivity;
 import com.toddburgessmedia.stackoverflowretrofit.RecyclerViewTagsAdapter;
 import com.toddburgessmedia.stackoverflowretrofit.mvp.GitHubPresenter;
+import com.toddburgessmedia.stackoverflowretrofit.mvp.MainActivityPresenter;
 
 import javax.inject.Singleton;
 
@@ -23,11 +23,11 @@ public interface OkHttpComponent {
 
     void inject(ListQuestionsActivity listQuestionsActivity);
 
-    void inject(GitHubActivity gitHubActivity);
-
     void inject(MeetupActivity meetupActivity);
 
     void inject(RecyclerViewTagsAdapter recyclerViewTagsAdapter);
 
     void inject(GitHubPresenter gitHubPresenter);
+
+    void inject(MainActivityPresenter mainActivityPresenter);
 }

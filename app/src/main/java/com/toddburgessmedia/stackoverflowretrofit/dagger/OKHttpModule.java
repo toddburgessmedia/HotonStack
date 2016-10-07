@@ -73,12 +73,12 @@ public class OKHttpModule {
     }
 
     @Provides
-    @Named("github")
+    @Named("stackexchangerx")
     @Singleton
-    public Retrofit getRetrofitGitHub (OkHttpClient client) {
-
+    public Retrofit getRetrofitStackExchangeRx (OkHttpClient client) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://api.github.com/")
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .baseUrl("https://api.stackexchange.com")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
