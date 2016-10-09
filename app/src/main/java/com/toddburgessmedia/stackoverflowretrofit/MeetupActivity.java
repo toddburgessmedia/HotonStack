@@ -60,6 +60,7 @@ public class MeetupActivity extends AppCompatActivity {
 
     HashMap<String,Double> latLng;
 
+
     String searchTag;
     String searchsite;
 
@@ -119,7 +120,7 @@ public class MeetupActivity extends AppCompatActivity {
         progress.setMessage(getString(R.string.meetupactivity_finding_groups));
         searchTag = getIntent().getStringExtra("searchtag");
         searchsite = getIntent().getStringExtra("searchsite");
-        searchTerm.setText(searchTag);
+//        searchTerm.setText(searchTag);
         createBottomBar(savedInstanceState);
 
         //watchLocationChange();

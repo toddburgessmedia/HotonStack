@@ -7,6 +7,7 @@ import com.toddburgessmedia.stackoverflowretrofit.RecyclerViewTagsAdapter;
 import com.toddburgessmedia.stackoverflowretrofit.mvp.GitHubPresenter;
 import com.toddburgessmedia.stackoverflowretrofit.mvp.ListQuestionsPresenter;
 import com.toddburgessmedia.stackoverflowretrofit.mvp.MainActivityPresenter;
+import com.toddburgessmedia.stackoverflowretrofit.mvp.MeetupPresenter;
 
 import javax.inject.Singleton;
 
@@ -33,4 +34,6 @@ public interface OkHttpComponent {
     void inject(MainActivityPresenter mainActivityPresenter);
 
     void inject(ListQuestionsPresenter listQuestionsPresenter);
+
+    void inject(MeetupPresenter meetupPresenter);
 }

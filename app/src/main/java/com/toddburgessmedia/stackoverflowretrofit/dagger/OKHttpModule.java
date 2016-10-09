@@ -114,4 +114,19 @@ public class OKHttpModule {
 
         return retrofit;
     }
+
+    @Provides
+    @Named("meetuprx")
+    @Singleton
+    public Retrofit getRetrofitMeetupRx (OkHttpClient client) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
+                .baseUrl("https://api.meetup.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client)
+                .build();
+
+        return retrofit;
+    }
 }
