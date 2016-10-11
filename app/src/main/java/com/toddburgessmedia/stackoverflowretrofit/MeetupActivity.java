@@ -330,6 +330,7 @@ public class MeetupActivity extends AppCompatActivity {
                 return;
             }
             Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             String provider = manager.getBestProvider(criteria, false);
 
             if (provider == null) {
@@ -339,7 +340,7 @@ public class MeetupActivity extends AppCompatActivity {
                 return;
             }
 
-            Location location = manager.getLastKnownLocation(provider);
+            Location location = manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (location == null)  {
                 stopProgressDialog();
                 Toast.makeText(MeetupActivity.this, "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
