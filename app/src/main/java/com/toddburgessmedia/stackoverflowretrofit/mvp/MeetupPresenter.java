@@ -62,6 +62,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
     String searchTag;
     String searchsite;
+
     String location = "Local Area";
 
     List<MeetUpGroup> groups;
@@ -71,6 +72,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
     @BindView(R.id.meetup_fragment_recycleview)
     RecyclerView rv;
     RecycleViewMeetup adapter;
+
 
     @Inject @Named("meetuprx")
     Retrofit retrofit;
@@ -92,8 +94,8 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
         searchTag = getArguments().getString("searchtag");
         searchsite = getArguments().getString("searchsite");
-
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -112,6 +114,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
         bottomBar.selectTabAtPosition(TABPOS,false);
     }
+
 
     @Nullable
     @Override
@@ -211,7 +214,6 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
                 latLng.get("longitude").toString(),
                 searchTag);
 
-
         call.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Response<List<MeetUpGroup>>>() {
                     @Override
@@ -228,6 +230,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
                     @Override
                     public void onNext(Response<List<MeetUpGroup>> listResponse) {
+
                         stopProgressDialog();
                         groups = listResponse.body();
                     }
@@ -260,6 +263,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         }
 
         LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
 //        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
 //            //Toast.makeText(getActivity(), "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
 //            //getActivity().finish();
@@ -277,11 +281,11 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 //        }
 
         Location location = manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (location == null)  {
-//                Toast.makeText(getActivity(), "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
-//                getActivity().finish();
-//                return;
-            throw new Exception("GPS Failed to Work :(");
+
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            //Toast.makeText(getActivity(), "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
+            //getActivity().finish();
+            throw new Exception("GPS is Disabled/Unavailable");
         }
 
         lat = location.getLatitude();
@@ -434,4 +438,5 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         }
 
     }
+
 }
