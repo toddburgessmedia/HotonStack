@@ -198,7 +198,6 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
                 startActivity(pi);
                 break;
         }
-
         return true;
     }
 
@@ -230,12 +229,10 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
                     @Override
                     public void onNext(Response<List<MeetUpGroup>> listResponse) {
-
                         stopProgressDialog();
                         groups = listResponse.body();
                     }
                 });
-
     }
 
     @Override
@@ -245,7 +242,6 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
             Toast.makeText(getActivity(), "No Meetups Found", Toast.LENGTH_SHORT).show();
             getActivity().finish();
         }
-
 
         MeetUpGroup holder = new MeetUpGroup();
         holder.setPlaceholder(true);
@@ -263,29 +259,19 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         }
 
         LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            throw new Exception("GPS is Disabled/Unavailable");
+        }
 
-//        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-//            //Toast.makeText(getActivity(), "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
-//            //getActivity().finish();
-//            throw new Exception("GPS is Disabled/Unavailable");
-//        }
         Criteria criteria = new Criteria();
         String provider = manager.getBestProvider(criteria, false);
 
-        // TODO Clean up this code
-//        if (provider == null) {
-////                Toast.makeText(getActivity(), "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
-////                getActivity().finish();
-////                return;
-//            throw new Exception("GPS Failed to Work :(");
-//        }
-
-        Location location = manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            //Toast.makeText(getActivity(), "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
-            //getActivity().finish();
-            throw new Exception("GPS is Disabled/Unavailable");
+        Location location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (location == null) {
+            location = manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            if (location == null) {
+                throw new Exception("Unable to get location");
+            }
         }
 
         lat = location.getLatitude();
