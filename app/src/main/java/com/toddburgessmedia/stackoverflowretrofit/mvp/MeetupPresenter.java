@@ -15,6 +15,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +35,7 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetUpGroup;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.MeetupAPI;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -59,7 +62,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
     String searchTag;
     String searchsite;
-    String location;
+    String location = "Local Area";
 
     List<MeetUpGroup> groups;
 
@@ -69,7 +72,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
     RecyclerView rv;
     RecycleViewMeetup adapter;
 
-    @Inject @Named("meeuprx")
+    @Inject @Named("meetuprx")
     Retrofit retrofit;
 
     @Inject Context context;
@@ -89,11 +92,25 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
         searchTag = getArguments().getString("searchtag");
         searchsite = getArguments().getString("searchsite");
+
+        setHasOptionsMenu(true);
     }
 
     @Override
     public void onDestroy() {
+
+        if (!subscribe.isUnsubscribed()) {
+            subscribe.isUnsubscribed();
+        }
+
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        bottomBar.selectTabAtPosition(TABPOS,false);
     }
 
     @Nullable
@@ -106,11 +123,60 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        createBottomBar(savedInstanceState);
+        createScrollChangeListener();
 
+        if (savedInstanceState != null) {
+            groups = (List<MeetUpGroup>) savedInstanceState.getSerializable("meetup_groups");
+            searchTag = savedInstanceState.getString("searchtag");
+            searchsite = savedInstanceState.getString("searchsite");
+            latLng = new HashMap<>();
+            latLng.put("latitude",savedInstanceState.getDouble("latitude"));
+            latLng.put("longitude",savedInstanceState.getDouble("longitude"));
+            //createBottomBar(savedInstanceState);
+            location = savedInstanceState.getString("location");
+            if (groups != null) {
+                adapter = new RecycleViewMeetup(groups,context);
+                adapter.setHeader(location,searchTag);
+                rv.setAdapter(adapter);
+                bottomBar.selectTabAtPosition(TABPOS,false);
+            }
+            return view;
+        }
 
+        try {
+            if (latLng == null) {
+                startProgressDialog();
+                getGPSLocation();
+            }
+        } catch (Exception e) {
+            Toast.makeText(context, "Error Getting location", Toast.LENGTH_SHORT).show();
+        }
+        setLocationName();
 
         return view;
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("meetup_groups", (Serializable) groups);
+        outState.putString("searchtag", searchTag);
+        outState.putString("searchsite",searchsite);
+        if (latLng != null) {
+            outState.putDouble("latitude", latLng.get("latitude"));
+            outState.putDouble("longitude", latLng.get("longitude"));
+            outState.putString("location", location);
+        }
+        bottomBar.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu,inflater);
+        inflater.inflate(R.menu.meetup_menu, menu);
     }
 
     @Override
@@ -136,6 +202,8 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
     @Override
     public void fetchRestSource() {
+
+        startProgressDialog();
         MeetupAPI meetupAPI = retrofit.create(MeetupAPI.class);
 
         Observable<Response<List<MeetUpGroup>>> call = meetupAPI.getMeetupGroupsObservable(
@@ -143,27 +211,25 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
                 latLng.get("longitude").toString(),
                 searchTag);
 
-        call.subscribeOn(AndroidSchedulers.mainThread())
+
+        call.observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Response<List<MeetUpGroup>>>() {
                     @Override
                     public void onCompleted() {
-
+                        renderModel();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        stopProgressDialog();
+                        Toast.makeText(context, "Meetup Groups Failed :(", Toast.LENGTH_SHORT).show();
+                        getActivity().finish();
                     }
 
                     @Override
                     public void onNext(Response<List<MeetUpGroup>> listResponse) {
-
+                        stopProgressDialog();
                         groups = listResponse.body();
-                        if (groups.size() == 0) {
-                            Toast.makeText(getActivity(), "No Meetups Found", Toast.LENGTH_SHORT).show();
-                            getActivity().finish();
-                        }
-
                     }
                 });
 
@@ -171,6 +237,12 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
 
     @Override
     public void renderModel() {
+
+        if (groups.size() == 0) {
+            Toast.makeText(getActivity(), "No Meetups Found", Toast.LENGTH_SHORT).show();
+            getActivity().finish();
+        }
+
 
         MeetUpGroup holder = new MeetUpGroup();
         holder.setPlaceholder(true);
@@ -188,22 +260,23 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         }
 
         LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            //Toast.makeText(getActivity(), "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
-            //getActivity().finish();
-            throw new Exception("GPS is Disabled/Unavailable");
-        }
+//        if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+//            //Toast.makeText(getActivity(), "GPS is Disabled/Unavailable", Toast.LENGTH_SHORT).show();
+//            //getActivity().finish();
+//            throw new Exception("GPS is Disabled/Unavailable");
+//        }
         Criteria criteria = new Criteria();
         String provider = manager.getBestProvider(criteria, false);
 
-        if (provider == null) {
-//                Toast.makeText(getActivity(), "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
-//                getActivity().finish();
-//                return;
-            throw new Exception("GPS Failed to Work :(");
-        }
+        // TODO Clean up this code
+//        if (provider == null) {
+////                Toast.makeText(getActivity(), "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
+////                getActivity().finish();
+////                return;
+//            throw new Exception("GPS Failed to Work :(");
+//        }
 
-        Location location = manager.getLastKnownLocation(provider);
+        Location location = manager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location == null)  {
 //                Toast.makeText(getActivity(), "GPS Failed to Work :(", Toast.LENGTH_SHORT).show();
 //                getActivity().finish();
@@ -218,25 +291,31 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
     }
 
     private void setLocationName() {
+        startProgressDialog();
+        if (!location.equals("Local Area")) {
+            return;
+        }
         subscribe = getGeoCoderObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<Address>>() {
                     @Override
                     public void onCompleted() {
-                        /* getMeetupGroups(searchTag); */
+                        fetchRestSource();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        stopProgressDialog();
+                        fetchRestSource();
+                        //Toast.makeText(context, "Unable to get location", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(List<Address> addresses) {
                         for (Address a : addresses) {
                             String loc = a.getLocality() + " - " + a.getCountryName();
-                            if (loc.contains("null")) {
+                            if (loc.contains("null") || (loc.equals(""))) {
                                 loc = "Local Area";
                             }
                             location = loc;
@@ -264,6 +343,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         if (progress == null) {
             progress = new ProgressDialog(getActivity());
         }
+        progress.setMessage("Loading Meetup Groups");
         progress.show();
     }
 
@@ -354,6 +434,4 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
         }
 
     }
-
-
 }
