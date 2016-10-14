@@ -2,7 +2,6 @@ package com.toddburgessmedia.stackoverflowretrofit;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.toddburgessmedia.stackoverflowretrofit.mvp.TechDiveWebActivity;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.GitHubProject;
 
 import org.greenrobot.eventbus.EventBus;
@@ -94,7 +94,8 @@ public class RecyclerViewGitHub extends RecyclerView.Adapter<RecyclerView.ViewHo
                     link = vh.link.getText().toString();
                 }
 
-                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+                Intent i = new Intent(v.getContext(), TechDiveWebActivity.class);
+                i.putExtra("url", link);
                 v.getContext().startActivity(i);
             }
         };

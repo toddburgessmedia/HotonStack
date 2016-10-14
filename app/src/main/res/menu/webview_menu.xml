@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:orderInCategory="0"
+        android:id="@+id/webview_menu_refresh"
+        android:title="@string/refresh"
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/webview_menu_preferences"
+        android:title="Preferences"
+        android:orderInCategory="400" />
+
+    <item
+        android:id="@+id/webview_menu_privacy"
+        android:title="Privacy Policy"
+        android:orderInCategory="300" />
+
+
+</menu>

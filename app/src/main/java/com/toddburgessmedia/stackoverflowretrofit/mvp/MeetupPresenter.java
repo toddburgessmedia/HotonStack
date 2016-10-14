@@ -233,6 +233,7 @@ public class MeetupPresenter extends Fragment implements TechDiveMVP {
                         groups = listResponse.body();
                     }
                 });
+
     }
 
     @Override
