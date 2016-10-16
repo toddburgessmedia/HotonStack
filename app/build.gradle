@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.toddburgessmedia.stackoverflowretrofit"
-        minSdkVersion 21
+        minSdkVersion 17
         targetSdkVersion 24
-        versionCode 9
-        versionName "1.5"
+        versionCode 10
+        versionName "1.6"
 
     }
 
