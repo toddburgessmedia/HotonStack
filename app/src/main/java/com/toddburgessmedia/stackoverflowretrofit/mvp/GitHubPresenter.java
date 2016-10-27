@@ -121,7 +121,10 @@ public class GitHubPresenter extends Fragment implements TechDiveMVP {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((TechDive) getActivity().getApplication()).getOkHttpComponent().inject(this);
+
+        if (getActivity().getApplication() instanceof TechDive) {
+            ((TechDive) getActivity().getApplication()).getOkHttpComponent().inject(this);
+        }
 
         searchTag = getArguments().getString("searchtag");
         searchsite = getArguments().getString("searchsite");

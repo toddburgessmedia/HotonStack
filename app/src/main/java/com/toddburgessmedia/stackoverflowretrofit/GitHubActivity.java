@@ -38,7 +38,7 @@ public class GitHubActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             presenter = (GitHubPresenter) getSupportFragmentManager().getFragment(savedInstanceState, "presenter");
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.github_presenter, presenter);
+            transaction.replace(R.id.github_presenter, presenter, "presenter");
             transaction.commit();
             return;
         }
@@ -50,7 +50,7 @@ public class GitHubActivity extends AppCompatActivity {
         presenter.setArguments(bundle);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.github_presenter, presenter);
+        transaction.replace(R.id.github_presenter, presenter, "presenter");
         transaction.commit();
     }
 
