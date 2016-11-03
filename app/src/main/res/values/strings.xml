@@ -34,6 +34,9 @@
 
     <string name="questions_time_frame">Time Frame: </string>
 
+    <string name="whats_hot_faq">FAQ</string>
+    <string name="whats_hot_search">Search Questions</string>
+
     <string name="github_language">Language: </string>
     <string name="github_searchterm">Search Term: </string>
 

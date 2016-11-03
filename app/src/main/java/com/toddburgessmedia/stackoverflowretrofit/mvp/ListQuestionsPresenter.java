@@ -76,6 +76,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
     String searchsite;
     int faqpagesize;
     int searchtime = TimeDelay.ALLTIME;
+    boolean listFAQ = false;
 
     @BindView(R.id.question_fragment_recycleview)
     RecyclerView rv;
@@ -96,6 +97,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
     private BottomBar bottomBar;
     int TABPOS = 0;
     ProgressDialog progress;
+    private MenuItem faqMenu;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -150,6 +152,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
         searchsite = savedInstanceState.getString("searchsite");
         faqpagesize = savedInstanceState.getInt("faqpagesize");
         pagecount = savedInstanceState.getInt("pagecount");
+        listFAQ = savedInstanceState.getBoolean("listFAQ");
         createBottomBar(savedInstanceState);
         if (faq != null) {
             adapter = new RecycleViewFAQ(faq.faq, context);
@@ -168,6 +171,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
         outState.putString("searchsite",searchsite);
         outState.putInt("pagecount",pagecount);
         outState.putInt("faqpagesize",faqpagesize);
+        outState.putBoolean("listFAQ",listFAQ);
         bottomBar.onSaveInstanceState(outState);
 
         super.onSaveInstanceState(outState);
@@ -257,6 +261,10 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
         long secondsPassed;
         TimeDelay delay = new TimeDelay();
 
+        if (listFAQ) {
+            return faqAPI.loadFAQ(tag, pagecount, faqpagesize, searchsite);
+        }
+
         switch (searchtime) {
             case TimeDelay.TODAY:
                 secondsPassed = delay.getTimeDelay(TimeDelay.TODAY);
@@ -324,6 +332,8 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.whatishot_menu,menu);
+
+        faqMenu = menu.findItem(R.id.whats_hot_faq);
     }
 
     @Override
@@ -346,6 +356,17 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
             case R.id.whats_hot_privacy:
                 Intent pi = new Intent(getActivity(), PrivacyPolicyActivity.class);
                 startActivity(pi);
+                break;
+            case R.id.whats_hot_faq:
+                if (listFAQ) {
+                    listFAQ = false;
+                    faqMenu.setTitle(getString(R.string.whats_hot_faq));
+                } else {
+                    listFAQ = true;
+                    faqMenu.setTitle(getString(R.string.whats_hot_search));
+                }
+                pagecount = 1;
+                fetchRestSource();
                 break;
         }
 

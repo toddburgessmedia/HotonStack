@@ -20,6 +20,7 @@ package com.toddburgessmedia.stackoverflowretrofit.retrofit;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -53,5 +54,11 @@ public interface StackOverFlowFaqAPI {
                                                    @Query("site") String site,
                                                    @Query("page") int page,
                                                    @Query("pagesize") int pagesize);
+
+        @GET("/2.2/tags/{tag}/faq")
+        Observable<Response<StackOverFlowFAQ>> loadFAQ (@Path("tag") String tag,
+                                                        @Query("page") int page,
+                                                        @Query("pagesize") int pagesize,
+                                                        @Query("site") String site);
 
 }
