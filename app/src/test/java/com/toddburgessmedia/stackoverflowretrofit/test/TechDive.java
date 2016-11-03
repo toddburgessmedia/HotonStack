@@ -15,19 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.toddburgessmedia.stackoverflowretrofit;
+package com.toddburgessmedia.stackoverflowretrofit.test;
 
 import android.app.Application;
 
-import com.toddburgessmedia.stackoverflowretrofit.dagger.DaggerOkHttpComponent;
-import com.toddburgessmedia.stackoverflowretrofit.dagger.OKHttpModule;
-import com.toddburgessmedia.stackoverflowretrofit.dagger.OkHttpComponent;
+//import com.toddburgessmedia.stackoverflowretrofit.dagger.DaggerOkHttpComponent;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 27/10/16.
  */
 
-public class TechDiveTest extends Application {
+public class TechDive extends Application {
 
     private OkHttpComponent okHttpComponent;
 
@@ -38,6 +36,8 @@ public class TechDiveTest extends Application {
         okHttpComponent = DaggerOkHttpComponent.builder()
                 .oKHttpModule(new OKHttpModule(this))
                 .build();
+
+
     }
 
     public OkHttpComponent getOkHttpComponent() {

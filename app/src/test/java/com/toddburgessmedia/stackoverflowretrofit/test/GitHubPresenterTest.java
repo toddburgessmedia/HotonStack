@@ -19,8 +19,6 @@ package com.toddburgessmedia.stackoverflowretrofit.test;
 
 import com.toddburgessmedia.stackoverflowretrofit.BuildConfig;
 import com.toddburgessmedia.stackoverflowretrofit.GitHubActivity;
-import com.toddburgessmedia.stackoverflowretrofit.TechDive;
-import com.toddburgessmedia.stackoverflowretrofit.TechDiveTest;
 import com.toddburgessmedia.stackoverflowretrofit.eventbus.NoLanguageFoundMessage;
 import com.toddburgessmedia.stackoverflowretrofit.mvp.GitHubPresenter;
 
@@ -39,12 +37,14 @@ import static junit.framework.Assert.assertNotNull;
  */
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, application = TechDiveTest.class)
+@Config(constants = BuildConfig.class,
+        sdk = 21,
+        application = com.toddburgessmedia.stackoverflowretrofit.test.TechDive.class)
 public class GitHubPresenterTest {
 
     private GitHubActivity gitHubActivity;
     private GitHubPresenter presenter;
-    private TechDive techDive;
+    private com.toddburgessmedia.stackoverflowretrofit.TechDive techDive;
 
     @Before
     public void setUp() throws Exception {
@@ -73,6 +73,11 @@ public class GitHubPresenterTest {
 
         NoLanguageFoundMessage message = new NoLanguageFoundMessage(false);
         presenter.positiveClick(message);
+    }
+
+    @Test
+    public void fetchData() throws Exception {
+
     }
 
 }
