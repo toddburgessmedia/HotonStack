@@ -39,7 +39,6 @@ import android.widget.Toast;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnMenuTabSelectedListener;
 import com.toddburgessmedia.stackoverflowretrofit.GitHubActivity;
-import com.toddburgessmedia.stackoverflowretrofit.MainActivity;
 import com.toddburgessmedia.stackoverflowretrofit.MeetupActivity;
 import com.toddburgessmedia.stackoverflowretrofit.PreferencesActivity;
 import com.toddburgessmedia.stackoverflowretrofit.PrivacyPolicyActivity;
@@ -47,8 +46,8 @@ import com.toddburgessmedia.stackoverflowretrofit.R;
 import com.toddburgessmedia.stackoverflowretrofit.RecycleViewFAQ;
 import com.toddburgessmedia.stackoverflowretrofit.TechDive;
 import com.toddburgessmedia.stackoverflowretrofit.TimeDelay;
-import com.toddburgessmedia.stackoverflowretrofit.TimeFrameDialog;
-import com.toddburgessmedia.stackoverflowretrofit.eventbus.TimeFrameDialogMessage;
+import com.toddburgessmedia.stackoverflowretrofit.TimeFAQDialog;
+import com.toddburgessmedia.stackoverflowretrofit.eventbus.TimeFrameFAQMessage;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFAQ;
 import com.toddburgessmedia.stackoverflowretrofit.retrofit.StackOverFlowFaqAPI;
 
@@ -65,6 +64,8 @@ import retrofit2.Retrofit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+
+import static com.toddburgessmedia.stackoverflowretrofit.MainActivity.TAG;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 07/10/16.
@@ -123,6 +124,12 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
         EventBus.getDefault().unregister(this);
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated: Activity created!!!!");
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -177,6 +184,8 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
         super.onSaveInstanceState(outState);
     }
 
+
+
     private void createScrollChangeListener() {
         rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -198,8 +207,11 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
     }
 
 
-        @Override
+    @Override
     public void fetchRestSource() {
+
+        Log.d(TAG, "fetchRestSource: fetching ListQuestions.....");
+        Log.d(TAG, "fetchRestSource: " + searchtime);
 
         startProgressDialog();
         final StackOverFlowFaqAPI faqAPI = retrofit.create(StackOverFlowFaqAPI.class);
@@ -258,7 +270,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
 
     private Observable<Response<StackOverFlowFAQ>> getStackOverFlowFAQCall(String tag, StackOverFlowFaqAPI faqAPI) {
 
-        long secondsPassed;
+        long secondsPassed = -1;
         TimeDelay delay = new TimeDelay();
 
         if (listFAQ) {
@@ -279,9 +291,13 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISYEAR);
                 break;
             default:
-                return faqAPI.loadQuestionsObservable(tag, searchsite, pagecount, faqpagesize);
+                break;
         }
-        return faqAPI.loadQuestionsByDate(secondsPassed, tag, searchsite, pagecount, faqpagesize);
+        if (secondsPassed == -1) {
+            return faqAPI.loadQuestionsObservable(tag, searchsite, pagecount, faqpagesize);
+        } else {
+            return faqAPI.loadQuestionsByDate(secondsPassed, tag, searchsite, pagecount, faqpagesize);
+        }
     }
 
     void setTimeFrame() {
@@ -341,7 +357,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
 
         switch (item.getItemId()) {
             case (R.id.whatshot_timeframe):
-                TimeFrameDialog timeFrameDialog = new TimeFrameDialog();
+                TimeFAQDialog timeFrameDialog = new TimeFAQDialog();
                 timeFrameDialog.show(getActivity().getFragmentManager(),"timeframe");
                 return true;
 
@@ -390,7 +406,7 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
     }
 
     @Subscribe
-    public void positiveClick(TimeFrameDialogMessage message) {
+    public void positiveClick(TimeFrameFAQMessage message) {
 
         String[] what = getResources().getStringArray(R.array.time_dialog);
         int which = message.getPosition();
@@ -450,8 +466,8 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
 
         @Override
         public void onMenuItemSelected(@IdRes int menuItemId) {
-            Log.d(MainActivity.TAG, "onMenuItemSelected: " + menuItemId);
-            Log.d(MainActivity.TAG, "onMenuItemSelected: " + searchTag);
+            Log.d(TAG, "onMenuItemSelected: " + menuItemId);
+            Log.d(TAG, "onMenuItemSelected: " + searchTag);
             Intent i;
             switch (menuItemId) {
                 case R.id.faq_bottom_github:

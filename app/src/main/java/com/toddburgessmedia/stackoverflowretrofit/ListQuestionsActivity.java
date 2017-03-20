@@ -49,7 +49,7 @@ public class ListQuestionsActivity extends AppCompatActivity {
         ((TechDive) getApplication()).getOkHttpComponent().inject(this);
 
         if (savedInstanceState != null) {
-            presenter = (ListQuestionsPresenter) getSupportFragmentManager().getFragment(savedInstanceState, "presenter");
+            presenter = (ListQuestionsPresenter) getSupportFragmentManager().getFragment(savedInstanceState, "faqpresenter");
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.questions_framelayout, presenter);
             transaction.commit();
@@ -90,7 +90,7 @@ public class ListQuestionsActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        getSupportFragmentManager().putFragment(outState,"presenter",presenter);
+        getSupportFragmentManager().putFragment(outState,"faqpresenter",presenter);
         super.onSaveInstanceState(outState);
     }
 

@@ -29,6 +29,7 @@ import com.toddburgessmedia.stackoverflowretrofit.retrofit.Tag;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -117,7 +118,7 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
                     Intent i = new Intent(v.getContext(),ListQuestionsActivity.class);
                     i.putExtra("name",tag);
                     i.putExtra("sitename",sitename);
-                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    //i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     v.getContext().startActivity(i);
                 }
             };
@@ -224,7 +225,8 @@ public class RecyclerViewTagsAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public RecyclerViewTagsAdapter(List<Tag> tags, Context con) {
 
-        this.tagList = tags;
+        this.tagList = new ArrayList<>();
+        this.tagList.addAll(tags);
         this.context = con;
 
     }

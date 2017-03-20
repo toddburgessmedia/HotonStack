@@ -143,7 +143,8 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         if (savedInstanceState != null) {
-            restoreInstanceState(savedInstanceState);
+            //restoreInstanceState(savedInstanceState);
+            Log.d(TAG, "We made it");
             startPrefsObservables();
             return view;
         }
@@ -156,10 +157,13 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
 
     private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
         tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
+        Log.d(TAG, tags.toString());
+        Log.d(TAG, "Hello World");
         searchsite = savedInstanceState.getString("searchsite");
         tagcount = savedInstanceState.getInt("tagcount");
         pagecount = savedInstanceState.getInt("pagecount");
         tagsearch = savedInstanceState.getBoolean("tagsearch");
+        searchtime = savedInstanceState.getInt("searchtime");
         setSiteName();
         if (tags != null) {
             adapter = new RecyclerViewTagsAdapter(tags.tags, context);
@@ -205,11 +209,33 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         outState.putInt("tagcount", tagcount);
         outState.putInt("pagecount", pagecount);
         outState.putBoolean("tagsearch", tagsearch);
-
+        outState.putInt("searchtime", searchtime);
         super.onSaveInstanceState(outState);
     }
 
 
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        EventBus.getDefault().unregister(this);
+//        Log.d(TAG, "onPause: MainActivityPResenter");
+//    }
+
+
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (!EventBus.getDefault().isRegistered(this)) {
+//            EventBus.getDefault().register(this);
+//        }
+//        Log.d(TAG, "onResume: resuming MainActivityPresenter.......");
+//        Log.d(TAG, "onResume: " + searchtime);
+//        if (tags != null) {
+//            Log.d(TAG, "onResume: " + tags.tags.size());
+//        }
+//
+//    }
 
     private void startProgressDialog() {
 
@@ -268,6 +294,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
     @Override
     public void fetchRestSource() {
 
+//        Log.d(TAG, "fetchRestSource: fetching data.....");
         startProgressDialog();
         setSiteName();
 
@@ -310,7 +337,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
 
     private Observable<Response<StackOverFlowTags>> getStackOverFlowFAQCall(StackOverFlowAPI faqAPI) {
 
-        long secondsPassed;
+        long secondsPassed = -1;
         TimeDelay delay = new TimeDelay();
 
         String sort;
@@ -334,13 +361,17 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
                 secondsPassed = delay.getTimeDelay(TimeDelay.THISYEAR);
                 break;
             default:
-                if (searchtype.equals("Popularity")) {
-                    return faqAPI.loadquestionsObservable(tagcount, searchsite, pagecount);
-                } else {
-                    return faqAPI.loadquestionsActivityObservable(tagcount, searchsite, pagecount);
-                }
+                break;
         }
-        return faqAPI.loadsquestionsByDateObservable(tagcount, sort, searchsite, pagecount, secondsPassed);
+        if (secondsPassed == -1) {
+            if (searchtype.equals("Popularity")) {
+                return faqAPI.loadquestionsObservable(tagcount, searchsite, pagecount);
+            } else {
+                return faqAPI.loadquestionsActivityObservable(tagcount, searchsite, pagecount);
+            }
+        } else {
+            return faqAPI.loadsquestionsByDateObservable(tagcount, sort, searchsite, pagecount, secondsPassed);
+        }
     }
 
     @Override
@@ -575,6 +606,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
 
         }
         pagecount = 1;
+        tags.tags.clear();
         fetchRestSource();
 
     }

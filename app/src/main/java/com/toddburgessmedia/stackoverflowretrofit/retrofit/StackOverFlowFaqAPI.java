@@ -48,7 +48,7 @@ public interface StackOverFlowFaqAPI {
                                                              @Query("page") int page,
                                                              @Query("pagesize") int pagesize);
 
-        @GET("/2.2/questions?order=desc&sort=votes")
+        @GET("/2.2/questions?order=desc&sort=activity")
         Observable<Response<StackOverFlowFAQ>> loadQuestionsByDate (@Query("fromdate") long fromdate,
                                                    @Query("tagged") String tagged,
                                                    @Query("site") String site,
