@@ -26,7 +26,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -143,8 +142,7 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         rv.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         if (savedInstanceState != null) {
-            //restoreInstanceState(savedInstanceState);
-            Log.d(TAG, "We made it");
+            restoreInstanceState(savedInstanceState);
             startPrefsObservables();
             return view;
         }
@@ -157,8 +155,6 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
 
     private void restoreInstanceState(@Nullable Bundle savedInstanceState) {
         tags = (StackOverFlowTags) savedInstanceState.getSerializable("taglist");
-        Log.d(TAG, tags.toString());
-        Log.d(TAG, "Hello World");
         searchsite = savedInstanceState.getString("searchsite");
         tagcount = savedInstanceState.getInt("tagcount");
         pagecount = savedInstanceState.getInt("pagecount");
@@ -213,30 +209,6 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         super.onSaveInstanceState(outState);
     }
 
-
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        EventBus.getDefault().unregister(this);
-//        Log.d(TAG, "onPause: MainActivityPResenter");
-//    }
-
-
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (!EventBus.getDefault().isRegistered(this)) {
-//            EventBus.getDefault().register(this);
-//        }
-//        Log.d(TAG, "onResume: resuming MainActivityPresenter.......");
-//        Log.d(TAG, "onResume: " + searchtime);
-//        if (tags != null) {
-//            Log.d(TAG, "onResume: " + tags.tags.size());
-//        }
-//
-//    }
-
     private void startProgressDialog() {
 
         if (progress == null) {
@@ -271,7 +243,6 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
         String[] values = getResources().getStringArray(R.array.site_select_array);
         boolean found = false;
         int i = 0;
-        Log.d(TAG, "setSiteName: " + searchsite);
         while (!found) {
             if (values[i].equals(searchsite)) {
                 found = true;
@@ -294,7 +265,6 @@ public class MainActivityPresenter extends Fragment implements TechDiveMVP {
     @Override
     public void fetchRestSource() {
 
-//        Log.d(TAG, "fetchRestSource: fetching data.....");
         startProgressDialog();
         setSiteName();
 

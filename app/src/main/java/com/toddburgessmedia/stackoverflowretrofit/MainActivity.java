@@ -21,7 +21,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.toddburgessmedia.stackoverflowretrofit.mvp.MainActivityPresenter;
@@ -56,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         ((TechDive) getApplication()).getOkHttpComponent().inject(this);
 
         if (savedInstanceState != null) {
-            Log.d(TAG, "Restoring....");
             presenter = (MainActivityPresenter) getSupportFragmentManager().getFragment(savedInstanceState, "mainpresenter");
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.mainactivity_framelayout, presenter);
@@ -84,13 +82,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
 
         getSupportFragmentManager().putFragment(outState,"mainpresenter",presenter);
-        Log.d(TAG, "onSaveInstanceState: saving state.....");
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG, "Restoring....");
-    }
+
 }

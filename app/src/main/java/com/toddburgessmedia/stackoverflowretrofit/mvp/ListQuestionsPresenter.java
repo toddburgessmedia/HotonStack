@@ -27,7 +27,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -64,8 +63,6 @@ import retrofit2.Retrofit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-
-import static com.toddburgessmedia.stackoverflowretrofit.MainActivity.TAG;
 
 /**
  * Created by Todd Burgess (todd@toddburgessmedia.com on 07/10/16.
@@ -122,12 +119,6 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
         super.onDestroy();
 
         EventBus.getDefault().unregister(this);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated: Activity created!!!!");
     }
 
     @Nullable
@@ -209,9 +200,6 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
 
     @Override
     public void fetchRestSource() {
-
-        Log.d(TAG, "fetchRestSource: fetching ListQuestions.....");
-        Log.d(TAG, "fetchRestSource: " + searchtime);
 
         startProgressDialog();
         final StackOverFlowFaqAPI faqAPI = retrofit.create(StackOverFlowFaqAPI.class);
@@ -466,8 +454,6 @@ public class ListQuestionsPresenter extends Fragment implements TechDiveMVP {
 
         @Override
         public void onMenuItemSelected(@IdRes int menuItemId) {
-            Log.d(TAG, "onMenuItemSelected: " + menuItemId);
-            Log.d(TAG, "onMenuItemSelected: " + searchTag);
             Intent i;
             switch (menuItemId) {
                 case R.id.faq_bottom_github:
